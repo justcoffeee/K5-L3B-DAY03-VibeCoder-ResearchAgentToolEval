@@ -11,6 +11,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 import streamlit as st
 
@@ -26,8 +27,24 @@ LOGO_PATH = Path(__file__).resolve().parent / "assets" / "vinuni_logo.png"
 PROVIDERS = ["openrouter", "openai", "anthropic", "gemini", "ollama", "groq"]
 HISTORY_WINDOW = 5
 MAX_TOOL_ROUNDS = 4
-TELEGRAM_TOKEN_IN_URL = re.compile(r"bot\d+:[A-Za-z0-9_-]+")
-NO_DATA_MESSAGE = "Không có dữ liệu thật vì mọi tool đều lỗi, nên câu trả lời của model đã bị ẩn để tránh thông tin không có nguồn."
+REDACTED = "<redacted>"
+SECRET_ENV_NAME = re.compile(r"(_KEY|_TOKEN|_SECRET|_PASSWORD|^TELEGRAM_CHAT_ID)$")
+SECRET_FIELD_NAME = re.compile(r"(^|[-_])(api[-_]?key|authorization|password|secret|token)$", re.IGNORECASE)
+SECRET_PATTERNS = [
+    (re.compile(r"bot\d+:[A-Za-z0-9_-]+"), f"bot{REDACTED}"),
+    (re.compile(r"\b\d{6,}:[A-Za-z0-9_-]{30,}"), REDACTED),
+    (re.compile(r"\b(?:gsk_[A-Za-z0-9]{20,}|tvly-[A-Za-z0-9-]{20,}|fc-[A-Za-z0-9]{20,}|sk-(?:or-v1-|proj-|ant-)?[A-Za-z0-9]{20,})"), REDACTED),
+    (re.compile(r"(?i)\b(bearer\s+)[A-Za-z0-9._~+/=-]{8,}"), rf"\g<1>{REDACTED}"),
+    (re.compile(r"""(?i)\b(x-rapidapi-key|api[-_]?key|token)(['"]?\s*[:=]\s*['"]?)[^\s'"&,}]{8,}"""), rf"\g<1>\g<2>{REDACTED}"),
+]
+# Identified by the "tool" field of the result, which stays the same if a tool is renamed.
+# Add new tools that fetch outside data here, otherwise their answers count as unsourced.
+RETRIEVAL_TOOLS = {
+    "web_search", "get_user_tweets", "search_tweets", "read_url",
+    "search_company_policy", "arxiv_search", "get_arxiv_paper_text",
+}
+PRESENTATION_TOOLS = {"render_digest", "rank"}
+NO_DATA_MESSAGE = "Không có dữ liệu nguồn từ tool, nên câu trả lời của model đã bị ẩn để tránh thông tin không có nguồn."
 SEND_HOLD_STATUS = "awaiting_ui_confirmation"
 SEND_QUESTION = "Bạn kiểm tra nguyên văn nội dung bên dưới rồi bấm xác nhận để gửi lên Telegram."
 SAMPLE_QUESTIONS = [
@@ -66,9 +83,12 @@ PAGE_STYLE = """
 
 
 def hold_send(text: str = "", confirmed: Any = False) -> dict[str, Any]:
-    """Stop the agent loop before posting, so the user approves the exact text in the UI."""
-    if not confirmed:
-        return send_telegram(text=text, confirmed=False)
+    """Hold every post as a draft and stop the loop; only the UI button can really send it.
+
+    `confirmed` is accepted to match the tool schema, but the model's value is never trusted.
+    """
+    if not isinstance(text, str) or not text.strip():
+        return {"tool": "send_telegram", "error": "InvalidDraft", "message": "send needs non-empty text."}
     return {
         "tool": "send_telegram",
         "status": SEND_HOLD_STATUS,
@@ -85,20 +105,70 @@ def install_send_gate() -> None:
             TOOL_FUNCTIONS[name] = hold_send
 
 
-def redact(turn: dict[str, Any]) -> dict[str, Any]:
-    """Remove Telegram bot tokens, which appear in the URL of HTTP error messages."""
-    text = json.dumps(turn, ensure_ascii=False, default=str)
-    return json.loads(TELEGRAM_TOKEN_IN_URL.sub("bot<redacted>", text))
+def configured_secrets() -> list[str]:
+    values = {value for name, value in os.environ.items() if SECRET_ENV_NAME.search(name) and len(value) >= 8}
+    values |= {quote(value, safe="") for value in values}
+    return sorted(values, key=len, reverse=True)
+
+
+def scrub_text(text: str, secrets: list[str]) -> str:
+    for secret in secrets:
+        text = text.replace(secret, REDACTED)
+    for pattern, replacement in SECRET_PATTERNS:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def scrub(value: Any, secrets: list[str]) -> Any:
+    if isinstance(value, str):
+        return scrub_text(value, secrets)
+    if isinstance(value, list):
+        return [scrub(item, secrets) for item in value]
+    if isinstance(value, dict):
+        return {
+            scrub_text(str(key), secrets): REDACTED if SECRET_FIELD_NAME.search(str(key)) else scrub(item, secrets)
+            for key, item in value.items()
+        }
+    return value
+
+
+def sanitize(turn: dict[str, Any]) -> dict[str, Any]:
+    """Remove credentials from a turn. Every turn passes here before it is saved or rendered."""
+    return scrub(json.loads(json.dumps(turn, ensure_ascii=False, default=str)), configured_secrets())
+
+
+def result_of(event: dict[str, Any]) -> dict[str, Any]:
+    result = event.get("result")
+    return result if isinstance(result, dict) else {}
 
 
 def tool_failed(event: dict[str, Any]) -> bool:
-    result = event.get("result")
-    return isinstance(result, dict) and bool(result.get("error"))
+    return bool(result_of(event).get("error"))
 
 
-def all_tools_failed(turn: dict[str, Any]) -> bool:
+def retrieved_records(event: dict[str, Any]) -> list[dict[str, Any]]:
+    """Return the records of real source data; output of format or rank never counts."""
+    result = result_of(event)
+    if result.get("tool") not in RETRIEVAL_TOOLS or result.get("error"):
+        return []
+    records = [*(result.get("items") or []), *(result.get("results") or [])]
+    return [
+        record for record in records
+        if isinstance(record, dict) and (str(record.get("summary") or "").strip() or str(record.get("facts") or "").strip())
+    ]
+
+
+def answer_lacks_sources(turn: dict[str, Any]) -> bool:
+    """True when the turn tried to use tools for facts but got no source data."""
+    if turn["status"] == "waiting_for_user":
+        return False  # A question or a draft to approve is not a factual answer.
     events = turn["tool_events"]
-    return bool(events) and all(tool_failed(event) for event in events)
+    if any(retrieved_records(event) for event in events):
+        return False
+    return any(
+        tool_failed(event) or result_of(event).get("tool") in RETRIEVAL_TOOLS | PRESENTATION_TOOLS
+        for event in events
+    )
 
 
 def pending_send(turns: list[dict[str, Any]]) -> dict[str, Any] | None:
@@ -143,7 +213,7 @@ def start_session(provider_name: str, model: str | None, version: str) -> None:
 
 
 def save_turn(turn: dict[str, Any]) -> dict[str, Any]:
-    turn = redact(turn)
+    turn = sanitize(turn)
     st.session_state.transcript["turns"].append(turn)
     write_transcript(st.session_state.transcript_path, st.session_state.transcript)
     return turn
@@ -172,6 +242,8 @@ def run_turn(user_text: str) -> None:
             tools=state.openai_tools,
             model=state.model,
             max_tool_rounds=MAX_TOOL_ROUNDS,
+            rounds=turn["rounds"],
+            tool_events=turn["tool_events"],
         ))
     except Exception as exc:
         turn.update({"status": "provider_error", "error": f"{type(exc).__name__}: {exc}"})
@@ -179,9 +251,9 @@ def run_turn(user_text: str) -> None:
 
     turn = save_turn(turn)
     if turn["status"] != "provider_error":
-        # An answer written without any tool data must not become context for later turns.
-        answer = NO_DATA_MESSAGE if all_tools_failed(turn) else turn["assistant_text"]
-        state.history.append({"role": "user", "content": user_text})
+        # An answer written without source data must not become context for later turns.
+        answer = NO_DATA_MESSAGE if answer_lacks_sources(turn) else turn["assistant_text"]
+        state.history.append({"role": "user", "content": turn["user"]})
         state.history.append({"role": "assistant", "content": answer})
 
 
@@ -215,31 +287,31 @@ def resolve_send(event: dict[str, Any], approved: bool) -> None:
 def source_lines(turn: dict[str, Any]) -> list[str]:
     lines: dict[str, str] = {}
     for event in turn["tool_events"]:
-        result = event.get("result")
-        if not isinstance(result, dict) or tool_failed(event):
-            continue
-        for item in result.get("items") or []:
-            url = str(item.get("url") or "")
+        for record in retrieved_records(event):
+            url = str(record.get("url") or "")
             if url.startswith(("http://", "https://")):
-                title = re.sub(r"[\[\]]", "", str(item.get("title") or url))[:100]
-                lines.setdefault(url, f"- [{title}]({url}) · {item.get('source') or ''}")
-        for hit in result.get("results") or []:
-            label = f"{hit.get('title')} › {hit.get('section')}"
-            lines.setdefault(label, f"- {label} · hiệu lực {hit.get('effective_date')}")
+                title = re.sub(r"[\[\]]", "", str(record.get("title") or url))[:100]
+                lines.setdefault(url, f"- [{title}]({url}) · {record.get('source') or ''}")
+            elif record.get("section"):
+                label = f"{record.get('title')} › {record.get('section')}"
+                lines.setdefault(label, f"- {label} · hiệu lực {record.get('effective_date')}")
     return list(lines.values())
 
 
+def render_sources(turn: dict[str, Any]) -> None:
+    sources = source_lines(turn)
+    if sources:
+        st.markdown("**Nguồn**\n" + "\n".join(sources))
+
+
 def render_tool_event(event: dict[str, Any]) -> None:
-    result = event.get("result")
-    result = result if isinstance(result, dict) else {}
+    result = result_of(event)
     failed = tool_failed(event)
     args = json.dumps(event.get("args", {}), ensure_ascii=False, sort_keys=True)
     with st.expander(f"🔧 {event.get('tool')}({args})", expanded=failed):
         st.json(result)
     if failed:
         st.error(f"Tool `{event.get('tool')}` lỗi: {result['error']}: {result.get('message', '')}")
-    elif result.get("status") == "needs_confirmation":
-        st.warning("Tin chưa được gửi vì chưa có xác nhận.")
     elif result.get("status") == "sent":
         st.success("Đã gửi lên Telegram.")
 
@@ -252,11 +324,12 @@ def render_turn(turn: dict[str, Any]) -> None:
             render_tool_event(event)
         if turn["status"] == "provider_error":
             st.error(f"Lỗi provider: {turn['error']}")
+            render_sources(turn)
             return
         if turn["status"] == "ui_action":
             st.markdown(turn["assistant_text"])
             return
-        if all_tools_failed(turn):
+        if answer_lacks_sources(turn):
             st.error(NO_DATA_MESSAGE)
             return
         if any(tool_failed(event) for event in turn["tool_events"]):
@@ -266,20 +339,19 @@ def render_turn(turn: dict[str, Any]) -> None:
         if turn["status"] == "waiting_for_user":
             st.info("Agent đang chờ bạn trả lời.")
         st.markdown(turn["assistant_text"])
-        sources = source_lines(turn)
-        if sources:
-            st.markdown("**Nguồn**\n" + "\n".join(sources))
+        render_sources(turn)
 
 
-def render_send_confirmation(event: dict[str, Any]) -> None:
+def render_send_confirmation(event: dict[str, Any], turn_index: int) -> None:
+    # The turn index in the keys stops a click on an old draft from approving a newer one.
     with st.container(border=True):
         st.markdown("**Nội dung sẽ gửi lên Telegram**")
         st.text(event["result"]["text"])
         confirm, cancel = st.columns(2)
-        if confirm.button("Gửi đúng nội dung này", key="confirm_send", type="primary", use_container_width=True):
+        if confirm.button("Gửi đúng nội dung này", key=f"confirm_send_{turn_index}", type="primary", use_container_width=True):
             resolve_send(event, approved=True)
             st.rerun()
-        if cancel.button("Huỷ", key="cancel_send", use_container_width=True):
+        if cancel.button("Huỷ", key=f"cancel_send_{turn_index}", use_container_width=True):
             resolve_send(event, approved=False)
             st.rerun()
 
@@ -320,7 +392,7 @@ def main() -> None:
         render_turn(turn)
     held = pending_send(turns)
     if held:
-        render_send_confirmation(held)
+        render_send_confirmation(held, turns[-1]["turn_index"])
 
     sample = render_samples() if not turns else None
     typed = st.chat_input("Nhập yêu cầu research...")
@@ -333,4 +405,5 @@ def main() -> None:
         st.rerun()
 
 
-main()
+if __name__ == "__main__":
+    main()
