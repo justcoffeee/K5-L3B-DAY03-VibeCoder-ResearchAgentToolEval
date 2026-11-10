@@ -1,0 +1,20 @@
+{
+  "version": "v1",
+  "recorded_before_edit_at": "2026-11-10T23:38:49+07:00",
+  "changed_artifact": "system_prompt.md",
+  "hypothesis": "Chỉ dẫn đoán account/URL khi thiếu dữ kiện gây missing_info; thay bằng clarify cho đầu vào bắt buộc.",
+  "expected": "R10/R11 hỏi dữ kiện thiếu; dữ kiện đã có trong hội thoại được dùng tiếp.",
+  "target_cases": [
+    "R10_missing_handle",
+    "R11_missing_url",
+    "M01_clarify_then_fill",
+    "M04_clarify_then_url"
+  ],
+  "previous_run": "runs/v0_B_base_groq_20261110T175003235889.json",
+  "before_hashes": {
+    "system_prompt.md": "eb1c8179815bd79d34de7d326420bb99b3072e6e8ae96464c02d4411f905fc68",
+    "tools.yaml": "e69bc53ed8846a5c2192e950c539806a61a6902b718f06d6773db6a42e9b996c"
+  },
+  "integration": false,
+  "conditions": "RapidAPI subscription passed after v0; v0 had 7 tool errors. Same Groq/model; Telegram execution disabled; scorer unchanged."
+}
