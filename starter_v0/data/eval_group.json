@@ -1,7 +1,265 @@
 {
   "dataset_id": "day03_v2_research_group",
   "dataset_role": "group",
-  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
-  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "description": "10 case tự viết: 5 single-turn và 5 multi-turn. URL là nguồn thật; số stars trong G03 là dữ liệu kiểm thử giả lập.",
+  "allowed_failure_types": [
+    "wrong_tool",
+    "wrong_arg_value",
+    "wrong_boundary",
+    "unnecessary_tool",
+    "out_of_scope",
+    "missing_info"
+  ],
+  "cases": [
+    {
+      "id": "G01_rank_by_relevance",
+      "phase": "B",
+      "query": "Tôi đã thu thập 4 item:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework hỗ trợ xây dựng mô hình machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Thư viện tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Thư viện xử lý và phân tích dữ liệu dạng bảng.\nHãy dùng chủ đề 'machine learning' để xếp hạng theo độ liên quan và giữ 2 item phù hợp nhất. Chỉ xử lý dữ liệu đã cung cấp, chưa cần trình bày bản tin.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "query": "machine learning",
+              "criteria": "relevance",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Đã có danh sách và yêu cầu chọn top theo chủ đề thì gọi rank với relevance, không tìm kiếm hoặc format thêm."
+      }
+    },
+    {
+      "id": "G02_rank_recency_with_duplicate_sources",
+      "phase": "B",
+      "query": "Danh sách paper đã thu thập có các mục sau. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762?utm_source=newsletter; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762#abstract; published=2017-06-12.\n4. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n5. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nHãy lọc các URL trùng và giữ 3 paper mới nhất theo ngày published, xếp mới trước. Không tải hoặc đọc thêm nội dung.",
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "recency",
+              "top_k": 3
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Yêu cầu lọc trùng và ưu tiên ngày công bố phải gọi rank với recency và top_k=3. Kết quả lọc URL trùng cần được kiểm tra riêng bằng unit test."
+      }
+    },
+    {
+      "id": "G03_rank_repositories_by_popularity",
+      "phase": "B",
+      "query": "Đây là danh sách repo với số stars giả lập dùng riêng cho bài kiểm thử, không phải số stars hiện tại:\n1. title=PyTorch; url=https://github.com/pytorch/pytorch; stars=200.\n2. title=Transformers; url=https://github.com/huggingface/transformers; stars=500.\n3. title=NumPy; url=https://github.com/numpy/numpy; stars=100.\n4. title=pandas; url=https://github.com/pandas-dev/pandas; stars=50.\nDựa đúng vào dữ liệu tôi đã cung cấp, chọn và xếp hạng 2 repo phổ biến nhất theo số stars. Không truy cập GitHub để cập nhật số liệu.",
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "popularity",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Có dữ liệu stars sẵn thì gọi rank với popularity, không gọi lookup hoặc fetch để lấy lại số liệu."
+      }
+    },
+    {
+      "id": "G04_explain_rank_without_execution",
+      "phase": "B",
+      "query": "Giải thích ngắn gọn sự khác nhau giữa relevance, recency và popularity của tool rank. Tôi chỉ hỏi cách sử dụng, chưa yêu cầu xử lý danh sách nào.",
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "no_tool": true
+      },
+      "metadata": {
+        "what_it_tests": "Câu hỏi về cách dùng tool được trả lời trực tiếp, không gọi rank hoặc tool tìm kiếm."
+      }
+    },
+    {
+      "id": "G05_rank_missing_item_list",
+      "phase": "B",
+      "query": "Hãy lọc trùng danh sách kết quả của tôi rồi giữ 3 mục mới nhất. Danh sách nằm trong một file trên máy tôi, tôi chưa gửi file hoặc dán nội dung vào cuộc trò chuyện.",
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Chưa nhận được danh sách thì hỏi người dùng cung cấp dữ liệu, không tự tạo items hoặc tìm dữ liệu thay thế."
+      }
+    },
+    {
+      "id": "G06_rank_items_from_previous_turn",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Đây là danh sách paper. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n4. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nTôi muốn chọn một phần của danh sách."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn chọn bao nhiêu mục và ưu tiên theo tiêu chí nào?"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 2 paper mới nhất theo ngày published từ danh sách tôi vừa gửi. Chưa cần định dạng hoặc đọc paper."
+        }
+      ],
+      "failure_type": "missing_info",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "recency",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Sau khi người dùng bổ sung số lượng và tiêu chí, dùng danh sách ở lượt trước để gọi rank thay vì hỏi lại hoặc tìm kiếm."
+      }
+    },
+    {
+      "id": "G07_rank_corrected_criteria_and_limit",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Danh sách tài liệu gồm:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Xử lý và phân tích dữ liệu dạng bảng.\nTôi định lấy top 4 theo cách cân bằng, nhưng hãy chờ tôi chốt tiêu chí."
+        },
+        {
+          "role": "assistant",
+          "content": "Tôi đã nhận danh sách và sẽ chờ bạn chốt tiêu chí."
+        },
+        {
+          "role": "user",
+          "content": "Đổi lại: chỉ lấy 2 mục liên quan nhất tới từ khóa 'machine learning'. Bắt đầu xếp hạng bằng dữ liệu đã có, chưa cần trình bày."
+        }
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "query": "machine learning",
+              "criteria": "relevance",
+              "top_k": 2
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Yêu cầu mới thay balanced/top 4 bằng relevance/top 2 và bổ sung query, không giữ tham số đã bị sửa."
+      }
+    },
+    {
+      "id": "G08_search_before_rank_when_no_items",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tôi muốn có một danh sách tin nổi bật về chip AI."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn đã có danh sách tin để lựa chọn chưa?"
+        },
+        {
+          "role": "user",
+          "content": "Chưa có. Trước hết hãy tìm trên web 6 tin tức về chip AI trong tuần này. Chỉ xếp hạng ở bước sau khi đã có kết quả."
+        }
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week",
+              "max_results": 6
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Chưa có items thì tìm dữ liệu trước; lượt hiện tại chỉ gọi lookup, không gọi rank sớm bằng dữ liệu tự tạo."
+      }
+    },
+    {
+      "id": "G09_format_only_for_two_selected_items",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Tôi đã chọn xong hai mục tài liệu:\n1. title=Hugging Face Transformers Quantization; url=https://huggingface.co/docs/transformers/quantization/overview; summary=Tài liệu về lượng tử hóa mô hình.\n2. title=vLLM; url=https://docs.vllm.ai/en/latest/; summary=Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ.\nGiữ nguyên hai mục này và thứ tự của chúng."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn trình bày hai mục theo mẫu nào?"
+        },
+        {
+          "role": "user",
+          "content": "Dùng mẫu bullets. Chỉ trình bày lại, không chấm điểm, không lọc và không tìm thêm."
+        }
+      ],
+      "failure_type": "unnecessary_tool",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "bullets"
+            }
+          }
+        ]
+      },
+      "metadata": {
+        "what_it_tests": "Hai mục đã được chọn và yêu cầu chỉ trình bày thì gọi format, không thêm bước rank."
+      }
+    },
+    {
+      "id": "G10_cancel_publish_after_confirmation_question",
+      "phase": "B",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Soạn bản nháp Telegram với nội dung: Buổi đọc paper của nhóm bắt đầu lúc 19 giờ. Chưa gửi ngay."
+        },
+        {
+          "role": "assistant",
+          "content": "Bản nháp: Buổi đọc paper của nhóm bắt đầu lúc 19 giờ. Bạn xác nhận gửi nội dung này lên Telegram chứ?"
+        },
+        {
+          "role": "user",
+          "content": "Không gửi. Giữ nguyên bản nháp, không chỉnh sửa hay thực hiện hành động nào thêm."
+        }
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {
+        "no_tool": true
+      },
+      "metadata": {
+        "what_it_tests": "Người dùng từ chối xác nhận thì không gọi send và không gọi thêm tool xử lý nội dung."
+      }
+    }
+  ]
 }
