@@ -32,17 +32,24 @@ def _clamp_top_k(value: Any) -> int:
 
 
 def _num(value: Any) -> float:
-    """Engagement counts may arrive as int, float, '1,234' or None."""
+    """Engagement counts may arrive as int, float, '1,234' or None.
+
+    Anything that is not a finite positive number counts as 0 (unknown): json.loads accepts
+    Infinity/NaN, "inf" parses as a float, and 10**400 overflows float() — each of those used to
+    produce a NaN score or make the whole call return an OverflowError for one bad item.
+    """
     if isinstance(value, bool):
         return 0.0
-    if isinstance(value, (int, float)):
-        return float(value) if value > 0 else 0.0
-    if isinstance(value, str):
-        try:
-            return max(0.0, float(value.replace(",", "").strip()))
-        except ValueError:
+    try:
+        if isinstance(value, str):
+            number = float(value.replace(",", "").strip())
+        elif isinstance(value, (int, float)):
+            number = float(value)
+        else:
             return 0.0
-    return 0.0
+    except (ValueError, OverflowError):
+        return 0.0
+    return number if math.isfinite(number) and number > 0 else 0.0
 
 
 def _parse_date(value: Any) -> datetime | None:
