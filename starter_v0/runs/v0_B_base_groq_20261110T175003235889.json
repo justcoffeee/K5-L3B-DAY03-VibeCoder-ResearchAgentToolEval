@@ -1,0 +1,1491 @@
+{
+  "run_id": "v0_B_base_groq_20261110T175003235889",
+  "version": "v0",
+  "artifact_version": "v0+peb1c8179815b+te69bc53ed884",
+  "prompt_hash": "eb1c8179815bd79d34de7d326420bb99b3072e6e8ae96464c02d4411f905fc68",
+  "tools_hash": "e69bc53ed8846a5c2192e950c539806a61a6902b718f06d6773db6a42e9b996c",
+  "phase": "B",
+  "suite": "base",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "system_prompt": "artifacts\\system_prompt.md",
+  "tools": "artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_base.json",
+  "dataset_id": "day03_v2_research_base",
+  "dataset_role": "base",
+  "description": "Core eval cho research agent: routing đúng tool + đúng args, hỏi lại khi thiếu (ask_user), xác nhận trước khi gửi, và xử lý câu ngoài phạm vi / không cần tool. Chấm trên tool_calls + args (subset). KHÔNG sửa file này — chỉ thêm case vào eval_group.json.",
+  "generated_at": "2026-11-10T17:50:03",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 9,
+    "case_accuracy": 0.45,
+    "tool_routing_accuracy": 0.7,
+    "argument_accuracy": 0.45,
+    "multiturn_accuracy": 0.3333,
+    "failure_counts": {
+      "wrong_tool": 4,
+      "missing_info": 3,
+      "wrong_boundary": 1,
+      "out_of_scope": 1,
+      "wrong_arg_value": 2
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 6,
+      "missing_tool_call": 4,
+      "unexpected_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "R01_user_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_user_tweets_name_to_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Tin CỦA một người nổi tiếng → map tên Sam Altman thành handle sama rồi gọi get_user_tweets."
+      },
+      "input": "Tweet mới nhất của Sam Altman là gì?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "sama"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 1,
+              "screenname": "samaltman"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "screenname: expected 'sama', got 'samaltman'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 1,
+            "screenname": "samaltman"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=samaltman"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R02_search_tweets_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_search_tweets",
+        "difficulty": "easy",
+        "what_it_tests": "Tweet theo CHỦ ĐỀ → search_tweets, không phải get_user_tweets."
+      },
+      "input": "Mọi người đang bàn gì về GPT-5 trên Twitter?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "limit": 5,
+              "query": "GPT-5"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "limit": 5,
+            "query": "GPT-5"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R03_web_news_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_web_news",
+        "difficulty": "medium",
+        "what_it_tests": "Tin thời sự trên web → web_search topic=news, timeframe=day (hôm nay)."
+      },
+      "input": "Tin tức AI hôm nay có gì nổi bật?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "AI news today",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "query: expected 'AI', got 'AI news today'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "AI news today",
+            "timeframe": "day",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI news today",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "TI redefines embedded development with agentic AI in its CCStudio™ ecosystem, empowering engineers to accelerate innovation — TradingView News",
+                "url": "https://www.tradingview.com/news/prnewswire:ef3fcc43cc632:0-ti-redefines-embedded-development-with-agentic-ai-in-its-ccstudio-ecosystem-empowering-engineers-to-accelerate-innovation",
+                "source": "tradingview.com",
+                "summary": "DALLAS, Nov. 10, 2026 /PRNewswire/ -- Texas Instruments (TI) (Nasdaq: TXN) today announced significant enhancements to its CCStudio™ ecosystem, strengthening its agentic artificial intelligence (AI) capabilities in order to streamline embedded software development across microcontroller (MCU), wireless connectivity and radar applications. Moving beyond generative code assistance toward autonomous development, the CCStudio ecosystem's agentic AI framework injects device-specific knowledge [...] Enablement across TI's embedded processing portfolioAgentic AI capabilities in TI's CCStudio ecosystem are available today across its general-purpose and real-time MCUs, wireless connectivity devices, and radar systems-on-chip. With a modular architecture that spans task-specific skills, MCP server integrations and context injection, CCStudio tools are designed to continuously expand support for new devices, updated SDKs and emerging edge AI development workflows. [...] knowledge directly into the AI tools engineers already use, enabling them to accelerate complex design tasks from months to days and focus on system-level design and innovation. TI is showcasing these innovations at electronica 2026, Nov. 10-13, in Munich, Germany.",
+                "score": 0.5129823
+              },
+              {
+                "title": "All the latest updates on AI data centers | The Verge",
+                "url": "https://www.theverge.com/ai-artificial-intelligence/902546/data-centers-ai-energy-power-grids-controversy",
+                "source": "theverge.com",
+                "summary": "Read Article >\n “We are a data center first company,” AMD CEO Lisa Su says.\n ## OpenAI is stepping back from NDAs for data center projects\n\n  Following this week’s midterms where voters resoundingly voiced their opposition to data center expansion, OpenAI today announced new commitments to communities where it is working on data center projects, including that it won’t use non-disclosure agreements (NDAs) with public officials. [...] Many data center projects have come under scrutiny for relying on NDAs to hide discussions between developers and local officials. However, OpenAI says it is now allowing “only narrow protections covering legitimate security information, trade secrets, or proprietary or competitively sensitive information.” In October, Amazon announced it would no longer use NDAs with government agencies it works with on data center projects.\n\n  Read Article >\n This week in the big AI data center buildout. [...] At the same time, tech money has been pouring into many of these races. Leading the Future, a super PAC backed by venture capitalist Marc Andreessen and OpenAI President Greg Brockman, has already spent $45 million in a year. And Public First Action, an Anthropic-backed group that says it supports AI safeguards, says it’s raised $80 million. Both have funded Democratic and Republican-aligned groups. Other super PACs see an opportunity to push for stricter AI policies, like the recently",
+                "score": 0.58474547
+              },
+              {
+                "title": "TikTok updates its AI video ad tools | Social Media Today",
+                "url": "https://www.socialmediatoday.com/news/tiktok-updates-its-ai-video-ad-tools/874209",
+                "source": "socialmediatoday.com",
+                "summary": "TikTok has added some new elements to its artificial intelligence-powered Symphony ad creation tools, including advanced video generation using the latest models, an updated Symphony API and broader access to AI usage tokens.\n\nFirst, TikTok added more capacity to generate video ads using the latest Dreamina Seedance AI models within its Symphony Agent tool.\n\nTikTok Symphony update [...] TikTok said advertisers will now be able to upload up to 50 multimodal references (images, videos, and audio), up from 9 previously, while the updated Seedance models will now be able to generate up to 30 seconds of video for each prompt, up from a previous 15-second maximum.\n\nTikTok said the latest Dreamina Seedance model is also able to generate sharper, more realistic imagery and offer better lighting and character consistency across video frames. [...] The company also expanded access to its BytePlus tokens, which will enable more use of its Symphony tools for visual generation.\n\n“Starting November 9, advertisers outside North America can purchase BytePlus tokens to access Dreamina Seedance AI models through Symphony, enabling faster video generation, higher-quality output, and more formats,” TikTok said.\n\nBytePlus is the enterprise technology arm of TikTok parent company ByteDance, and it manages all of the company’s AI tools and systems.",
+                "score": 0.5266167
+              },
+              {
+                "title": "The BSO Meets AI, and Explores the Vitality of Classical Music Today | The Harvard Crimson",
+                "url": "https://www.thecrimson.com/article/2026/11/9/already-and-not-yet-tod-machover-bso-review",
+                "source": "thecrimson.com",
+                "summary": "At the center of Machover’s composition philosophy is his belief that classical music finds a natural extension and innovation in technology. He revealed in an interview with GBH music that the music he hears in his head is often beyond the scope of traditional instruments. Thus, alongside the MIT Media Lab, Machover has developed an audio AI that takes in the playing of the orchestra as input and produces live synthetic sounds that — as Machover puts it — “enhances” the orchestra. [...] From Oct. 22 to 24, the Boston Symphony Orchestra and conductor Kent Nagano performed “already and not yet: A world premiere by Tod Machover.” The headliner was a modern classical work: an onstage musical dialogue between the BSO and a live AI system. Beyond the philosophical implications of the concept, the performance struck at a key nerve of classical music culture — a delicate balancing of tradition and relevance. [...] The piece was divided into three movements. The first movement, “SMASH UP,” was, in Machover’s words, a “clash/crisis” without audible enhancement from the AI.\n\nThe second, “WAKE UP,” was an “awakening”: the AI slowly produced sound in response to various solo lines in the orchestra. Then the last movement, “STAND UP,” was a “depiction of democracy,” as the musicians and AI listened to one another and negotiated the final musical product.",
+                "score": 0.31341976
+              },
+              {
+                "title": "Is Ai Holdings (TSE:3076) Priced For Its Cash Flow Strength?",
+                "url": "https://sg.finance.yahoo.com/news/ai-holdings-tse-3076-priced-091344322.html",
+                "source": "sg.finance.yahoo.com",
+                "summary": "Simply Wall St Narratives for Ai Holdings pick up where the DCF puzzle leaves off and explain which combinations of future growth, profitability and earnings power would need to occur for Ai Holdings' share price to appear meaningfully higher or lower than it does today. Each narrative links its valuation view to a specific path for revenue expansion, margins and risk, giving you something concrete to compare against as new results and disclosures are released. [...] Simply Wall St.\n\n# Is Ai Holdings (TSE:3076) Priced For Its Cash Flow Strength?\n\nBailey Pemberton\n\n3 min read\n\n 3076.T\n\n  +1.17%\n 3076\n\nAi Holdings has delivered strong long term share gains, which naturally raises a question for anyone looking at the stock today. Are the cash flows that the business can generate enough to support the current price, or has sentiment moved ahead of the underlying numbers? [...] ### The Ai Holdings Narrative: What Would Justify Today's Price?",
+                "score": 0.19421494
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R04_read_url_routing",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_read_url",
+        "difficulty": "easy",
+        "what_it_tests": "Đã có link cụ thể → read_url, không phải web_search."
+      },
+      "input": "Tóm tắt bài này giúp mình: https://openai.com/blog/gpt-5",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://openai.com/blog/gpt-5"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://openai.com/blog/gpt-5"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://openai.com/blog/gpt-5",
+            "items": [
+              {
+                "title": "OpenAI",
+                "url": "https://openai.com/blog/gpt-5",
+                "source": "openai.com",
+                "summary": "OpenAI\n\n# 404\n\nSearch finds no result\n\nThe question still earns its keep\n\nAsk it a new way\n\nby [gpt-6-astra(opens in a new window)](https://chatgpt.com/?surface=work&model=gpt-6-astra-wm&openaicom-did=52cdc990-ae75-4748-bf07-215286d35858&openaicom_referred=true)"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R05_limit_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_limit",
+        "difficulty": "easy",
+        "what_it_tests": "Trích đúng limit=10 từ '10 tweet'."
+      },
+      "input": "Lấy 10 tweet mới nhất của Elon Musk",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 10
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 10,
+              "screenname": "elonmusk"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 10,
+            "screenname": "elonmusk"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R06_timeframe_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_timeframe",
+        "difficulty": "medium",
+        "what_it_tests": "'tuần này' → timeframe=week."
+      },
+      "input": "Tin công nghệ trong tuần này",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "technology news this week",
+              "timeframe": "week",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "technology news this week",
+            "timeframe": "week",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "technology news this week",
+            "topic": "news",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "WWT, Microsoft, AWS, Google and IFS: Top Tech News | Technology Magazine",
+                "url": "https://technologymagazine.com/news/wwt-microsoft-aws-google-and-ifs-top-tech-news-week-1-december",
+                "source": "technologymagazine.com",
+                "summary": "Top stories this week include WWT securing computing power, Q3 results from Microsoft, Amazon and the major cyberattack on European supermarket freezers\n\n## WWT-Backed Scheme to Unlock £225m of Compute for European AI\n\nWorld Wide Technology (WWT) plans to secure up to £225m (US$303m) worth of computing power hosted in Europe to supply a select group of growing AI startups over the next six years. [...] The programme has been set up to combat the growing divide in global compute capacity. According to WWT, only 2GW of AI compute capacity – around 5% of the global total – sit in the EU while the US has around 17 times as much with 36GW and China more than twice as much with 5GW. These figures point to a connectivity gap, which InfiniteAI aims to address.\n\nQuarterly earnings from Microsoft, Amazon and Google were released this week, indicating growth in the cloud market [...] ## Cloud Surges as AI CapEx Splits Microsoft, AWS and Google\n\nThe latest quarterly earnings reports from the world’s biggest technology companies have laid bare a defining inflection point for the sector.\n\nWhile enterprise adoption of AI continues to drive unprecedented revenue across cloud infrastructure, staggering capital expenditure and margin pressures are creating stark divides on Wall Street.",
+                "score": 0.8742601
+              },
+              {
+                "title": "SPS to tighten student tech policies this week for students in grades 3 to 5",
+                "url": "https://komonews.com/news/local/seattle-public-schools-ben-shuldiner-tighten-student-technology-policies-grades-3-to-5-screen-time-cap-minecraft-youtube-gemini-blocked-ai",
+                "source": "komonews.com",
+                "summary": "SEATTLE — Seattle Public Schools (SPS) is tightening its technology rules for some students this week, adding new limits aimed at reducing distractions and curbing reliance on generative AI tools.\n\nSuperintendent Ben Shuldiner said that when he arrived in Seattle, it was clear the district had “steered too heavily into an overreliance of technology.” [...] Under the changes, students in grades three through five will have a one-hour daily cap on screen time. The limit includes activities such as watching a 10-minute educational video.\n\nThe district will also no longer allow iPads and laptops to be used as incentives or rewards. In addition, Seattle Public Schools is blocking access to Minecraft, YouTube and Gemini, programs Shuldiner said have been \"abused.\" [...] RELATED | Seattle schools to cap elementary students' screen time, block unapproved AI tools\n\nParents have been asking the district to review how technology is used in classrooms, saying students are getting distracted or relying too heavily on generative AI tools.",
+                "score": 0.7742597
+              },
+              {
+                "title": "Tech set to still sway US stock market's course despite AI-driven swoon | Reuters",
+                "url": "https://www.reuters.com/business/tech-set-still-sway-us-stock-markets-course-despite-ai-driven-swoon-2026-11-09",
+                "source": "reuters.com",
+                "summary": "A month-long swoon in technology and AI-related stocks culminated this week in the biggest one-day drop for the S&P 500 technology sector in ‌over six years. Investors are concerned Democratic victories in the midterm elections would lead to slower data-center spending that has been at the heart of the market's rally.\n\nThe Reuters Daily Briefing newsletter provides all the news you need to start your day. Sign up here. [...] The P/E ratio for the overall S&P 500 stood at 17.9. This week marked the first time since 2017 that the tech sector's P/E has fallen below that of the broader market.\n\nThe drop in valuations means \"arguably ... the market is already pricing in a lot of bad news,\" said Keith Lerner, chief investment officer at Truist Advisory Services.\n\n\"We are moving toward a situation where a little good news could go a long way,\" Lerner ​said in a note on Thursday. [...] NEW YORK, Nov 9 (Reuters) - Even with the steep pullback in AI names, the US stock market is poised to rely on the performance of technology shares — and investors are on guard for obstacles that could trip up the ​trade in the coming weeks.",
+                "score": 0.7393665
+              },
+              {
+                "title": "Office Technology News Recap from The Cannata Report",
+                "url": "https://www.thecannatareport.com/office-technology-visualedge-kyocera",
+                "source": "thecannatareport.com",
+                "summary": "Kyocera sells its first TASKalfa Pro 15000b monochrome inkjet to Visual Edge IT.\n ConnectWise has launched the industry’s first agentic RMM.\n While two-thirds of TD Synnex partners are spending more on AI, related revenue lags.\n HP Inc. has appointed pharma exec Emma Walmsley as its new CEO.\n Docutrend, a dealer based in New Jersey, has acquired NYC’s American Copy Machines.\n VIDEO: Minnesota-based dealership Loffler Companies is celebrating its 40th anniversary. [...] Sustainability: Domino Printing Sciences rolls out low-VOC inks that contain no MEK.\n Can inflation return to the Fed’s 2% target? November’s “Economics Watch” provides insights.\n Ahead of Veterans Day this week, meet U.S. Navy captain and retired SEAL Tom Chaby. [...] PlanProphet is set to bring CRM and sales automation to printIQ and DocketManager’s clients.\n Lemhi has launched certified professional services automation (PSA) for ConnectWise platform.\n A new AI workspace inside Hatz Chat keeps context, files, and tools together—with built-in governance.\n Heidelberg celebrates first North American installation of the B3-format JetFire 50 inkjet system.\n Kodak blog explains why embracing inkjet imprinting is a process.",
+                "score": 0.6100127
+              },
+              {
+                "title": "Tech firms claw back some losses after midterms rout, eyes on Nvidia",
+                "url": "https://finance.yahoo.com/technology/articles/tech-firms-claw-back-losses-025428116.html",
+                "source": "finance.yahoo.com",
+                "summary": "That has led to speculation the new Congress will seek to wind in tech firms' construction drive, which could put thousands of jobs at risk.\n\nThe uncertainty comes with traders already nervous about when the hundreds of billions of dollars pumped into the sector would actually see a profit.\n\nAfter taking a lashing on Thursday, Wall Street enjoyed a little stability at the end of last week, and Asia -- which had suffered a hammering itself on Friday -- largely followed suit to start this week. [...] \"This will add risk to the stock as he is so important to the Nvidia story and strategy globally,\" Ives added. \"This will also increase major scrutiny regarding selling chips to China, which remains a key battleground issue in DC.\"\n\nInvestors will be keeping tabs this week on the release of fresh US inflation data, after figures Friday showed the economy created far more jobs than expected in October. [...] 1. Crypto\n2. AI\n\nTrending \n\n Nvidia CEO investigation\n AI selloff, explained\n iPhone settlement claims\n Fed rate hikes loom\n\nAFP\n\n# Tech firms claw back some losses after midterms rout, eyes on Nvidia\n\nAFP\n\n4 min read\n\n NVDA\n\n  +3.91%\n\n\n\n \n\nTech firms rose Monday to claw back some of last week's painful losses fuelled by AI regulation worries, though traders were keeping a wary eye on a probe into Nvidia boss Jensen Huang amid claims of an affair with a Chinese spy.",
+                "score": 0.5911811
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R07_search_type_arg",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "arg_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "'phổ biến/top' → search_type=Top (không phải Latest)."
+      },
+      "input": "Cho mình các tweet phổ biến (top) nhất về OpenAI",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "limit": 5,
+              "query": "OpenAI",
+              "search_type": "Top"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "limit": 5,
+            "query": "OpenAI",
+            "search_type": "Top"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R08_out_of_scope",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope",
+        "difficulty": "easy",
+        "what_it_tests": "Câu ngoài phạm vi research → KHÔNG gọi tool, từ chối/định hướng."
+      },
+      "input": "Giải giúp mình bài toán tích phân: nguyên hàm của x^2 là gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "∫ x² dx = (1/3) x³ + C, với C là hằng số bất kỳ.",
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R09_no_tool_capability",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "no_tool_meta",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi meta → trả lời thẳng, KHÔNG gọi tool."
+      },
+      "input": "Bạn là gì và làm được những gì?",
+      "expect": {
+        "no_tool": true,
+        "behavior": "answer_without_tool"
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Tôi là ChatGPT, một mô hình ngôn ngữ lớn được huấn luyện bởi OpenAI. Tôi có thể:\n\n- Trả lời câu hỏi và giải thích các khái niệm.\n- Viết, chỉnh sửa và biên tập văn bản (bài báo, thư, báo cáo, nội dung mạng xã hội, v.v.).\n- Tạo nội dung sáng tạo: câu chuyện, thơ, kịch bản, nội dung marketing, v.v.\n- Phân tích dữ liệu, tổng hợp thông tin và đưa ra khuyến nghị.\n- Dịch văn bản giữa nhiều ngôn ngữ.\n- Hỗ trợ lập kế hoạch, lập lịch, và quản lý công việc.\n- Tìm kiếm thông tin trên internet (bằng các công cụ tìm kiếm tích hợp).\n- Trả lời câu hỏi chuyên môn trong nhiều lĩnh vực: khoa học, công nghệ, kinh doanh, sức khỏe, nghệ thuật, v.v.\n- Tạo và chia sẻ nội dung trên các nền tảng mạng xã hội (đăng tweet, bài viết, v.v.) nếu được yêu cầu.\n\nNếu bạn cần bất kỳ trợ giúp nào, cứ nói ra – tôi sẽ làm ngay!",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "R10_missing_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_handle",
+        "difficulty": "medium",
+        "what_it_tests": "Thiếu handle → ask_user, KHÔNG đoán bừa người nào."
+      },
+      "input": "Tóm tắt 5 tweet mới nhất giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 5,
+              "screenname": "sama"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call timeline"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 5,
+            "screenname": "sama"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+          }
+        }
+      ]
+    },
+    {
+      "id": "R11_missing_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "clarify_missing_url",
+        "difficulty": "medium",
+        "what_it_tests": "Nói 'bài này' nhưng không có link → ask_user xin URL."
+      },
+      "input": "Tóm tắt bài viết này hộ mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://www.bbc.com/news/technology-66712345"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call fetch"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://www.bbc.com/news/technology-66712345"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://www.bbc.com/news/technology-66712345",
+            "items": [
+              {
+                "title": "BBC",
+                "url": "https://www.bbc.com/news/technology-66712345",
+                "source": "bbc.com",
+                "summary": "[Skip to content](https://www.bbc.com/news/technology-66712345#bbc-main)\n\nSite search\n\n[Home](https://www.bbc.com/)\n\nNews\n\n[Sport](https://www.bbc.com/sport)\n\nBusiness\n\nTechnology\n\n[Health](https://www.bbc.com/health)\n\nCulture\n\nArts\n\nTravel\n\nEarth\n\nAudio\n\nVideo\n\nLive\n\nDocumentaries\n\n[Weather](https://www.bbc.com/weather)\n\n[Newsletters](https://www.bbc.com/newsletters)\n\n[Watch Live](https://www.bbc.com/watch-live-news/)\n\n## Error 404 - Oops, the page you're looking for is no longer here\n\n# Try searching for it instead\n\nSite search\n\nWe can't find the page you're looking for. If you've typed the URL into your browser, check that you entered it correctly. If you reached this page via our site or search, please let us know by emailing\n\n[comhelp.bbc@bbc.com](mailto:comhelp.bbc@bbc.com)\n\n.\n\nOur team will investigate this feedback but will not reply directly.\n\n* * *\n\nMore from BBC\n\n[15 mins ago\\\\\n\\\\\n![An attendee in a purple tshirt holds a sign that says \"Yes on 40: save lives, tax billionaires\" during a rally in support of the wealth tax.](https://ichef.bbci.co.uk/news/480/cpsprodpb/8df3/live/53f86970-d7b4-11f1-9092-abeae3cab3b1.jpg.webp)\\\\\n\\\\\n**Californians reject wealth tax for billionaires**\\\\\n\\\\\nProposition 40 targeted Californian billionaires with a 5% tax on their total wealth, including assets such as shares as well as income. \\\\\n\\\\\n15 mins ago](https://www.bbc.com/news/articles/cq398em3032wo)\n\n[26 mins ago\\\\\n\\\\\n![Jemima Khan (L) and Russell Brand pictured at a press event at Cafe de Paris in London in June 2014](https://ichef.bbci.co.uk/news/480/cpsprodpb/fc6f/live/9dd1bab0-dc78-11f1-b23d-9526db010e6c.jpg.webp)\\\\\n\\\\\n**Russell Brand's ex Jemima Goldsmith accuses him of violence and abuse against her**\\\\\n\\\\\nGoldsmith accuses the disgraced entertainer of \"violence, coercive control and abuse\" while the two were together.\\\\\n\\\\\n26 mins ago](https://www.bbc.com/news/articles/c95ynylr8j6xo)\n\n[47 mins ago\\\\\n\\\\\n![President Donald Trump speaks in the James Brady Press Briefing Room at the White House Monday, Nov. 9, 2026,](https://ichef.bbci.co.uk/news/480/cpsprodpb/6017/live/b94816e0-dca5-11f1-b441-2b33b063138f.jpg.webp)\\\\\n\\\\\n**Trump says Iran war is 'effectively over' militarily with further strikes unlikely**\\\\\n\\\\\nThe president says the US is keeping \"status quo\" with Iran but remains “locked and loaded” should the situation in the Middle East change.\\\\\n\\\\\n47 mins ago](https://www.bbc.com/news/articles/cq5yny4nl2d3o)\n\n[1 hr ago\\\\\n\\\\\n![A woman wearing a red blazer, holding a microphone and gesturing, with a large image of the Qantas logo on the tail of a plane in the background](https://ichef.bbci.co.uk/news/480/cpsprodpb/47eb/live/926fac30-dca6-11f1-86c1-89409a3a3bd9.jpg.webp)\\\\\n\\\\\n**Qantas to outsource 850 local jobs with most roles moving to India**\\\\\n\\\\\nThe Australian airline said the move was aimed at modernising its IT systems and noted the impact of AI.\\\\\n\\\\\n1 hr ago](https://www.bbc.com/news/articles/cry838v4qzvyo)\n\n[2 hrs ago\\\\\n\\\\\n![An aerial view shows the Villa Vie Residences' cruise ship Odyssey docked at Sihanoukville port in Cambodia](https://ichef.bbci.co.uk/news/480/cpsprodpb/54ec/live/78680920-dca3-11f1-93a0-e3acb3757eea.jpg.webp)\\\\\n\\\\\n**'Cruise for life' ship seized in Singapore**\\\\\n\\\\\nIt comes weeks after the cruise came to a sudden end, leaving 200 guests stranded in Cambodia.\\\\\n\\\\\n2 hrs ago](https://www.bbc.com/news/articles/cqr7y7myer53o)\n\n[2 hrs ago\\\\\n\\\\\n![A composite image of Donald Trump on the right and Jensen Huang on the left](https://ichef.bbci.co.uk/news/480/cpsprodpb/f773/live/9c28e680-dc95-11f1-a701-fddedf244c16.jpg.webp)\\\\\n\\\\\n**Trump says FBI investigating Nvidia boss's affair with alleged Chinese spy**\\\\\n\\\\\nThe US president said he spoke with Jensen Huang on Monday and asked him about the affair with the alleged spy.\\\\\n\\\\\n2 hrs ago](https://www.bbc.com/news/articles/cqg7x7dpvym8o)\n\n[2 hrs ago\\\\\n\\\\\n![Thomas Massie (left) and Pete Hegseth](https://ichef.bbci.co.uk/news/480/cpsprodpb/0303/live/c8a877f0-"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R12_confirm_before_send",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "confirm_before_write",
+        "difficulty": "medium",
+        "what_it_tests": "Hành động ghi (gửi) → xác nhận trước (ask_user yes_no), không tự gửi."
+      },
+      "input": "Đăng bản tin này lên Telegram giúp mình",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 3,
+              "query": "AI breakthrough 2024",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call lookup"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 3,
+            "query": "AI breakthrough 2024",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI breakthrough 2024",
+            "topic": "news",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Microsoft opens Imagine Cup to startups, and the new rules show how its AI strategy has changed – GeekWire",
+                "url": "https://www.geekwire.com/2026/microsoft-opens-imagine-cup-to-startups-and-the-new-rules-show-how-its-ai-strategy-has-changed",
+                "source": "geekwire.com",
+                "summary": "Changing AI requirements: The clearest example is the Imagine Cup rules for AI usage. In 2024, entrants had to build their products with “Microsoft and/or OpenAI” services. In 2025, they had to use at least one Microsoft AI service. In 2026, they had to use at least two Microsoft AI services.\n\nFor 2027, they can use any AI they want, as long as they use Microsoft’s Azure cloud. [...] As recently as 2024, student teams couldn’t have raised more than $50,000 in outside funding to compete. Under the new rules, final-round judges, whose scores determine all of the winners, will look for net revenue retention over the previous 12 months, six months of traction data, and a customer reference willing to be contacted. [...] It’s the latest step in a broader evolution of the Imagine Cup, and the implications go beyond the competition itself. Changes in the rules from 2024 to 2027 show how Microsoft and the tech industry are adjusting, year by year, to the realities of the AI era.",
+                "score": 0.5715041
+              },
+              {
+                "title": "Alleged Chinese spy Alice Huang boasted about Nvidia AI chip access — as US officials grew concerned about smuggling",
+                "url": "https://nypost.com/2026/11/09/business/alleged-chinese-spy-alice-huang-boasted-about-nvidia-ai-chip-access-as-us-officials-grew-concerned-about-smuggling",
+                "source": "nypost.com",
+                "summary": "Huang Le and Jensen Huang are believed to have met in early 2024 during an Nvidia event in California. A widely circulated photo showed the duo sitting together at a bar in Taipei followed a trade show in June 2024.\n\nTheir public connection surfaced in May 2025, when the pair were seen with a group of other executives having dinner at a restaurant in Taiwan. They were seen leaving the event in the same car. [...] Huang Le and Jensen Huang are believed to have met in early 2024 during an Nvidia event in California. A widely circulated photo showed the duo sitting together at a bar in Taipei followed a trade show in June 2024.\n\nTheir public connection surfaced in May 2025, when the pair were seen with a group of other executives having dinner at a restaurant in Taiwan. They were seen leaving the event in the same car. [...] Meanwhile in early 2025, Huang reportedly boasted that her company had “no problem securing GPUs” and touted Chinese tech giant Alibaba as a customer while trying to secure an investment for a data center, the Financial Times reported.\n\nNVIDIA CEO Jensen Huang sitting with Alice Huang at an event during the COMPUTEX forum in Taipei.  4\n\nNVIDIA CEO Jensen Huang sits with Alice Huang at an event during the COMPUTEX forum in Taipei, Taiwan, in June 2024. Via Reuters",
+                "score": 0.35682812
+              },
+              {
+                "title": "Finpilot raises $10M for AI agents that handle the grunt work for institutional investors – GeekWire",
+                "url": "https://www.geekwire.com/2026/finpilot-raises-10m-for-ai-agents-that-handle-the-grunt-work-for-institutional-investors",
+                "source": "geekwire.com",
+                "summary": "It’s a change of course for the company. When GeekWire covered its seed round, Finpilot was building a ChatGPT-style tool for analysts researching public companies. It shifted to allocators in mid-2024, Chauhan said, after concluding that AI added only marginal value in public markets, where Bloomberg and S&P Capital IQ had already organized most of the data.\n\n“There’s no Bloomberg for what they do,” he said of allocators.",
+                "score": 0.3333952
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R13_parallel_web_and_tweets",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "parallel_tool_calls",
+        "difficulty": "hard",
+        "what_it_tests": "Một request cần hai nguồn → gọi cả web_search và search_tweets; eval không phụ thuộc thứ tự tool call."
+      },
+      "input": "Tìm trên web tin AI hôm nay và tìm thêm tweet về AI.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          },
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "AI news today",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "query: expected 'AI', got 'AI news today'",
+          "missing tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "AI news today",
+            "timeframe": "day",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI news today",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "TI redefines embedded development with agentic AI in its CCStudio™ ecosystem, empowering engineers to accelerate innovation — TradingView News",
+                "url": "https://www.tradingview.com/news/prnewswire:ef3fcc43cc632:0-ti-redefines-embedded-development-with-agentic-ai-in-its-ccstudio-ecosystem-empowering-engineers-to-accelerate-innovation",
+                "source": "tradingview.com",
+                "summary": "DALLAS, Nov. 10, 2026 /PRNewswire/ -- Texas Instruments (TI) (Nasdaq: TXN) today announced significant enhancements to its CCStudio™ ecosystem, strengthening its agentic artificial intelligence (AI) capabilities in order to streamline embedded software development across microcontroller (MCU), wireless connectivity and radar applications. Moving beyond generative code assistance toward autonomous development, the CCStudio ecosystem's agentic AI framework injects device-specific knowledge [...] Enablement across TI's embedded processing portfolioAgentic AI capabilities in TI's CCStudio ecosystem are available today across its general-purpose and real-time MCUs, wireless connectivity devices, and radar systems-on-chip. With a modular architecture that spans task-specific skills, MCP server integrations and context injection, CCStudio tools are designed to continuously expand support for new devices, updated SDKs and emerging edge AI development workflows. [...] knowledge directly into the AI tools engineers already use, enabling them to accelerate complex design tasks from months to days and focus on system-level design and innovation. TI is showcasing these innovations at electronica 2026, Nov. 10-13, in Munich, Germany.",
+                "score": 0.5129823
+              },
+              {
+                "title": "All the latest updates on AI data centers | The Verge",
+                "url": "https://www.theverge.com/ai-artificial-intelligence/902546/data-centers-ai-energy-power-grids-controversy",
+                "source": "theverge.com",
+                "summary": "Read Article >\n “We are a data center first company,” AMD CEO Lisa Su says.\n ## OpenAI is stepping back from NDAs for data center projects\n\n  Following this week’s midterms where voters resoundingly voiced their opposition to data center expansion, OpenAI today announced new commitments to communities where it is working on data center projects, including that it won’t use non-disclosure agreements (NDAs) with public officials. [...] Many data center projects have come under scrutiny for relying on NDAs to hide discussions between developers and local officials. However, OpenAI says it is now allowing “only narrow protections covering legitimate security information, trade secrets, or proprietary or competitively sensitive information.” In October, Amazon announced it would no longer use NDAs with government agencies it works with on data center projects.\n\n  Read Article >\n This week in the big AI data center buildout. [...] At the same time, tech money has been pouring into many of these races. Leading the Future, a super PAC backed by venture capitalist Marc Andreessen and OpenAI President Greg Brockman, has already spent $45 million in a year. And Public First Action, an Anthropic-backed group that says it supports AI safeguards, says it’s raised $80 million. Both have funded Democratic and Republican-aligned groups. Other super PACs see an opportunity to push for stricter AI policies, like the recently",
+                "score": 0.58474547
+              },
+              {
+                "title": "TikTok updates its AI video ad tools | Social Media Today",
+                "url": "https://www.socialmediatoday.com/news/tiktok-updates-its-ai-video-ad-tools/874209",
+                "source": "socialmediatoday.com",
+                "summary": "TikTok has added some new elements to its artificial intelligence-powered Symphony ad creation tools, including advanced video generation using the latest models, an updated Symphony API and broader access to AI usage tokens.\n\nFirst, TikTok added more capacity to generate video ads using the latest Dreamina Seedance AI models within its Symphony Agent tool.\n\nTikTok Symphony update [...] TikTok said advertisers will now be able to upload up to 50 multimodal references (images, videos, and audio), up from 9 previously, while the updated Seedance models will now be able to generate up to 30 seconds of video for each prompt, up from a previous 15-second maximum.\n\nTikTok said the latest Dreamina Seedance model is also able to generate sharper, more realistic imagery and offer better lighting and character consistency across video frames. [...] The company also expanded access to its BytePlus tokens, which will enable more use of its Symphony tools for visual generation.\n\n“Starting November 9, advertisers outside North America can purchase BytePlus tokens to access Dreamina Seedance AI models through Symphony, enabling faster video generation, higher-quality output, and more formats,” TikTok said.\n\nBytePlus is the enterprise technology arm of TikTok parent company ByteDance, and it manages all of the company’s AI tools and systems.",
+                "score": 0.5266167
+              },
+              {
+                "title": "The BSO Meets AI, and Explores the Vitality of Classical Music Today | The Harvard Crimson",
+                "url": "https://www.thecrimson.com/article/2026/11/9/already-and-not-yet-tod-machover-bso-review",
+                "source": "thecrimson.com",
+                "summary": "At the center of Machover’s composition philosophy is his belief that classical music finds a natural extension and innovation in technology. He revealed in an interview with GBH music that the music he hears in his head is often beyond the scope of traditional instruments. Thus, alongside the MIT Media Lab, Machover has developed an audio AI that takes in the playing of the orchestra as input and produces live synthetic sounds that — as Machover puts it — “enhances” the orchestra. [...] From Oct. 22 to 24, the Boston Symphony Orchestra and conductor Kent Nagano performed “already and not yet: A world premiere by Tod Machover.” The headliner was a modern classical work: an onstage musical dialogue between the BSO and a live AI system. Beyond the philosophical implications of the concept, the performance struck at a key nerve of classical music culture — a delicate balancing of tradition and relevance. [...] The piece was divided into three movements. The first movement, “SMASH UP,” was, in Machover’s words, a “clash/crisis” without audible enhancement from the AI.\n\nThe second, “WAKE UP,” was an “awakening”: the AI slowly produced sound in response to various solo lines in the orchestra. Then the last movement, “STAND UP,” was a “depiction of democracy,” as the musicians and AI listened to one another and negotiated the final musical product.",
+                "score": 0.31341976
+              },
+              {
+                "title": "Is Ai Holdings (TSE:3076) Priced For Its Cash Flow Strength?",
+                "url": "https://sg.finance.yahoo.com/news/ai-holdings-tse-3076-priced-091344322.html",
+                "source": "sg.finance.yahoo.com",
+                "summary": "Simply Wall St Narratives for Ai Holdings pick up where the DCF puzzle leaves off and explain which combinations of future growth, profitability and earnings power would need to occur for Ai Holdings' share price to appear meaningfully higher or lower than it does today. Each narrative links its valuation view to a specific path for revenue expansion, margins and risk, giving you something concrete to compare against as new results and disclosures are released. [...] Simply Wall St.\n\n# Is Ai Holdings (TSE:3076) Priced For Its Cash Flow Strength?\n\nBailey Pemberton\n\n3 min read\n\n 3076.T\n\n  +1.17%\n 3076\n\nAi Holdings has delivered strong long term share gains, which naturally raises a question for anyone looking at the stock today. Are the cash flows that the business can generate enough to support the current price, or has sentiment moved ahead of the underlying numbers? [...] ### The Ai Holdings Narrative: What Would Justify Today's Price?",
+                "score": 0.19421494
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "R14_out_of_scope_coding",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "out_of_scope_coding",
+        "difficulty": "easy",
+        "what_it_tests": "Câu coding ngoài phạm vi research/news → KHÔNG gọi tool."
+      },
+      "input": "Viết giúp mình một hàm Python tính Fibonacci bằng recursion.",
+      "expect": {
+        "no_tool": true,
+        "behavior": "refuse"
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "def fibonacci(n):\n    \"\"\"Return the nth Fibonacci number using recursion.\n\n    Parameters\n    ----------\n    n : int\n        The position in the Fibonacci sequence (0-indexed). Must be non‑negative.\n\n    Returns\n    -------\n    int\n        The nth Fibonacci number.\n\n    Raises\n    ------\n    ValueError\n        If n is negative.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non‑negative integer\")\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "out_of_scope",
+        "observed_mismatch": "unexpected_tool_call",
+        "failure_type": "out_of_scope",
+        "failures": [
+          "expected no tool call"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "def fibonacci(n):\n    \"\"\"Return the nth Fibonacci number using recursion.\n\n    Parameters\n    ----------\n    n : int\n        The position in the Fibonacci sequence (0-indexed). Must be non‑negative.\n\n    Returns\n    -------\n    int\n        The nth Fibonacci number.\n\n    Raises\n    ------\n    ValueError\n        If n is negative.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non‑negative integer\")\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n"
+          },
+          "result": {
+            "tool": "send_telegram",
+            "status": "needs_confirmation",
+            "message": "Only send after the user explicitly confirms."
+          }
+        }
+      ]
+    },
+    {
+      "id": "M01_clarify_then_fill",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_fill",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: carry limit=5 từ lượt 1 + map tên Elon Musk thành handle elonmusk từ lượt 2."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt 5 tweet mới nhất giúp mình"
+        },
+        {
+          "role": "user",
+          "content": "Của Elon Musk nhé"
+        },
+        {
+          "role": "user",
+          "content": "Giữ đúng 5 tweet, đừng đổi số lượng"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 5
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "headline": "Latest 5 tweets from @elonmusk",
+              "items": [
+                {
+                  "section": "",
+                  "source": "",
+                  "summary": "",
+                  "title": ""
+                }
+              ],
+              "template": "bullets"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call timeline",
+          "extra tool call format"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "headline": "Latest 5 tweets from @elonmusk",
+            "items": [
+              {
+                "section": "",
+                "source": "",
+                "summary": "",
+                "title": ""
+              }
+            ],
+            "template": "bullets"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "bullets",
+            "markdown": "-  - ",
+            "item_count": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "M02_carryover_timeframe",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_carryover",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: chỉ xử lý latest turn, carry timeframe=day và topic=news, query robotics."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tin AI hôm nay có gì?"
+        },
+        {
+          "role": "user",
+          "content": "Còn về robotics thì sao?"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ tìm robotics thôi, vẫn là tin hôm nay"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "robotics",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "robotics news today",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "query: expected 'robotics', got 'robotics news today'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "robotics news today",
+            "timeframe": "day",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "robotics news today",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Cowin Robotics wins robot system order from global ESS company",
+                "url": "https://www.digitaltoday.co.kr/en/view/123676/cowin-robotics-wins-robot-system-order-from-global-ess-company",
+                "source": "digitaltoday.co.kr",
+                "summary": "Writer Daegeon Seok\n published 2026-11-10 15:24:02\n\nLink copied to clipboard.\n\nCowin Robotics' \"AI-based robot simulation\" system. (Photo: Cowin Robotics)\n\nCowin Robotics said on Nov. 10 it has won a new order for a robot integration system from a global energy storage system (ESS) company. The system will be deployed at the customer’s mid- to large-sized ESS manufacturing line. It did not disclose the counterparty or contract value for business reasons. [...] ## Generating... AI Summary Cowin Robotics said on Nov. 10 it won a new order for a robot integration system from a global energy storage system (ESS) company. The system will be deployed at the customer’s mid- to large-sized ESS manufacturing line. The company did not disclose the counterparty or contract value for business reasons. Cowin Robotics said ESS-related robot orders have continued this year and it is discussing supplying robot systems to other gigafactories the customer is expanding [...] Cowin Robotics said it has continued to win ESS robot orders this year. In March, it won an order worth 20.4 billion won from Seojin System for ESS robots destined for the United States, and in August it agreed, via DFS, to supply robots worth 8.5 billion won for a domestic ESS manufacturing line. The company said it is discussing ways to supply robot systems to other gigafactories the customer is expanding in North America.",
+                "score": 0.79080546
+              },
+              {
+                "title": "Geek+ Unveils 24/7 Warehouse Autonomy Plan to Advance Self-Optimizing, Around-the-Clock Operation — TradingView News",
+                "url": "https://www.tradingview.com/news/eqs:406e145a7094b:0-geek-unveils-24-7-warehouse-autonomy-plan-to-advance-self-optimizing-around-the-clock-operation",
+                "source": "tradingview.com",
+                "summary": "BEIJING, Nov. 12, 2026 — Geekplus (HKEX: 2590), a global leader in intelligent robotics, today announced its 24/7 Warehouse Autonomy Plan, a strategic roadmap for warehouses that can operate around the clock with increasing autonomy—and continue to improve through real-world experience. [...] BEIJING, Nov. 12, 2026 — Geekplus (HKEX: 2590), a global leader in intelligent robotics, today announced its 24/7 Warehouse Autonomy Plan, a strategic roadmap for warehouses that can operate around the clock with increasing autonomy—and continue to improve through real-world experience. [...] Physical AI is extending robotics beyond highly structured material-handling tasks into more complex manipulation and exception handling. Meanwhile, advances in AI are bringing greater intelligence to robot fleet coordination, warehouse workflows and day-to-day operations. Together, these developments are laying the groundwork for a new operating model: autonomous warehousing.",
+                "score": 0.77096564
+              },
+              {
+                "title": "FF EAI Robotics Ecosystem (FFR) Announces Third Quarter 2026 Earnings Release Date and Conference Call Details to be Held on November 12, 2026 | The Manila Times",
+                "url": "https://www.manilatimes.net/2026/11/10/tmt-newswire/pr-newswire/ff-eai-robotics-ecosystem-ffr-announces-third-quarter-2026-earnings-release-date-and-conference-call-details-to-be-held-on-november-12-2026/2465915",
+                "source": "manilatimes.net",
+                "summary": "LOS ANGELES, Nov. 10, 2026 /PRNewswire/ -- FF EAI Robotics Ecosystem Inc. (NASDAQ: FFR) (\"FFR\" or the \"Company\") a U.S.-based Embodied AI robotics company, today announced that it is scheduled to report its third quarter financial results on Thursday, November 12, 2026. The Company will host an earnings call at 4:00 p.m. Pacific Time (7:00 p.m. Eastern Time) that same day after the close of the market.\n\n[No Image](\n\nFF EAI Robotics Ecosystem Inc. [...] The Manila Times\n\nTuesday, November 10, 2026  \n Today's Paper\n\nThe Manila Times \n\nFF EAI Robotics Ecosystem (FFR) Announces Third Quarter 2026 Earnings Release Date and Conference Call Details to be Held on November 12, 2026\n\nUser\n\nSign In\n\nNew user? Sign Up\n\nyoutube   tiktok   messenger   threads   x   facebook   Subscribe \n\nUser\n\nSign In\n\nNew user? Sign Up\n\nThe Manila Times\n\nOPINION\n\nNEWS\n\nREGIONS\n\nWORLD\n\nBUSINESS\n\nSPORTS\n\nENTERTAINMENT\n\nLIFESTYLE\n\nTHE SUNDAY TIMES\n\nSPECIAL FEATURES [...] This press release contains \"forward-looking statements\" within the meaning of the safe harbor provisions of the Private Securities Litigation Reform Act of 1995, as amended, and other applicable securities laws. Statements other than historical facts, including statements regarding the standalone full-year 2026 guidance for the acquired robotics business, expected sales and shipments, projected revenue and unit sales under the five-year business plan, expected gross margins, planned",
+                "score": 0.6907474
+              },
+              {
+                "title": "Berkshire Grey expands warehouse robotics AI with BG Pilot",
+                "url": "https://roboticsandautomationnews.com/2026/11/09/berkshire-grey-unveils-enhanced-ai-capabilities-powered-by-bg-pilot-software/106852",
+                "source": "roboticsandautomationnews.com",
+                "summary": "Skip to primary navigation\n Skip to primary sidebar\n Skip to secondary sidebar\n\nRobotics & Automation News\n\nHuman judgment in the AI era\n\n# Berkshire Grey unveils enhanced AI capabilities powered by BG Pilot software\n\nby Sam Francis\n\nBerkshire Grey, a wholly owned subsidiary of SoftBank Group, has announced new AI-enabled enhancements across its robotic automation portfolio, powered by BG Pilot software (BG Pilot), the company’s unified AI software platform.",
+                "score": 0.6892434
+              },
+              {
+                "title": "Ubtech Robotics Ties Sales Pact With Tianyi Telecom to a Factory Already Running",
+                "url": "https://www.ad-hoc-news.de/boerse/news/unternehmensnachrichten/ubtech-robotics-ties-sales-pact-with-tianyi-telecom-to-a-factory-already-running/70482034",
+                "source": "ad-hoc-news.de",
+                "summary": "Ubtech Robotics Illustration mit AI erstellt.\n\nUbtech Robotics Illustration mit AI erstellt.\n\nUbtech Robotics has signed a distribution agreement with Tianyi Telecom Terminal that will put its robots in front of retail customers, just as the company's intelligent factory ramps up output. The deal, inked today, covers joint procurement, rental and service packages, and live demonstrations inside telecom stores. [...] Simulation is the other thread. On 2 November, Ubtech introduced Thinker-Sim, a platform for digitising real environments, generating synthetic data and evaluating robot capabilities. The approach, labelled Real2Sim2Real, links real scenes with simulation. A compute node with eight graphics processors can produce 390 hours of simulation data per day, according to media reports — covering both the creation of test environments and the subsequent assessment of what the robots can do. [...] Execution is what counts from here. The new distribution agreement strengthens Ubtech's access to potential buyers, provided successful demonstrations and application tests translate into recurring demand. That is where the economic weight of today's partnership will be decided.\n\nAd\n\nUbtech Robotics Stock: New Analysis - 9 November\n\nFresh Ubtech Robotics information released. What's the impact for investors? Our latest independent report examines recent figures and market trends.",
+                "score": 0.68344116
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M03_correction_handle",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên thường, sửa Sam Altman→Andrej Karpathy, dùng handle karpathy và limit=3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tweet mới nhất của Sam Altman"
+        },
+        {
+          "role": "user",
+          "content": "À nhầm, của Andrej Karpathy"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 3 tweet mới nhất nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 3,
+              "screenname": "karpathy"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 3,
+            "screenname": "karpathy"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M04_clarify_then_url",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_clarify_url",
+        "difficulty": "medium",
+        "what_it_tests": "3 turns: sau khi được cung cấp URL, latest turn xác nhận chỉ đọc link đó → read_url đúng url."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tóm tắt bài này hộ mình"
+        },
+        {
+          "role": "user",
+          "content": "https://anthropic.com/news/claude"
+        },
+        {
+          "role": "user",
+          "content": "Chỉ đọc đúng link đó thôi"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "fetch",
+            "args": {
+              "url": "https://anthropic.com/news/claude"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "fetch",
+          "args": {
+            "url": "https://anthropic.com/news/claude"
+          },
+          "result": {
+            "tool": "read_url",
+            "url": "https://anthropic.com/news/claude",
+            "items": [
+              {
+                "title": "https://anthropic.com/news/claude",
+                "url": "https://anthropic.com/news/claude",
+                "source": "anthropic.com",
+                "summary": "[Skip to main content](https://www.anthropic.com/news/claude#main-content)\n\nA 404 poem byClaude Fable 5Claude Opus 5.5Claude Sonnet 5.5Claude Haiku 5.5\n\nYou came"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "M05_correction_limit",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_arg_correction",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: map tên Elon Musk, carry handle elonmusk, sửa limit 10→3."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Lấy 10 tweet mới nhất của Elon Musk"
+        },
+        {
+          "role": "user",
+          "content": "Cho mình 3 thôi"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn của Elon Musk nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "elonmusk",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 10,
+              "screenname": "elonmusk"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_arg_value",
+        "failures": [
+          "limit: expected 3, got 10"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "timeline",
+          "args": {
+            "limit": 10,
+            "screenname": "elonmusk"
+          },
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ]
+    },
+    {
+      "id": "M06_switch_tool",
+      "phase": "B",
+      "suite": "base",
+      "case_suite": "base",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_switch_tool",
+        "difficulty": "hard",
+        "what_it_tests": "3 turns: explicitly bỏ Twitter, chuyển sang web_search news, giữ chủ đề OpenAI."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mọi người nói gì về OpenAI trên Twitter?"
+        },
+        {
+          "role": "user",
+          "content": "Bỏ Twitter, chuyển sang tìm trên web tin tức đi"
+        },
+        {
+          "role": "user",
+          "content": "Giữ chủ đề OpenAI"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "OpenAI",
+              "topic": "news"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "OpenAI news",
+              "timeframe": "month",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "query: expected 'OpenAI', got 'OpenAI news'"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "OpenAI news",
+            "timeframe": "month",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "OpenAI news",
+            "topic": "news",
+            "timeframe": "month",
+            "items": [
+              {
+                "title": "OpenAI",
+                "url": "https://tavily.com/knowledge/company/p4PyTakV77G9",
+                "source": "tavily.com",
+                "summary": "# OpenAI\nID: p4PyTakV77G9\nWebsite: www.openai.com\nHeadquarters: San Francisco, CA, United States\nLinkedIn: www.linkedin.com/company/openai · 11,529,792 followers\nIndustry: Research Services\nIndustry codes: SIC 87, 873, NAICS 54, 541\nCompany type: Partnership\nSocial profiles: www.facebook.com/openai, www.twitter.com/openai, www.crunchbase.com/organization/openai, www.instagram.com/openai.gpt, www.instagram.com/openai, www.youtube.com/@openai, www.youtube.com/openai, github.com/openai [...] ## M&A\n- Ona (2026-06-01)\n- Tomoro AI (2026-05-01)\n- Hiro Finance (2026-04-01)\n- TBPN (2026-04-01)\n- Promptfoo, Inc. (2026-03-01)\n- Astral Software Inc (2026-03-01)\n- OpenClaw (2026-02-01)\n- Torch Health Inc (2026-01-01): 100.00M USD [...] - Secondary Market 2023-08-01\n- Venture Round 2023-04-01 300.00M USD\n- Venture Round 2023-01-01 10.00B USD\n- Secondary Market 2022-01-01\n- Secondary Market 2021-01-01\n- Venture Round 2019-07-01 1.00B USD\n- Seed Round 2019-03-01 50.00M USD\n- Seed Round 2016-01-01\n- Grant 2015-12-01 1.00B USD",
+                "score": 0.73138535
+              },
+              {
+                "title": "OpenAI to acquire Pierre Computer Company, Inc.",
+                "url": "https://openai.com/index/openai-to-acquire-pierre",
+                "source": "openai.com",
+                "summary": "Today we're announcing that OpenAI will acquire Pierre Computer Company, Inc⁠(opens in a new window). (“Pierre”), the company behind Code Storage⁠(opens in a new window) and a family of standout open-source developer tools. If you’ve browsed files or reviewed a change in the Codex app, you’ve already used Pierre’s Trees and Diffs libraries. We’re excited to work with the Pierre team to build on the Git workflows that developers already rely on and adapt them to how teams work with coding [...] ## Keep reading\n\nView all\n\nImage 1: Scaling Git at OpenAI — art card\n\nScaling Git at OpenAI Engineering Nov 2, 2026\n\nImage 2: Codex maxxing 1x1\n\nCodex-Maxxing for Long-Running Work AI Adoption Jun 22, 2026\n\nImage 3: OAIonOAI ChadNelson 1x1\n\nHow Codex became a collaborator for OpenAI’s creative team OpenAI on OpenAI Jul 16, 2026\n\nResearch\n   Research Index\n   Research Overview\n   Economic Research\n\nLatest Advancements\n   GPT-6.1 Sol\n   GPT-6 Astra\n   GPT-5.6\n   GPT-5.5 [...] Skip to main content\n\n\n\nLog inTry ChatGPT(opens in a new window)\n\n   Research\n   Products\n   Business\n   Developers\n   Company\n   Foundation(opens in a new window)\n\nOpenAI to acquire Pierre Computer Company, Inc. | OpenAI\n\nNovember 4, 2026\n\nCompany\n\n# OpenAI to acquire Pierre Computer Company, Inc.\n\nExpanding Codex’s tools for building, understanding, and reviewing code.\n\nShare\n\nCraftsmanship meets scale for the agentic era",
+                "score": 0.7092009
+              },
+              {
+                "title": "OpenAI and Poland’s NASK partner to advance AI safety and security",
+                "url": "https://openai.com/index/openai-nask-ai-safety-security-partnership",
+                "source": "openai.com",
+                "summary": "2026\n\n## Author\n\nOpenAI\n\n## Keep reading\n\nView all\n\nImage 1: Building shared standards for the next phase of AI - art card\n\nBuilding standards for the next phase of AI Global Affairs Sep 21, 2026\n\nImage 2: Critical cyber capabilities card art\n\nResponding to the next frontier of critical cyber capabilities Security Aug 7, 2026\n\nImage 3: Daybreak for Critical Infrastructure — cover\n\nDaybreak for Frontline Defenders Security Sep 3, 2026 [...] Share\n\nOpenAI and Poland’s NASK National Research Institute have signed an agreement to explore collaboration on AI safety, security and technical research. The partnership will bring together expertise from both organizations to better understand emerging risks, strengthen safeguards, and explore how advanced AI can contribute to a more secure and resilient digital ecosystem. [...] The agreement also builds on OpenAI’s existing work with cyber defenders in Poland. In July, CERT Polska, which operates within NASK, gained access⁠(opens in a new window) to OpenAI’s cyber capable models through Daybreak. The team used OpenAI models to help discover six vulnerabilities in MikroTik RouterOS, including flaws that could be combined to take control of affected devices without authentication. The vendor released fixes, which CERT Polska confirmed prevented the attacks it observed.",
+                "score": 0.6698534
+              },
+              {
+                "title": "OpenAI appoints Dan Driscoll as Senior Counselor for National Security Modernization",
+                "url": "https://openai.com/index/dan-driscoll-joins-openai",
+                "source": "openai.com",
+                "summary": "2026\n   Global Affairs\n\n## Author\n\nOpenAI\n\n## Keep reading\n\nView all\n\nImage 1: Strengthening Democratic Oversight in National Security — card image\n\nStrengthening Democratic Oversight in National Security Global Affairs Aug 18, 2026\n\nImage 2: Democratic governance of frontier AI, part II: Empowering cyber defenders — Cover\n\nDemocratic governance of frontier AI, part II: Empowering cyber defenders Global Affairs Oct 21, 2026 [...] Developers\n   Plugins(opens in a new window)\n   Models(opens in a new window)\n   Docs(opens in a new window)\n   Resources(opens in a new window)\n   Developer Forum(opens in a new window)\n\nCompany\n   About Us\n   Our Charter\n   Careers\n   News\n\nSupport\n   Help Center(opens in a new window)\n   OpenAI Status(opens in a new window)\n\nMore\n   Stories\n   Academy\n   Supply Co.\n   Livestreams\n   Podcast\n   RSS\n\nTerms & Policies\n   Terms of Use\n   Privacy Policy\n   Other Policies [...] Skip to main content\n\n\n\nLog inTry ChatGPT(opens in a new window)\n\n   Research\n   Products\n   Business\n   Developers\n   Company\n   Foundation(opens in a new window)\n\nOpenAI appoints Dan Driscoll as Senior Counselor for National Security Modernization | OpenAI\n\nNovember 2, 2026\n\nCompanyGlobal Affairs\n\n# OpenAI appoints Dan Driscoll as Senior Counselor for National Security Modernization\n\nListen to article 2:00\n\nAudio 1\n\nShare",
+                "score": 0.6641271
+              },
+              {
+                "title": "Working with academic communities to build scientific understanding",
+                "url": "https://openai.com/index/building-scientific-understanding-with-academic-communities",
+                "source": "openai.com",
+                "summary": "We will turn over materials and artifacts related to these results to the collaborations. For the computer science collaboration, the group has decided to make the natural language proof and Lean formalization public immediately, and we are publishing them directly to our GitHub repository. For the physics collaboration, the group has decided to hold off on releasing the AI-produced artifacts and instead work on writing it up themselves. [...] We continue to invite feedback on the best way to disclose results and engage with scientists to accelerate discovery.\n\n   2026\n\n## Author\n\nOpenAI\n\n## Keep reading\n\nView all\n\nImage 1: Sharing AI progress in mathematics — Cover\n\nSharing AI progress in mathematics Research Oct 6, 2026\n\nImage 2: Advisory Group on Mathematics and Artificial Intelligence — cover\n\nAdvisory group on mathematics and artificial intelligence Company Sep 21, 2026",
+                "score": 0.6466616
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

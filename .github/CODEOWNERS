@@ -1,0 +1,4 @@
+# Every change to dev requires the group leader's review.
+# Do not add a later pattern that replaces this owner.
+* @justcoffeee
+/.github/ @justcoffeee
