@@ -1,0 +1,58 @@
+{
+  "purpose": "Retest after user subscribed to Twitter API45 free plan",
+  "results": [
+    {
+      "endpoint": "/timeline.php",
+      "status": 200,
+      "item_count": 20,
+      "quota_headers": {
+        "X-RateLimit-rapid-free-plans-hard-limit-Limit": "500000",
+        "X-RateLimit-rapid-free-plans-hard-limit-Remaining": "499999",
+        "X-RateLimit-rapid-free-plans-hard-limit-Reset": "2591908",
+        "X-RateLimit-Requests-Limit": "1000",
+        "X-RateLimit-Requests-Remaining": "999",
+        "X-RateLimit-Requests-Reset": "2591908"
+      }
+    },
+    {
+      "endpoint": "/search.php",
+      "status": 200,
+      "item_count": 20,
+      "quota_headers": {
+        "X-RateLimit-rapid-free-plans-hard-limit-Limit": "500000",
+        "X-RateLimit-rapid-free-plans-hard-limit-Remaining": "499998",
+        "X-RateLimit-rapid-free-plans-hard-limit-Reset": "2591901",
+        "X-RateLimit-Requests-Limit": "1000",
+        "X-RateLimit-Requests-Remaining": "998",
+        "X-RateLimit-Requests-Reset": "2591901"
+      }
+    }
+  ],
+  "registry_tool_results": [
+    {
+      "tool": "timeline",
+      "args": {
+        "screenname": "sama",
+        "limit": 1
+      },
+      "success": true,
+      "item_count": 1,
+      "error": null,
+      "message": null,
+      "sample_url": "https://x.com/sama/status/2118471941002842341"
+    },
+    {
+      "tool": "social_search",
+      "args": {
+        "query": "OpenAI",
+        "search_type": "Latest",
+        "limit": 1
+      },
+      "success": true,
+      "item_count": 1,
+      "error": null,
+      "message": null,
+      "sample_url": "https://x.com/kriss_de_valnor/status/2120110018083348500"
+    }
+  ]
+}

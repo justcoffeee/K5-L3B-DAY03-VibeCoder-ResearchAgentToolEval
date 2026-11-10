@@ -8,9 +8,9 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: VibeCoder (L3B)
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model dùng cho v0–v3:
+- Provider/model baseline v0: Groq / openai/gpt-oss-20b. Dùng cùng cấu hình khi so sánh v1–v3; các vòng tối ưu chưa thực hiện.
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
@@ -62,7 +62,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
+| v0 | baseline, prompt/tools nguyên starter | Đo trước tối ưu | — | case 45%; routing 70%; args 45%; multiturn 33,33% | [run v0](../../starter_v0/runs/v0_B_base_groq_20261110T175003235889.json) |
 | v1 |  |  |  |  |  |
 | v2 |  |  |  |  |  |
 | v3 |  |  |  |  |  |
@@ -73,7 +73,23 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R01_user_tweets_routing | wrong_tool (nhãn case); observed wrong_arg_value | timeline(screenname=samaltman, limit=1) | Cần sama; tool đúng, handle sai | Giả thuyết: quy ước handle/xác minh danh tính chưa rõ |
+| R03_web_news_routing | wrong_tool; observed wrong_arg_value | lookup(query=AI news today, topic=news, timeframe=day) | Expect query=AI, so sánh chuỗi chính xác; topic/timeframe đúng | Review ngữ nghĩa thủ công, không sửa đáp án hoặc chấm điểm |
+| R10_missing_handle | missing_info | timeline(screenname=sama, limit=5) | Đoán tài khoản, thiếu clarify | Giả thuyết: bỏ chỉ dẫn đoán khi thiếu dữ kiện |
+| R11_missing_url | missing_info | fetch(url=https://www.bbc.com/news/technology-66712345) | Tự bịa URL thay vì hỏi | Giả thuyết: hỏi lại URL trước fetch |
+| R12_confirm_before_send | wrong_boundary | lookup(query=AI breakthrough 2024, topic=news, max_results=3) | Không hỏi xác nhận, tự đi tìm tin không được yêu cầu | Giả thuyết: boundary hành động và nội dung cần xác nhận chưa rõ |
+| R13_parallel_web_and_tweets | wrong_tool | lookup(query=AI news today, topic=news, timeframe=day) | Thiếu social_search, query khác expect AI | Giả thuyết: chỉ dẫn ép một tool/một bước gây bỏ phần yêu cầu |
+| R14_out_of_scope_coding | out_of_scope; observed unexpected_tool_call | send(text=code Fibonacci) | Gọi tool khi expect no_tool; guard trả needs_confirmation, không gửi | Giả thuyết: thiếu scope và ràng buộc dùng send đúng mục đích |
+| M01_clarify_then_fill | missing_info | format(items=[item rỗng], template=bullets) | Không lấy tweet sau khi đã có handle | Giả thuyết: workflow cần lấy dữ liệu trước khi format |
+| M02_carryover_timeframe | wrong_arg_value | lookup(query=robotics news today, topic=news, timeframe=day) | Giữ đúng timeframe nhưng query khác expect robotics | Review khác biệt exact-match/ngữ nghĩa |
+| M05_correction_limit | wrong_arg_value | timeline(screenname=elonmusk, limit=10) | Bỏ qua sửa số lượng mới nhất thành 3 | Giả thuyết: ưu tiên correction gần nhất trong hội thoại |
+| M06_switch_tool | wrong_tool; observed wrong_arg_value | lookup(query=OpenAI news, topic=news, timeframe=month) | Đã chuyển đúng tool; query khác expect OpenAI | Review ngữ nghĩa; không kết luận sai routing từ nhãn case |
+
+Đủ 11 case FAIL; nguyên nhân trong cột Fix là **giả thuyết chưa kiểm chứng**, sẽ đo ở issue #10.
+Chi tiết actual args/failures và lỗi tool: [baseline analysis](../../starter_v0/analysis/cp1_baseline_analysis.json).
+Run có provider_error_cases=0, measured_cases=total_cases=20. Failure type là nhãn bộ case;
+observed_mismatch mới mô tả sai lệch thực đo. Harness so sánh query chính xác nên cần review ngữ nghĩa
+R03/M02/M06; giữ nguyên metric và bộ case cố định.
 
 ### B3. Team Eval Cases
 
@@ -101,6 +117,11 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
 Tool unit tests: `analyze_text` có 7 hàm test (18 case), `rank` có 10 hàm test (17 case). Với `rank`: model gọi đúng `rank(criteria="recency")` nên eval chấm PASS, nhưng nếu code không đọc được ngày dạng Twitter (`Mon Nov 09 10:00:00 +0000 2026`) thì mọi tweet bị coi như không có ngày và thứ tự sai hoàn toàn. Test `test_rank_recency_parses_twitter_iso_and_rfc_dates_undated_last` bắt đúng lỗi này. Ví dụ lỗi unit test bắt được còn eval thì không: model gọi đúng `analyze_text(text=..., task="sentiment")`, nên eval chấm PASS vì chỉ so tên tool và args. Nhưng nếu Groq trả `"sentiment": "angry"` (ngoài enum) hoặc trả text thường thay vì JSON, UI sẽ hiển thị sai hoặc crash. Hai test `test_analyze_text_bad_task_and_max_words_are_normalised` và `test_analyze_text_non_json_reply_falls_back_to_raw_summary` bắt đúng tầng này: chúng assert cách tool chuẩn hóa response, việc mà eval không bao giờ nhìn thấy. Tương tự, test model env bảo đảm việc đổi `GROQ_MODEL` cho agent không âm thầm đổi model của tool.
+| Tool mới (`tools/<tên>/`) | `starter_v0/tools/analyze_text/` (`tool.py`, `TOOL.md`, `declaration.yaml`); registry `tools/__init__.py`; commit `1c3be2b` (tool), `bb0628a` (registry), `e553d4b` (test + báo cáo) trên `dev` | Chức năng mới tự viết (không đổi tên tool có sẵn): gọi LLM trên Groq (`openai/gpt-oss-120b`, đổi được qua `ANALYZE_TEXT_MODEL`) để `summary` / `key_points` / `sentiment` cho text agent đã lấy về từ `fetch`, `paper_text`, `timeline`. Output JSON có cấu trúc; nếu model không trả JSON thì fallback sang text thường. Đã gọi Groq thật thành công: `key_points` và `sentiment=mixed` đúng nội dung. | Dùng chung `GROQ_API_KEY` với provider. Text từ web được bọc trong `<document>` và system prompt cấm làm theo lệnh bên trong; lần chạy thật có chèn "Ignore all previous instructions…", model không làm theo. Text dài hơn 12 000 ký tự bị cắt và báo `truncated`. Read-only, không cần xác nhận. Không bao giờ raise. Declaration chỉ tích hợp vào `tools.yaml` sau baseline. |
+| Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` (khối `analyze_text`); `pytest` trên `dev` sau merge: `82 passed, 0 failed, 14 skipped` (14 skip là stub của tool có sẵn) | 7 hàm test (18 case sau parametrize): happy path (URL/header/model/`response_format`, text bọc trong `<document>`), cắt text dài và `ANALYZE_TEXT_MODEL` không bị `GROQ_MODEL` của agent ghi đè, text xấu (`""`, `"   "`, `None`, `42`, list) không gọi API, `task`/`max_words`/`sentiment` ngoài enum được chuẩn hóa, model trả non-JSON, thiếu key, 429/401/timeout/200 nhưng thiếu `choices`. | Toàn bộ offline nhờ `fake_http`; `block_network` chặn mọi HTTP thật, không tốn credit Groq. |
+| UI (lệnh chạy + link dùng thử) |  |  |  |
+
+Tool unit tests: `analyze_text` có 7 hàm test (18 case). Ví dụ lỗi unit test bắt được còn eval thì không: model gọi đúng `analyze_text(text=..., task="sentiment")`, nên eval chấm PASS vì chỉ so tên tool và args. Nhưng nếu Groq trả `"sentiment": "angry"` (ngoài enum) hoặc trả text thường thay vì JSON, UI sẽ hiển thị sai hoặc crash. Hai test `test_analyze_text_bad_task_and_max_words_are_normalised` và `test_analyze_text_non_json_reply_falls_back_to_raw_summary` bắt đúng tầng này: chúng assert cách tool chuẩn hóa response, việc mà eval không bao giờ nhìn thấy. Tương tự, test model env bảo đảm việc đổi `GROQ_MODEL` cho agent không âm thầm đổi model của tool.
 
 ### B5. Bonus Evidence
 
@@ -144,6 +165,20 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 ## 5. Khó khăn và cách xử lý
 
 > Khó khăn chính và cách nhóm xử lý. Nếu gặp lỗi kỹ thuật (provider lỗi, hết quota API, tool không chạy), mô tả lỗi và dẫn bằng chứng: run JSON, log, ảnh chụp.
+
+- Preflight OpenRouter ban đầu thiếu key; sau đó nhóm chọn Groq. Model llama-3.3-70b-versatile
+  trả 404, nên chuyển sang model tài khoản có quyền dùng: openai/gpt-oss-20b. Preflight mới pass;
+  [log](../../starter_v0/analysis/cp1_groq_preflight_gpt_oss_20b.txt), [trạng thái CP1](../../docs/CP1-STATUS.md).
+- Tavily và Firecrawl smoke test thành công. RapidAPI timeline trả 403, search từng trả 429;
+  [tool smoke](../../starter_v0/analysis/cp1_tool_smoke.json). Run v0 có 7 lỗi RapidAPI trong tool_results,
+  độc lập với 0 lỗi provider. Routing PASS không chứng minh tool lấy được dữ liệu.
+- Sau khi đăng ký gói free Twitter API45, timeline/search đều HTTP 200 và qua registry trả đúng
+  1 item khi limit=1. [Evidence retest](../../starter_v0/analysis/cp1_rapidapi_subscription_retest.json).
+  Đây là kiểm tra live riêng, không thay đổi run hoặc metric baseline v0 trước đó.
+- R04, R11, M04: fetch trả nội dung trang 404. Không sửa URL của case cố định;
+  đây là giới hạn dữ liệu/thực thi, không làm thay đổi metric chọn tool/args.
+- Kiểm thử offline hiện tại: 64 passed, 17 skipped, 0 failed; xem [pytest output](../../starter_v0/analysis/cp1_pytest.txt).
+  Các skipped là stub TODO CP3 của starter.
 
 -
 

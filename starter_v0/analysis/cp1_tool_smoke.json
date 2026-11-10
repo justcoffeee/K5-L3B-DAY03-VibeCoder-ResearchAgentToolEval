@@ -1,0 +1,53 @@
+{
+  "results": [
+    {
+      "tool": "lookup",
+      "args": {
+        "query": "AI agent evaluation",
+        "timeframe": null,
+        "max_results": 1
+      },
+      "success": true,
+      "item_count": 1,
+      "error": null,
+      "message": null,
+      "sample_url": "https://www.ibm.com/think/topics/ai-agent-evaluation"
+    },
+    {
+      "tool": "fetch",
+      "args": {
+        "url": "https://example.com"
+      },
+      "success": true,
+      "item_count": 1,
+      "error": null,
+      "message": null,
+      "sample_url": "https://example.com"
+    },
+    {
+      "tool": "timeline",
+      "args": {
+        "screenname": "sama",
+        "limit": 1
+      },
+      "success": false,
+      "item_count": 0,
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama",
+      "sample_url": null
+    },
+    {
+      "tool": "social_search",
+      "args": {
+        "query": "OpenAI",
+        "search_type": "Latest",
+        "limit": 1
+      },
+      "success": false,
+      "item_count": 0,
+      "error": "HTTPError",
+      "message": "429 Client Error: Too Many Requests for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Latest",
+      "sample_url": null
+    }
+  ]
+}
