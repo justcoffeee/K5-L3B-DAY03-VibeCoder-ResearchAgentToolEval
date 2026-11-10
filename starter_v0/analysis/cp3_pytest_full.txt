@@ -1,0 +1,137 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.6, pytest-9.0.3, pluggy-1.6.0 -- C:\Users\PC\anaconda3\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\PC\Documents\GitHub\K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval\starter_v0
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.12.1
+collecting ... collected 111 items
+
+tests/test_tool_contract.py::test_tool_names_are_unique PASSED           [  0%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[clarify] PASSED [  1%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[fetch] PASSED [  2%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[format] PASSED [  3%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[lookup] PASSED [  4%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[paper_text] PASSED [  5%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[papers] PASSED [  6%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[policy] PASSED [  7%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[send] PASSED [  8%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[social_search] PASSED [  9%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[timeline] PASSED [  9%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[clarify] PASSED [ 10%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[fetch] PASSED [ 11%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[format] PASSED [ 12%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[lookup] PASSED [ 13%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[paper_text] PASSED [ 14%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[papers] PASSED [ 15%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[policy] PASSED [ 16%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[send] PASSED [ 17%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[social_search] PASSED [ 18%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[timeline] PASSED [ 18%]
+tests/test_tool_contract.py::test_required_params_are_declared[clarify] PASSED [ 19%]
+tests/test_tool_contract.py::test_required_params_are_declared[fetch] PASSED [ 20%]
+tests/test_tool_contract.py::test_required_params_are_declared[format] PASSED [ 21%]
+tests/test_tool_contract.py::test_required_params_are_declared[lookup] PASSED [ 22%]
+tests/test_tool_contract.py::test_required_params_are_declared[paper_text] PASSED [ 23%]
+tests/test_tool_contract.py::test_required_params_are_declared[papers] PASSED [ 24%]
+tests/test_tool_contract.py::test_required_params_are_declared[policy] PASSED [ 25%]
+tests/test_tool_contract.py::test_required_params_are_declared[send] PASSED [ 26%]
+tests/test_tool_contract.py::test_required_params_are_declared[social_search] PASSED [ 27%]
+tests/test_tool_contract.py::test_required_params_are_declared[timeline] PASSED [ 27%]
+tests/test_tool_contract.py::test_description_is_not_empty[clarify] PASSED [ 28%]
+tests/test_tool_contract.py::test_description_is_not_empty[fetch] PASSED [ 29%]
+tests/test_tool_contract.py::test_description_is_not_empty[format] PASSED [ 30%]
+tests/test_tool_contract.py::test_description_is_not_empty[lookup] PASSED [ 31%]
+tests/test_tool_contract.py::test_description_is_not_empty[paper_text] PASSED [ 32%]
+tests/test_tool_contract.py::test_description_is_not_empty[papers] PASSED [ 33%]
+tests/test_tool_contract.py::test_description_is_not_empty[policy] PASSED [ 34%]
+tests/test_tool_contract.py::test_description_is_not_empty[send] PASSED  [ 35%]
+tests/test_tool_contract.py::test_description_is_not_empty[social_search] PASSED [ 36%]
+tests/test_tool_contract.py::test_description_is_not_empty[timeline] PASSED [ 36%]
+tests/test_tool_contract.py::test_openai_tool_schema_shape PASSED        [ 37%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[clarify] PASSED [ 38%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[fetch] PASSED [ 39%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[format] PASSED [ 40%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[lookup] PASSED [ 41%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[paper_text] PASSED [ 42%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[papers] PASSED [ 43%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[policy] PASSED [ 44%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[send] PASSED [ 45%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[social_search] PASSED [ 45%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[timeline] PASSED [ 46%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_base.json] PASSED [ 47%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_group.json] PASSED [ 48%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_research_extension.json] PASSED [ 49%]
+tests/test_tools_examples.py::test_format_brief_keeps_at_most_5_items_and_links_source PASSED [ 50%]
+tests/test_tools_examples.py::test_format_truncates_long_summary PASSED  [ 51%]
+tests/test_tools_examples.py::test_send_without_confirmation_does_not_call_network PASSED [ 52%]
+tests/test_tools_examples.py::test_lookup_sends_expected_request_and_maps_results PASSED [ 53%]
+tests/test_tools_examples.py::test_lookup_without_key_returns_error_dict PASSED [ 54%]
+tests/test_tools_examples.py::test_lookup_http_error_returns_error_dict PASSED [ 54%]
+tests/test_tools_examples.py::test_agent_executes_tool_and_survives_unknown_or_bad_calls PASSED [ 55%]
+tests/test_tools_todo.py::test_clarify_choice_returns_options_and_awaits_user SKIPPED [ 56%]
+tests/test_tools_todo.py::test_format_sections_groups_items_by_section SKIPPED [ 57%]
+tests/test_tools_todo.py::test_format_thread_numbers_items SKIPPED (...) [ 58%]
+tests/test_tools_todo.py::test_format_empty_items_does_not_crash SKIPPED [ 59%]
+tests/test_tools_todo.py::test_send_confirmed_posts_to_telegram SKIPPED  [ 60%]
+tests/test_tools_todo.py::test_send_confirmed_without_env_returns_error_and_no_request SKIPPED [ 61%]
+tests/test_tools_todo.py::test_lookup_without_timeframe_omits_time_range SKIPPED [ 62%]
+tests/test_tools_todo.py::test_fetch_maps_firecrawl_response SKIPPED     [ 63%]
+tests/test_tools_todo.py::test_fetch_truncates_markdown_to_4000_chars SKIPPED [ 63%]
+tests/test_tools_todo.py::test_timeline_respects_limit_and_skips_items_without_id SKIPPED [ 64%]
+tests/test_tools_todo.py::test_social_search_passes_search_type SKIPPED  [ 65%]
+tests/test_tools_todo.py::test_policy_empty_query_returns_no_results SKIPPED [ 66%]
+tests/test_tools_todo.py::test_policy_area_filter_only_returns_that_area SKIPPED [ 67%]
+tests/test_tools_todo.py::test_policy_instruction_like_lines_go_to_untrusted_text SKIPPED [ 68%]
+tests/test_tools_todo.py::test_analyze_text_sends_groq_request_and_maps_json_reply PASSED [ 69%]
+tests/test_tools_todo.py::test_analyze_text_truncates_long_text_and_uses_its_own_model_env PASSED [ 70%]
+tests/test_tools_todo.py::test_analyze_text_empty_or_non_string_text_returns_error_without_request[] PASSED [ 71%]
+tests/test_tools_todo.py::test_analyze_text_empty_or_non_string_text_returns_error_without_request[   ] PASSED [ 72%]
+tests/test_tools_todo.py::test_analyze_text_empty_or_non_string_text_returns_error_without_request[None] PASSED [ 72%]
+tests/test_tools_todo.py::test_analyze_text_empty_or_non_string_text_returns_error_without_request[42] PASSED [ 73%]
+tests/test_tools_todo.py::test_analyze_text_empty_or_non_string_text_returns_error_without_request[bad_text4] PASSED [ 74%]
+tests/test_tools_todo.py::test_analyze_text_bad_task_and_max_words_are_normalised[50-50] PASSED [ 75%]
+tests/test_tools_todo.py::test_analyze_text_bad_task_and_max_words_are_normalised[0-30] PASSED [ 76%]
+tests/test_tools_todo.py::test_analyze_text_bad_task_and_max_words_are_normalised[9999-500] PASSED [ 77%]
+tests/test_tools_todo.py::test_analyze_text_bad_task_and_max_words_are_normalised[abc-150] PASSED [ 78%]
+tests/test_tools_todo.py::test_analyze_text_bad_task_and_max_words_are_normalised[None-150] PASSED [ 79%]
+tests/test_tools_todo.py::test_analyze_text_non_json_reply_falls_back_to_raw_summary PASSED [ 80%]
+tests/test_tools_todo.py::test_analyze_text_without_key_returns_error_and_no_request PASSED [ 81%]
+tests/test_tools_todo.py::test_analyze_text_api_failures_return_error_dict[failure0-HTTPError] PASSED [ 81%]
+tests/test_tools_todo.py::test_analyze_text_api_failures_return_error_dict[failure1-HTTPError] PASSED [ 82%]
+tests/test_tools_todo.py::test_analyze_text_api_failures_return_error_dict[failure2-Timeout] PASSED [ 83%]
+tests/test_tools_todo.py::test_analyze_text_api_failures_return_error_dict[failure3-KeyError] PASSED [ 84%]
+tests/test_tools_todo.py::test_rank_relevance_orders_by_query_match_and_adds_rank_fields PASSED [ 85%]
+tests/test_tools_todo.py::test_rank_dedupes_same_url_variants_and_same_title_without_url PASSED [ 86%]
+tests/test_tools_todo.py::test_rank_recency_parses_twitter_iso_and_rfc_dates_undated_last PASSED [ 87%]
+tests/test_tools_todo.py::test_rank_popularity_uses_metrics_and_stars_with_string_counts PASSED [ 88%]
+tests/test_tools_todo.py::test_rank_balanced_without_query_uses_recency_and_popularity PASSED [ 89%]
+tests/test_tools_todo.py::test_rank_non_list_items_returns_error_dict[GPT-5 news] PASSED [ 90%]
+tests/test_tools_todo.py::test_rank_non_list_items_returns_error_dict[bad_items1] PASSED [ 90%]
+tests/test_tools_todo.py::test_rank_non_list_items_returns_error_dict[42] PASSED [ 91%]
+tests/test_tools_todo.py::test_rank_empty_items_returns_empty_result_not_error[None] PASSED [ 92%]
+tests/test_tools_todo.py::test_rank_empty_items_returns_empty_result_not_error[empty1] PASSED [ 93%]
+tests/test_tools_todo.py::test_rank_drops_non_object_entries_and_normalises_bad_args PASSED [ 94%]
+tests/test_tools_todo.py::test_rank_top_k_is_coerced[0-1] PASSED         [ 95%]
+tests/test_tools_todo.py::test_rank_top_k_is_coerced[-3-1] PASSED        [ 96%]
+tests/test_tools_todo.py::test_rank_top_k_is_coerced[2-2] PASSED         [ 97%]
+tests/test_tools_todo.py::test_rank_top_k_is_coerced[abc-5] PASSED       [ 98%]
+tests/test_tools_todo.py::test_rank_top_k_is_coerced[None-5] PASSED      [ 99%]
+tests/test_tools_todo.py::test_rank_relevance_without_query_falls_back_with_warning PASSED [100%]
+
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_tools_todo.py:29: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:36: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:41: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:46: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:54: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:58: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:65: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:73: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:77: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:85: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:90: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:96: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:101: TODO CP3 (student): implement this test
+SKIPPED [1] tests\test_tools_todo.py:107: TODO CP3 (student): implement this test
+======================= 97 passed, 14 skipped in 0.48s ========================
