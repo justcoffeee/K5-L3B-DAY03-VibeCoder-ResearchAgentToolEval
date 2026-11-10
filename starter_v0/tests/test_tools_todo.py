@@ -10,7 +10,10 @@ Rules:
 """
 from __future__ import annotations
 
+import json
+
 import pytest
+import requests
 
 from conftest import FakeResponse  # noqa: F401  (you will need it)
 from tools import TOOL_FUNCTIONS  # noqa: F401
