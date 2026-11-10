@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "C:\Code\VINAI\K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval\starter_v0\scripts\preflight_provider.py", line 43, in <module>
+    main()
+    ~~~~^^
+  File "C:\Code\VINAI\K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval\starter_v0\scripts\preflight_provider.py", line 32, in main
+    response = provider.complete(messages, tools, model=args.model, temperature=0.0)
+  File "C:\Code\VINAI\K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval\starter_v0\providers\openai_provider.py", line 42, in complete
+    raise RuntimeError(f"Missing API key env var: {self.api_key_env}")
+RuntimeError: Missing API key env var: OPENROUTER_API_KEY
