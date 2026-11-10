@@ -11,7 +11,7 @@ import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote
+from urllib.parse import quote, urlsplit
 
 import streamlit as st
 
@@ -318,24 +318,58 @@ def resolve_send(event: dict[str, Any], approved: bool) -> None:
     state.history.append({"role": "assistant", "content": turn["assistant_text"]})
 
 
-def source_lines(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> list[str]:
-    lines: dict[str, str] = {}
+def safe_source_url(value: Any) -> str | None:
+    """Accept only plain HTTP(S) URLs; source metadata is controlled by external pages."""
+    url = str(value or "").strip()
+    if not url or any(char.isspace() or ord(char) < 32 or char == "\\" for char in url):
+        return None
+    try:
+        parsed = urlsplit(url)
+        if parsed.scheme.lower() not in {"http", "https"} or not parsed.hostname:
+            return None
+        if parsed.username or parsed.password:
+            return None
+        # Accessing .port also rejects malformed ports before a URL reaches the UI.
+        _ = parsed.port
+    except ValueError:
+        return None
+    return url
+
+
+def source_entries(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> list[dict[str, str]]:
+    """Build plain source entries for Streamlit components, never interpolated Markdown."""
+    entries: dict[str, dict[str, str]] = {}
     records = [record for event in turn["tool_events"] for record in retrieved_records(event)]
     for record in records + reused_records(turn, earlier_turns):
-        url = str(record.get("url") or "")
-        if url.startswith(("http://", "https://")):
-            title = re.sub(r"[\[\]]", "", str(record.get("title") or url))[:100]
-            lines.setdefault(url, f"- [{title}]({url}) · {record.get('source') or ''}")
+        url = safe_source_url(record.get("url"))
+        if url:
+            entries.setdefault(url, {
+                "title": " ".join(str(record.get("title") or url).split())[:100],
+                "url": url,
+                "source": " ".join(str(record.get("source") or "").split()),
+            })
         elif record.get("section"):
-            label = f"{record.get('title')} › {record.get('section')}"
-            lines.setdefault(label, f"- {label} · hiệu lực {record.get('effective_date')}")
-    return list(lines.values())
+            label = " ".join(f"{record.get('title') or ''} › {record.get('section')}".split())
+            entries.setdefault(label, {
+                "title": label,
+                "url": "",
+                "source": " ".join(f"hiệu lực {record.get('effective_date') or ''}".split()),
+            })
+    return list(entries.values())
 
 
 def render_sources(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> None:
-    sources = source_lines(turn, earlier_turns)
-    if sources:
-        st.markdown("**Nguồn**\n" + "\n".join(sources))
+    sources = source_entries(turn, earlier_turns)
+    if not sources:
+        return
+    st.markdown("**Nguồn**")
+    for source in sources:
+        st.text(source["title"])
+        if source["url"]:
+            st.text(source["url"])
+            st.link_button("Mở nguồn", source["url"])
+        if source["source"]:
+            st.text(f"· {source['source']}")
 
 
 def render_tool_event(event: dict[str, Any]) -> None:
