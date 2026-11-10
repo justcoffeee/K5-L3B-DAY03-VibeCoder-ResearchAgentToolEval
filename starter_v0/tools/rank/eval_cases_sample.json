@@ -1,0 +1,32 @@
+{
+  "_note": "Case mẫu bàn giao cho TV3. Chép vào data/eval_group.json -> cases[] SAU KHI rank đã có trong artifacts/tools.yaml. Lưu ý cách run_eval chấm: mỗi case chỉ gọi model 1 lần (không chain search -> rank được), và mọi tool call thừa so với expect đều làm fail routing. Vì vậy item phải có sẵn trong câu hỏi hoặc ở lượt trước.",
+  "cases": [
+    {
+      "id": "K_S01_rank_given_items_recency",
+      "phase": "B",
+      "query": "Mình có 3 tin sau, xếp giúp theo thứ tự mới nhất trước và chỉ giữ 2 tin: (1) 'OpenAI ra GPT-5' ngày 2026-08-07, https://openai.com/gpt-5 ; (2) 'Anthropic ra Claude mới' ngày 2026-11-01, https://anthropic.com/news ; (3) 'Google ra Gemini 3' ngày 2026-10-15, https://blog.google/gemini-3",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "rank", "args": {"criteria": "recency", "top_k": 2}}]},
+      "metadata": {
+        "skill": "routing_new_tool_rank",
+        "difficulty": "easy",
+        "what_it_tests": "Item đã có sẵn trong câu hỏi, user muốn mới nhất trước và giữ 2 -> rank criteria=recency top_k=2; không gọi lookup thừa, không dùng format để sắp xếp."
+      }
+    },
+    {
+      "id": "K_M01_rank_popularity_from_previous_turn",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Đây là 4 tweet về Claude mình gom được: (a) @alice 'Claude viết code tốt' 120 like, 10 retweet; (b) @bob 'Claude chậm quá' 15 like, 1 retweet; (c) @carol 'So sánh Claude và GPT' 900 like, 300 retweet; (d) @dave 'Claude ra tính năng mới' 400 like, 50 retweet."},
+        {"role": "user", "content": "Lọc giúp mình 2 tweet nhiều tương tác nhất thôi"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "rank", "args": {"criteria": "popularity", "top_k": 2}}]},
+      "metadata": {
+        "skill": "multiturn_rank_carry_items",
+        "difficulty": "medium",
+        "what_it_tests": "Item nằm ở lượt 1, lượt 2 yêu cầu lọc theo tương tác -> rank criteria=popularity top_k=2; không gọi lại social_search."
+      }
+    }
+  ]
+}
