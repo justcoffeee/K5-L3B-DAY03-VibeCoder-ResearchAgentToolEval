@@ -321,7 +321,7 @@ def resolve_send(event: dict[str, Any], approved: bool) -> None:
 def safe_source_url(value: Any) -> str | None:
     """Accept only plain HTTP(S) URLs; source metadata is controlled by external pages."""
     url = str(value or "").strip()
-    if not url or any(char.isspace() or ord(char) < 32 for char in url):
+    if not url or any(char.isspace() or ord(char) < 32 or char == "\\" for char in url):
         return None
     try:
         parsed = urlsplit(url)
@@ -366,6 +366,7 @@ def render_sources(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) ->
     for source in sources:
         st.text(source["title"])
         if source["url"]:
+            st.text(source["url"])
             st.link_button("Mở nguồn", source["url"])
         if source["source"]:
             st.text(f"· {source['source']}")

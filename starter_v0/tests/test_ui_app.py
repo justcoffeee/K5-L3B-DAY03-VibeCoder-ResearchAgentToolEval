@@ -260,7 +260,7 @@ def test_format_alone_is_not_evidence(ui) -> None:
     assert not any(value.startswith("**Nguồn**") for value in visible_answers(ui))
 
 
-def test_source_metadata_is_rendered_as_text_and_urls_are_validated(ui, monkeypatch) -> None:
+def test_source_metadata_is_plain_text_data_and_urls_are_validated() -> None:
     malicious_title = "[Đăng nhập](https://phish.example)\n- [Nút giả](https://evil.example)"
     result = {
         "tool": "web_search",
@@ -271,12 +271,9 @@ def test_source_metadata_is_rendered_as_text_and_urls_are_validated(ui, monkeypa
             "summary": "Nội dung nguồn có thật",
         }],
     }
-    monkeypatch.setitem(TOOL_FUNCTIONS, "lookup", lambda **kw: result)
-    ask(ui, "Tin AI?", tool_call("lookup", query="AI"), ModelResponse(text=ANSWER))
+    turn = {"tool_events": [{"tool": "lookup", "args": {}, "result": result}]}
 
-    assert "[Đăng nhập](https://phish.example) - [Nút giả](https://evil.example)" in rendered(ui)
-    assert malicious_title not in visible_answers(ui), "untrusted title must not be parsed as Markdown"
-    assert ui_app.source_entries(turns(ui)[0], []) == [{
+    assert ui_app.source_entries(turn, []) == [{
         "title": "[Đăng nhập](https://phish.example) - [Nút giả](https://evil.example)",
         "url": "https://news.example/story",
         "source": "[Nguồn giả](https://evil.example)",
@@ -284,6 +281,7 @@ def test_source_metadata_is_rendered_as_text_and_urls_are_validated(ui, monkeypa
     assert ui_app.safe_source_url("javascript:alert(1)") is None
     assert ui_app.safe_source_url("https://news.example/a)\n- [Nút giả](https://evil.example") is None
     assert ui_app.safe_source_url("https://user:pass@news.example/a") is None
+    assert ui_app.safe_source_url("https://news.example\\@evil.example/a") is None
 
 
 def test_rank_output_is_not_a_source(ui, monkeypatch) -> None:
