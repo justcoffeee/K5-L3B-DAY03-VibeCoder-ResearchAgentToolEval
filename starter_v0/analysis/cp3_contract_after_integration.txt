@@ -1,14 +1,8 @@
-﻿# CP3 integration simulation: declaration.yaml của analyze_text + rank dán vào BẢN COPY của artifacts/tools.yaml (file thật không đổi).
-# Date: 2026-11-10; branch NguyenLeTrongManh sau merge origin/dev
-
-## pytest -v tests/test_tool_contract.py
 ============================= test session starts =============================
-platform win32 -- Python 3.14.6, pytest-9.0.3, pluggy-1.6.0 -- C:\Users\PC\anaconda3\python.exe
-cachedir: .pytest_cache
-rootdir: C:\Users\PC\AppData\Local\Temp\claude\7f4f2fb44e059365\32591c62-f897-4f81-8796-f780884e28ed\scratchpad\integration_sim
+platform win32 -- Python 3.14.8, pytest-9.2.0, pluggy-1.7.0 -- C:\Code\VINAI\K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval\starter_v0\.venv\Scripts\python.exe
+rootdir: C:\Code\VINAI\pr28-fix\starter_v0
 configfile: pytest.ini
-plugins: anyio-4.12.1
-collecting ... collected 65 items
+collecting ... collected 66 items
 
 tests/test_tool_contract.py::test_tool_names_are_unique PASSED           [  1%]
 tests/test_tool_contract.py::test_every_declared_tool_has_implementation[analyze_text] PASSED [  3%]
@@ -22,78 +16,59 @@ tests/test_tool_contract.py::test_every_declared_tool_has_implementation[policy]
 tests/test_tool_contract.py::test_every_declared_tool_has_implementation[rank] PASSED [ 15%]
 tests/test_tool_contract.py::test_every_declared_tool_has_implementation[send] PASSED [ 16%]
 tests/test_tool_contract.py::test_every_declared_tool_has_implementation[social_search] PASSED [ 18%]
-tests/test_tool_contract.py::test_every_declared_tool_has_implementation[timeline] PASSED [ 20%]
+tests/test_tool_contract.py::test_every_declared_tool_has_implementation[timeline] PASSED [ 19%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[analyze_text] PASSED [ 21%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[clarify] PASSED [ 23%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[clarify] PASSED [ 22%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[fetch] PASSED [ 24%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[format] PASSED [ 26%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[format] PASSED [ 25%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[lookup] PASSED [ 27%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[paper_text] PASSED [ 29%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[paper_text] PASSED [ 28%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[papers] PASSED [ 30%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[policy] PASSED [ 32%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[policy] PASSED [ 31%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[rank] PASSED [ 33%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[send] PASSED [ 35%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[send] PASSED [ 34%]
 tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[social_search] PASSED [ 36%]
-tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[timeline] PASSED [ 38%]
-tests/test_tool_contract.py::test_required_params_are_declared[analyze_text] PASSED [ 40%]
-tests/test_tool_contract.py::test_required_params_are_declared[clarify] PASSED [ 41%]
-tests/test_tool_contract.py::test_required_params_are_declared[fetch] PASSED [ 43%]
-tests/test_tool_contract.py::test_required_params_are_declared[format] PASSED [ 44%]
-tests/test_tool_contract.py::test_required_params_are_declared[lookup] PASSED [ 46%]
-tests/test_tool_contract.py::test_required_params_are_declared[paper_text] PASSED [ 47%]
-tests/test_tool_contract.py::test_required_params_are_declared[papers] PASSED [ 49%]
+tests/test_tool_contract.py::test_declared_params_exist_in_function_signature[timeline] PASSED [ 37%]
+tests/test_tool_contract.py::test_required_params_are_declared[analyze_text] PASSED [ 39%]
+tests/test_tool_contract.py::test_required_params_are_declared[clarify] PASSED [ 40%]
+tests/test_tool_contract.py::test_required_params_are_declared[fetch] PASSED [ 42%]
+tests/test_tool_contract.py::test_required_params_are_declared[format] PASSED [ 43%]
+tests/test_tool_contract.py::test_required_params_are_declared[lookup] PASSED [ 45%]
+tests/test_tool_contract.py::test_required_params_are_declared[paper_text] PASSED [ 46%]
+tests/test_tool_contract.py::test_required_params_are_declared[papers] PASSED [ 48%]
 tests/test_tool_contract.py::test_required_params_are_declared[policy] PASSED [ 50%]
-tests/test_tool_contract.py::test_required_params_are_declared[rank] PASSED [ 52%]
+tests/test_tool_contract.py::test_required_params_are_declared[rank] PASSED [ 51%]
 tests/test_tool_contract.py::test_required_params_are_declared[send] PASSED [ 53%]
-tests/test_tool_contract.py::test_required_params_are_declared[social_search] PASSED [ 55%]
+tests/test_tool_contract.py::test_required_params_are_declared[social_search] PASSED [ 54%]
 tests/test_tool_contract.py::test_required_params_are_declared[timeline] PASSED [ 56%]
-tests/test_tool_contract.py::test_description_is_not_empty[analyze_text] PASSED [ 58%]
-tests/test_tool_contract.py::test_description_is_not_empty[clarify] PASSED [ 60%]
-tests/test_tool_contract.py::test_description_is_not_empty[fetch] PASSED [ 61%]
-tests/test_tool_contract.py::test_description_is_not_empty[format] PASSED [ 63%]
-tests/test_tool_contract.py::test_description_is_not_empty[lookup] PASSED [ 64%]
-tests/test_tool_contract.py::test_description_is_not_empty[paper_text] PASSED [ 66%]
-tests/test_tool_contract.py::test_description_is_not_empty[papers] PASSED [ 67%]
-tests/test_tool_contract.py::test_description_is_not_empty[policy] PASSED [ 69%]
-tests/test_tool_contract.py::test_description_is_not_empty[rank] PASSED  [ 70%]
-tests/test_tool_contract.py::test_description_is_not_empty[send] PASSED  [ 72%]
-tests/test_tool_contract.py::test_description_is_not_empty[social_search] PASSED [ 73%]
-tests/test_tool_contract.py::test_description_is_not_empty[timeline] PASSED [ 75%]
-tests/test_tool_contract.py::test_openai_tool_schema_shape PASSED        [ 76%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[analyze_text] PASSED [ 78%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[clarify] PASSED [ 80%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[fetch] PASSED [ 81%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[format] PASSED [ 83%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[lookup] PASSED [ 84%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[paper_text] PASSED [ 86%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[papers] PASSED [ 87%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[policy] PASSED [ 89%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[rank] PASSED [ 90%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[send] PASSED [ 92%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[social_search] PASSED [ 93%]
-tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[timeline] PASSED [ 95%]
-tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_base.json] PASSED [ 96%]
-tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_group.json] PASSED [ 98%]
-tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_research_extension.json] PASSED [100%]
+tests/test_tool_contract.py::test_description_is_not_empty[analyze_text] PASSED [ 57%]
+tests/test_tool_contract.py::test_description_is_not_empty[clarify] PASSED [ 59%]
+tests/test_tool_contract.py::test_description_is_not_empty[fetch] PASSED [ 60%]
+tests/test_tool_contract.py::test_description_is_not_empty[format] PASSED [ 62%]
+tests/test_tool_contract.py::test_description_is_not_empty[lookup] PASSED [ 63%]
+tests/test_tool_contract.py::test_description_is_not_empty[paper_text] PASSED [ 65%]
+tests/test_tool_contract.py::test_description_is_not_empty[papers] PASSED [ 66%]
+tests/test_tool_contract.py::test_description_is_not_empty[policy] PASSED [ 68%]
+tests/test_tool_contract.py::test_description_is_not_empty[rank] PASSED  [ 69%]
+tests/test_tool_contract.py::test_description_is_not_empty[send] PASSED  [ 71%]
+tests/test_tool_contract.py::test_description_is_not_empty[social_search] PASSED [ 72%]
+tests/test_tool_contract.py::test_description_is_not_empty[timeline] PASSED [ 74%]
+tests/test_tool_contract.py::test_openai_tool_schema_shape PASSED        [ 75%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[analyze_text] PASSED [ 77%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[clarify] PASSED [ 78%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[fetch] PASSED [ 80%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[format] PASSED [ 81%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[lookup] PASSED [ 83%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[paper_text] PASSED [ 84%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[papers] PASSED [ 86%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[policy] PASSED [ 87%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[rank] PASSED [ 89%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[send] PASSED [ 90%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[social_search] PASSED [ 92%]
+tests/test_tool_contract.py::test_tool_folder_has_tool_md_with_matching_name[timeline] PASSED [ 93%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_base.json] PASSED [ 95%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_group.json] PASSED [ 96%]
+tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_research_extension.json] PASSED [ 98%]
+tests/test_tool_contract.py::test_gemini_tool_objects_have_declared_properties PASSED [100%]
 
-============================= 65 passed in 0.80s ==============================
-
-## pytest -q (full suite)
-........................................................................ [ 58%]
-..ssssssssssssss...................................                      [100%]
-=========================== short test summary info ===========================
-SKIPPED [1] tests\test_tools_todo.py:29: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:36: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:41: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:46: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:54: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:58: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:65: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:73: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:77: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:85: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:90: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:96: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:101: TODO CP3 (student): implement this test
-SKIPPED [1] tests\test_tools_todo.py:107: TODO CP3 (student): implement this test
-109 passed, 14 skipped in 2.92s
+============================= 66 passed in 0.26s ==============================

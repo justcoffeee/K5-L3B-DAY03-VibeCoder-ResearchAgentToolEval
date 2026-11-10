@@ -70,11 +70,11 @@ Không bao giờ raise. Lỗi trả về `{"tool": "rank", "error": "<ExceptionN
 ## Bàn giao
 
 - **Nhóm trưởng:** khối trong `declaration.yaml` đã được dán vào cuối `artifacts/tools.yaml`
-  (`tools_hash` `e69bc53ed884` → `d373921af2af`) và `pytest tests/test_tool_contract.py` xanh. Còn lại:
+  (`tools_hash` `e69bc53ed884` → `54ed7f4a1216`) và `pytest tests/test_tool_contract.py` xanh. Còn lại:
   review, chạy eval và ghi thành một version riêng trong `version_log.csv` để đo ảnh hưởng tới routing.
   Gợi ý thêm rule vào prompt: "gộp từ nhiều nguồn hoặc user hỏi top/mới nhất/nổi bật nhất → `rank` trước
   rồi mới `format`". Từ giờ `tools.yaml` mới là bản đang dùng và có thể được tinh chỉnh; `declaration.yaml`
-  chỉ giữ bản gốc lúc tích hợp.
+  đã được đồng bộ schema item/metrics sau review PR #28. Mọi object có properties để tương thích Gemini.
 - **TV3 (eval):** case mẫu trong `eval_cases_sample.json`.
 - **TV4 (UI):** hiển thị `items` theo `rank`, có thể thêm badge `rank_score` và tooltip `rank_signals`.
   Nếu `dropped_duplicates > 0` thì ghi chú "đã gộp N kết quả trùng". `warnings` có nội dung thì hiển thị nhỏ.
