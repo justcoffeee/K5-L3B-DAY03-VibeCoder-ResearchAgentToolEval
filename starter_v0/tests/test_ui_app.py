@@ -234,7 +234,7 @@ def assert_answer_hidden(ui) -> None:
     assert ANSWER not in visible_answers(ui)
     assert ANSWER not in history(ui)
     assert ui_app.NO_DATA_MESSAGE in [element.value for element in ui.at.error]
-    assert turns(ui)[0]["assistant_text"] == ANSWER, "the transcript keeps the raw answer as evidence"
+    assert turns(ui)[-1]["assistant_text"] == ANSWER, "the transcript keeps the raw answer as evidence"
 
 
 def test_lookup_error_plus_empty_format_hides_the_answer(ui) -> None:
@@ -274,6 +274,101 @@ def test_retrieved_data_shows_answer_and_source_link(ui, monkeypatch, fake_http)
     assert ANSWER in visible_answers(ui)
     assert ANSWER in history(ui)
     assert any("[Tin A](https://example.com/a)" in value for value in visible_answers(ui))
+
+
+# Data retrieved in an earlier turn of the same session can be presented again.
+
+OLD_ITEM = {"title": "Tin A", "url": "https://example.com/a", "summary": "Nội dung thật"}
+
+
+def lookup_first(ui, monkeypatch, fake_http) -> None:
+    monkeypatch.setenv("TAVILY_API_KEY", FAKE_SECRETS["TAVILY_API_KEY"])
+    fake_http(FakeResponse(TAVILY_OK))
+    ask(ui, "Tin AI?", tool_call("lookup", query="AI"), ModelResponse(text="Câu trả lời có nguồn"))
+
+
+def present(ui, *items: Any) -> None:
+    ask(ui, "Trình bày thành bullet", tool_call("format", items=list(items), template="bullets"), ModelResponse(text=ANSWER))
+
+
+def test_formatting_data_from_an_earlier_turn_stays_visible(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    present(ui, OLD_ITEM)
+
+    assert ANSWER in visible_answers(ui)
+    assert ANSWER in history(ui)
+    assert ui_app.NO_DATA_MESSAGE not in history(ui)
+    assert sum("[Tin A](https://example.com/a)" in value for value in visible_answers(ui)) == 2
+
+
+def test_reworded_summary_of_earlier_data_stays_visible(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    present(ui, {**OLD_ITEM, "url": "https://example.com/a/", "summary": "Nội dung thật được viết lại ngắn gọn"})
+
+    assert ANSWER in visible_answers(ui)
+
+
+def test_real_url_with_invented_content_is_hidden(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    present(ui, {"title": "Tuyên bố bịa đặt", "url": OLD_ITEM["url"], "summary": "Hoàn toàn khác biệt"})
+    assert_answer_hidden(ui)
+
+
+def test_invented_url_after_a_real_lookup_is_hidden(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    present(ui, {**OLD_ITEM, "url": "https://example.com/invented"})
+    assert_answer_hidden(ui)
+
+
+def test_one_invented_item_among_real_ones_hides_the_answer(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    present(ui, OLD_ITEM, {"title": "Tin B", "url": "https://example.com/b", "summary": "Tự chế"})
+    assert_answer_hidden(ui)
+
+
+def test_earlier_format_output_is_not_evidence(ui) -> None:
+    invented = {"title": "Tin tự chế", "url": "https://example.com/x", "summary": "Không có nguồn"}
+    ask(ui, "Tin AI?", tool_call("format", items=[invented], template="bullets"), ModelResponse(text="Lần một"))
+    present(ui, invented)
+    assert_answer_hidden(ui)
+
+
+def test_rank_of_earlier_data_stays_visible(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    monkeypatch.setitem(TOOL_FUNCTIONS, "rank", lambda **kw: {"tool": "rank", "items": kw["items"]})
+    ask(ui, "Xếp hạng tin vừa rồi", tool_call("rank", items=[OLD_ITEM]), ModelResponse(text=ANSWER))
+
+    assert ANSWER in visible_answers(ui)
+    assert ANSWER in history(ui)
+
+
+def test_rank_of_invented_data_after_a_real_lookup_is_hidden(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    invented = {"title": "Tin B", "url": "https://example.com/b", "summary": "Tự chế"}
+    monkeypatch.setitem(TOOL_FUNCTIONS, "rank", lambda **kw: {"tool": "rank", "items": kw["items"]})
+    ask(ui, "Xếp hạng", tool_call("rank", items=[invented]), ModelResponse(text=ANSWER))
+    assert_answer_hidden(ui)
+
+
+def test_failed_new_lookup_is_not_rescued_by_earlier_data(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    monkeypatch.setitem(TOOL_FUNCTIONS, "lookup", lambda **kw: {"tool": "web_search", "error": "HTTPError", "message": "x"})
+    ask(
+        ui, "Tin mới hơn?",
+        ModelResponse(tool_calls=[ToolCall("lookup", {"query": "AI"}), ToolCall("format", {"items": [OLD_ITEM]})]),
+        ModelResponse(text=ANSWER),
+    )
+    assert_answer_hidden(ui)
+
+
+def test_new_session_forgets_earlier_data(ui, monkeypatch, fake_http) -> None:
+    lookup_first(ui, monkeypatch, fake_http)
+    ui.at.sidebar.button[0].click().run()
+    assert not ui.at.exception
+    assert turns(ui) == []
+
+    present(ui, OLD_ITEM)
+    assert_answer_hidden(ui)
 
 
 def test_clarify_question_stays_visible(ui) -> None:

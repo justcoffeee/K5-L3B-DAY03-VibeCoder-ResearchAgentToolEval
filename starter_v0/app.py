@@ -19,6 +19,7 @@ import chat
 from chat import ARTIFACTS_DIR, now_iso, run_model_tool_loop, safe_slug, trim_history, write_transcript
 from providers import make_provider
 from tools import TOOL_FUNCTIONS, load_tool_declarations, to_openai_tools
+from tools._shared import terms
 from tools.send.tool import send_telegram
 from versioning import artifact_version_dict, build_artifact_version
 
@@ -44,6 +45,8 @@ RETRIEVAL_TOOLS = {
     "search_company_policy", "arxiv_search", "get_arxiv_paper_text",
 }
 PRESENTATION_TOOLS = {"render_digest", "rank"}
+# A reused item may be reworded, but this share of its words must come from the retrieved record.
+MIN_SHARED_TERMS = 0.3
 NO_DATA_MESSAGE = "Không có dữ liệu nguồn từ tool, nên câu trả lời của model đã bị ẩn để tránh thông tin không có nguồn."
 SEND_HOLD_STATUS = "awaiting_ui_confirmation"
 SEND_QUESTION = "Bạn kiểm tra nguyên văn nội dung bên dưới rồi bấm xác nhận để gửi lên Telegram."
@@ -158,12 +161,43 @@ def retrieved_records(event: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def answer_lacks_sources(turn: dict[str, Any]) -> bool:
-    """True when the turn tried to use tools for facts but got no source data."""
+def url_key(url: Any) -> str:
+    return str(url or "").strip().rstrip("/").lower()
+
+
+def record_supports_item(record: dict[str, Any], item: Any) -> bool:
+    if not isinstance(item, dict) or not url_key(item.get("url")) or url_key(item.get("url")) != url_key(record.get("url")):
+        return False
+    claimed = terms(f"{item.get('title') or ''} {item.get('summary') or ''}")
+    known = terms(f"{record.get('title') or ''} {record.get('summary') or ''}")
+    return bool(claimed) and len(claimed & known) / len(claimed) >= MIN_SHARED_TERMS
+
+
+def reused_records(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return the earlier records behind a presentation-only turn, or [] if any item is unverified."""
+    events = turn["tool_events"]
+    if not events or any(tool_failed(event) or result_of(event).get("tool") not in PRESENTATION_TOOLS for event in events):
+        return []
+    known = [record for earlier in earlier_turns for event in earlier["tool_events"] for record in retrieved_records(event)]
+    matched: list[dict[str, Any]] = []
+    for event in events:
+        items = (event.get("args") or {}).get("items")
+        if not isinstance(items, list) or not items:
+            return []
+        for item in items:
+            record = next((candidate for candidate in known if record_supports_item(candidate, item)), None)
+            if record is None:
+                return []
+            matched.append(record)
+    return matched
+
+
+def answer_lacks_sources(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> bool:
+    """True when the turn used tools for facts but has no source data from this session."""
     if turn["status"] == "waiting_for_user":
         return False  # A question or a draft to approve is not a factual answer.
     events = turn["tool_events"]
-    if any(retrieved_records(event) for event in events):
+    if any(retrieved_records(event) for event in events) or reused_records(turn, earlier_turns):
         return False
     return any(
         tool_failed(event) or result_of(event).get("tool") in RETRIEVAL_TOOLS | PRESENTATION_TOOLS
@@ -252,7 +286,7 @@ def run_turn(user_text: str) -> None:
     turn = save_turn(turn)
     if turn["status"] != "provider_error":
         # An answer written without source data must not become context for later turns.
-        answer = NO_DATA_MESSAGE if answer_lacks_sources(turn) else turn["assistant_text"]
+        answer = NO_DATA_MESSAGE if answer_lacks_sources(turn, state.transcript["turns"][:-1]) else turn["assistant_text"]
         state.history.append({"role": "user", "content": turn["user"]})
         state.history.append({"role": "assistant", "content": answer})
 
@@ -284,22 +318,22 @@ def resolve_send(event: dict[str, Any], approved: bool) -> None:
     state.history.append({"role": "assistant", "content": turn["assistant_text"]})
 
 
-def source_lines(turn: dict[str, Any]) -> list[str]:
+def source_lines(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> list[str]:
     lines: dict[str, str] = {}
-    for event in turn["tool_events"]:
-        for record in retrieved_records(event):
-            url = str(record.get("url") or "")
-            if url.startswith(("http://", "https://")):
-                title = re.sub(r"[\[\]]", "", str(record.get("title") or url))[:100]
-                lines.setdefault(url, f"- [{title}]({url}) · {record.get('source') or ''}")
-            elif record.get("section"):
-                label = f"{record.get('title')} › {record.get('section')}"
-                lines.setdefault(label, f"- {label} · hiệu lực {record.get('effective_date')}")
+    records = [record for event in turn["tool_events"] for record in retrieved_records(event)]
+    for record in records + reused_records(turn, earlier_turns):
+        url = str(record.get("url") or "")
+        if url.startswith(("http://", "https://")):
+            title = re.sub(r"[\[\]]", "", str(record.get("title") or url))[:100]
+            lines.setdefault(url, f"- [{title}]({url}) · {record.get('source') or ''}")
+        elif record.get("section"):
+            label = f"{record.get('title')} › {record.get('section')}"
+            lines.setdefault(label, f"- {label} · hiệu lực {record.get('effective_date')}")
     return list(lines.values())
 
 
-def render_sources(turn: dict[str, Any]) -> None:
-    sources = source_lines(turn)
+def render_sources(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> None:
+    sources = source_lines(turn, earlier_turns)
     if sources:
         st.markdown("**Nguồn**\n" + "\n".join(sources))
 
@@ -316,7 +350,7 @@ def render_tool_event(event: dict[str, Any]) -> None:
         st.success("Đã gửi lên Telegram.")
 
 
-def render_turn(turn: dict[str, Any]) -> None:
+def render_turn(turn: dict[str, Any], earlier_turns: list[dict[str, Any]]) -> None:
     with st.chat_message("user"):
         st.markdown(turn["user"])
     with st.chat_message("assistant"):
@@ -324,12 +358,12 @@ def render_turn(turn: dict[str, Any]) -> None:
             render_tool_event(event)
         if turn["status"] == "provider_error":
             st.error(f"Lỗi provider: {turn['error']}")
-            render_sources(turn)
+            render_sources(turn, earlier_turns)
             return
         if turn["status"] == "ui_action":
             st.markdown(turn["assistant_text"])
             return
-        if answer_lacks_sources(turn):
+        if answer_lacks_sources(turn, earlier_turns):
             st.error(NO_DATA_MESSAGE)
             return
         if any(tool_failed(event) for event in turn["tool_events"]):
@@ -339,7 +373,7 @@ def render_turn(turn: dict[str, Any]) -> None:
         if turn["status"] == "waiting_for_user":
             st.info("Agent đang chờ bạn trả lời.")
         st.markdown(turn["assistant_text"])
-        render_sources(turn)
+        render_sources(turn, earlier_turns)
 
 
 def render_send_confirmation(event: dict[str, Any], turn_index: int) -> None:
@@ -388,8 +422,8 @@ def main() -> None:
         if turns:
             st.caption(f"Transcript: `{st.session_state.transcript_path.name}`")
 
-    for turn in turns:
-        render_turn(turn)
+    for index, turn in enumerate(turns):
+        render_turn(turn, turns[:index])
     held = pending_send(turns)
     if held:
         render_send_confirmation(held, turns[-1]["turn_index"])
