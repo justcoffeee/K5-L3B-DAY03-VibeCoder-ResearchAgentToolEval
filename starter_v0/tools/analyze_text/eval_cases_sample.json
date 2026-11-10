@@ -1,0 +1,32 @@
+{
+  "_note": "Case mẫu bàn giao cho TV3. Chép vào data/eval_group.json -> cases[] SAU KHI analyze_text đã có trong artifacts/tools.yaml. expect.args chỉ ghi arg cần chấm.",
+  "cases": [
+    {
+      "id": "A_S01_analyze_key_points_with_text",
+      "phase": "B",
+      "query": "Rút giúp mình các ý chính của đoạn này: \"OpenAI vừa công bố mô hình mới với chi phí suy luận giảm 40%, hỗ trợ ngữ cảnh 1 triệu token, nhưng nhiều nhà nghiên cứu lo ngại về việc thiếu công bố dữ liệu huấn luyện.\"",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "analyze_text", "args": {"task": "key_points"}}]},
+      "metadata": {
+        "skill": "routing_new_tool_analyze",
+        "difficulty": "easy",
+        "what_it_tests": "Text đã nằm trong câu hỏi, user muốn ý chính -> analyze_text task=key_points; không gọi lookup/fetch thừa."
+      }
+    },
+    {
+      "id": "A_M01_analyze_missing_text_then_fill",
+      "phase": "B",
+      "turns": [
+        {"role": "user", "content": "Đánh giá giúp mình thái độ của đoạn bình luận này là tích cực hay tiêu cực"},
+        {"role": "user", "content": "Đây: \"Bản cập nhật lần này chậm hơn hẳn, lỗi liên tục, mình rất thất vọng.\""}
+      ],
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "analyze_text", "args": {"task": "sentiment"}}]},
+      "metadata": {
+        "skill": "multiturn_clarify_then_analyze",
+        "difficulty": "medium",
+        "what_it_tests": "Lượt 1 chưa có text -> phải clarify, không bịa nội dung. Lượt 2 có text -> analyze_text task=sentiment."
+      }
+    }
+  ]
+}
