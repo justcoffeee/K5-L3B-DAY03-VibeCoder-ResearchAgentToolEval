@@ -5,7 +5,7 @@
 - Họ tên: Vũ Duy Khánh
 - MSSV: 2A202603865
 - GitHub: khanhduyvu1
-- Email: khanhduy1609@gmail.com
+- Email: 26ai.khanhvd2@vinuni.edu.vn
 
 ## 2. Phần việc phụ trách
 
