@@ -123,3 +123,68 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- Team tools (CP3) ----------------
+  - name: analyze_text
+    description: >-
+      Dùng LLM (Groq) để tóm tắt, rút ý chính hoặc đánh giá sentiment của một đoạn text ĐÃ CÓ.
+      DÙNG KHI agent đã lấy được nội dung (từ fetch, paper_text, timeline, social_search...) và user
+      muốn "tóm tắt", "ý chính", "dư luận tích cực/tiêu cực".
+      KHÔNG DÙNG để tìm kiếm hoặc đọc URL: tool không truy cập web, phải gọi fetch/lookup/timeline trước.
+      KHÔNG DÙNG để trình bày nhiều item thành bản tin (dùng format).
+    parameters:
+      type: object
+      properties:
+        text:
+          type: string
+          default: ""
+          description: "Nội dung nguyên văn cần phân tích, lấy từ kết quả tool trước. Không truyền URL."
+        task:
+          type: string
+          enum: [summary, key_points, sentiment]
+          default: summary
+          description: "summary khi user muốn tóm tắt; key_points khi muốn các ý chính/gạch đầu dòng; sentiment khi hỏi thái độ/dư luận tích cực hay tiêu cực."
+        focus:
+          type: string
+          default: ""
+          description: "Khía cạnh user muốn tập trung nếu có (vd: 'chi phí', 'rủi ro'). Để trống nếu không nói."
+        language:
+          type: string
+          default: vi
+          description: "Ngôn ngữ của output: vi (mặc định) hoặc en nếu user yêu cầu tiếng Anh."
+        max_words:
+          type: integer
+          default: 150
+          description: "Độ dài tối đa của summary (30-500 từ). Đặt theo yêu cầu của user, ví dụ 'tóm tắt trong 50 chữ' thì 50."
+      required: [text]
+
+  - name: rank
+    description: >-
+      Lọc trùng và xếp hạng các item ĐÃ THU THẬP từ tool khác (lookup, social_search, timeline, papers...),
+      giữ lại top_k. Chạy cục bộ, không gọi mạng.
+      DÙNG KHI có nhiều item (gộp từ nhiều nguồn hoặc nhiều hơn số user cần) và user muốn
+      "top N quan trọng nhất", "mới nhất trước", "nhiều tương tác nhất". Gọi TRƯỚC format.
+      KHÔNG DÙNG khi chưa có item (phải tìm trước), khi chỉ có 1-2 item, để tóm tắt nội dung (dùng analyze_text)
+      hoặc chỉ để trình bày (dùng format).
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          default: []
+          description: "Truyền nguyên các item lấy từ kết quả tool trước (giữ title, url, source, summary, date, metrics, score...)."
+          items: {type: object}
+        query:
+          type: string
+          default: ""
+          description: "Chủ đề hoặc câu hỏi của user, dùng để chấm độ liên quan (vd: 'GPT-5')."
+        criteria:
+          type: string
+          enum: [balanced, relevance, recency, popularity]
+          default: balanced
+          description: "recency khi user muốn 'mới nhất'; popularity khi muốn 'nổi bật/nhiều like/viral'; relevance khi muốn 'liên quan nhất'; còn lại balanced."
+        top_k:
+          type: integer
+          default: 5
+          description: "Số item giữ lại (1-20), lấy đúng số user yêu cầu, mặc định 5."
+      required: [items]
