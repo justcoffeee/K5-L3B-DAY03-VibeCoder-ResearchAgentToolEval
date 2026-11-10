@@ -221,3 +221,133 @@ def test_analyze_text_api_failures_return_error_dict(groq_env, fake_http, failur
 
     assert result["tool"] == "analyze_text"
     assert result["error"] == expected_error
+
+
+# ---------------- rank (team tool, local) ----------------
+
+rank_tool = TOOL_FUNCTIONS["rank"]
+
+
+def _titles(result) -> list[str]:
+    return [item["title"] for item in result["items"]]
+
+
+def test_rank_relevance_orders_by_query_match_and_adds_rank_fields(fake_http) -> None:
+    calls = fake_http(FakeResponse({}))
+    items = [
+        {"title": "Giá vàng hôm nay", "url": "https://a.com/1", "summary": "thị trường vàng"},
+        {"title": "GPT-5 ra mắt", "url": "https://b.com/2", "summary": "OpenAI công bố GPT-5"},
+        {"title": "Tin công nghệ", "url": "https://c.com/3", "summary": "nhắc tới GPT-5 trong bài"},
+    ]
+
+    result = rank_tool(items=items, query="GPT-5", criteria="relevance", top_k=3)
+
+    assert calls == []  # purely local, never touches the network
+    assert _titles(result) == ["GPT-5 ra mắt", "Tin công nghệ", "Giá vàng hôm nay"]
+    top = result["items"][0]
+    assert top["rank"] == 1 and top["url"] == "https://b.com/2" and top["summary"] == "OpenAI công bố GPT-5"
+    assert top["rank_signals"]["relevance"] == 1.0
+    assert result["items"][2]["rank_signals"]["relevance"] == 0.0
+    assert "rank" not in items[0]  # input list is not mutated
+
+
+def test_rank_dedupes_same_url_variants_and_same_title_without_url() -> None:
+    items = [
+        {"title": "A", "url": "https://www.example.com/post/?utm_source=x#top"},
+        {"title": "A copy", "url": "https://example.com/post"},
+        {"title": "Video", "url": "https://youtube.com/watch?v=1"},
+        {"title": "Video 2", "url": "https://youtube.com/watch?v=2"},  # real query param -> NOT a duplicate
+        {"title": "Tin Nóng  Hôm Nay"},
+        {"title": "tin nong hom nay"},  # same title after folding accents/case/spaces
+    ]
+
+    result = rank_tool(items=items, top_k=20)
+
+    assert result["dropped_duplicates"] == 2
+    assert sorted(_titles(result)) == sorted(["A", "Video", "Video 2", "Tin Nóng  Hôm Nay"])
+
+
+def test_rank_recency_parses_twitter_iso_and_rfc_dates_undated_last() -> None:
+    items = [
+        {"title": "no date"},
+        {"title": "tweet", "date": "Mon Nov 09 10:00:00 +0000 2026"},
+        {"title": "paper", "published": "2026-10-01T00:00:00Z"},
+        {"title": "rss", "date": "Tue, 10 Nov 2026 08:00:00 +0000"},
+        {"title": "garbage date", "date": "hôm qua"},
+    ]
+
+    result = rank_tool(items=items, criteria="recency", top_k=5)
+
+    assert _titles(result) == ["rss", "tweet", "paper", "no date", "garbage date"]
+    assert result["items"][0]["rank_signals"]["recency"] == 1.0
+    assert result["items"][2]["rank_signals"]["recency"] == 0.1
+    assert result["items"][3]["rank_signals"]["recency"] == 0.0
+
+
+def test_rank_popularity_uses_metrics_and_stars_with_string_counts() -> None:
+    items = [
+        {"title": "quiet", "metrics": {"favorites": 3, "retweets": 0, "views": None}},
+        {"title": "viral", "metrics": {"favorites": "12,000", "retweets": 4000, "views": 900000}},
+        {"title": "repo", "stars": 500},
+        {"title": "bad metrics", "metrics": "n/a"},
+    ]
+
+    result = rank_tool(items=items, criteria="popularity", top_k=4)
+
+    assert _titles(result) == ["viral", "repo", "quiet", "bad metrics"]
+    assert result["items"][0]["rank_signals"]["popularity"] == 1.0
+
+
+def test_rank_balanced_without_query_uses_recency_and_popularity() -> None:
+    items = [
+        {"title": "old but viral", "date": "2026-01-01", "metrics": {"favorites": 10000}},
+        {"title": "new and quiet", "date": "2026-11-10", "metrics": {"favorites": 1}},
+        {"title": "new and viral", "date": "2026-11-09", "metrics": {"favorites": 9000}},
+    ]
+
+    result = rank_tool(items=items)
+
+    assert result["criteria"] == "balanced"
+    assert _titles(result)[0] == "new and viral"
+
+
+@pytest.mark.parametrize("bad_items", ["GPT-5 news", {"title": "x"}, 42])
+def test_rank_non_list_items_returns_error_dict(bad_items) -> None:
+    result = rank_tool(items=bad_items)
+
+    assert result["tool"] == "rank"
+    assert result["error"] == "ValueError"
+
+
+@pytest.mark.parametrize("empty", [None, []])
+def test_rank_empty_items_returns_empty_result_not_error(empty) -> None:
+    result = rank_tool(items=empty)
+
+    assert "error" not in result
+    assert result["items"] == [] and result["input_count"] == 0
+
+
+def test_rank_drops_non_object_entries_and_normalises_bad_args() -> None:
+    items = [{"title": f"t{i}", "url": f"https://x.com/{i}"} for i in range(25)] + ["oops", None, 7]
+
+    result = rank_tool(items=items, criteria="hottest", top_k="999")
+
+    assert result["dropped_invalid"] == 3
+    assert result["criteria"] == "balanced"
+    assert len(result["items"]) == 20  # top_k clamped to the max
+    assert any("hottest" in w for w in result["warnings"])
+    assert _titles(result)[:3] == ["t0", "t1", "t2"]  # all-tie -> original order kept
+
+
+@pytest.mark.parametrize("raw_k, expected_len", [(0, 1), (-3, 1), ("2", 2), ("abc", 5), (None, 5)])
+def test_rank_top_k_is_coerced(raw_k, expected_len) -> None:
+    items = [{"title": f"t{i}", "url": f"https://x.com/{i}"} for i in range(8)]
+
+    assert len(rank_tool(items=items, top_k=raw_k)["items"]) == expected_len
+
+
+def test_rank_relevance_without_query_falls_back_with_warning() -> None:
+    result = rank_tool(items=[{"title": "a"}, {"title": "b"}], criteria="relevance", query="  ")
+
+    assert result["criteria"] == "balanced"
+    assert result["warnings"] == ["criteria 'relevance' needs a query, used 'balanced'"]

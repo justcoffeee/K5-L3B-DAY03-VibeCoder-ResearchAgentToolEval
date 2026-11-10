@@ -18,6 +18,7 @@ from .social_search.tool import search_tweets
 from .send.tool import send_telegram
 from .lookup.tool import web_search
 from .analyze_text.tool import analyze_text
+from .rank.tool import rank_items
 
 
 # NOTE (starter_v0): tool names here are intentionally vague. These keys are the
@@ -38,6 +39,7 @@ TOOL_FUNCTIONS = {
     "paper_text": get_arxiv_paper_text,
     # CP3 — team tools (declare in artifacts/tools.yaml after baseline, see tools/<name>/declaration.yaml):
     "analyze_text": analyze_text,
+    "rank": rank_items,
 }
 
 
