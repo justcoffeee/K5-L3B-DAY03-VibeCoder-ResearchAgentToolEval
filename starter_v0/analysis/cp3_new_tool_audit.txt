@@ -1,0 +1,4 @@
+analyze_text: metadata, registry and declaration OK
+rank: metadata, registry and declaration OK
+rank: 216 calls passed (9 invalid counts x 6 fields x 4 criteria)
+No API calls; analyze_text request/error paths are covered by mocked unit tests.

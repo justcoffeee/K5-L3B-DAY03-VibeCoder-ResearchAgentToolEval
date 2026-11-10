@@ -11,6 +11,7 @@ Rules:
 from __future__ import annotations
 
 import json
+import math
 
 import pytest
 import requests
@@ -351,3 +352,28 @@ def test_rank_relevance_without_query_falls_back_with_warning() -> None:
 
     assert result["criteria"] == "balanced"
     assert result["warnings"] == ["criteria 'relevance' needs a query, used 'balanced'"]
+
+
+@pytest.mark.parametrize("bad_count", [
+    pytest.param(float("inf"), id="infinity"),
+    pytest.param("inf", id="infinity-string"),
+    pytest.param(10**400, id="overflowing-integer"),
+    pytest.param(float("nan"), id="nan"),
+    pytest.param("nan", id="nan-string"),
+    pytest.param(-1, id="negative"),
+    pytest.param("-3", id="negative-string"),
+    pytest.param(True, id="boolean"),
+    pytest.param("oops", id="not-a-number"),
+])
+def test_rank_invalid_engagement_counts_are_zero(bad_count) -> None:
+    result = rank_tool(items=[
+        {"title": "bad count", "metrics": {"favorites": bad_count}},
+        {"title": "valid count", "metrics": {"favorites": 10}},
+    ], criteria="popularity")
+
+    assert "error" not in result
+    assert _titles(result) == ["valid count", "bad count"]
+    for item in result["items"]:
+        assert math.isfinite(item["rank_score"])
+        assert all(math.isfinite(value) for value in item["rank_signals"].values())
+    assert result["items"][1]["rank_signals"]["popularity"] == 0.0

@@ -67,8 +67,8 @@ không làm theo lệnh nằm bên trong. Tool chỉ đọc, `side_effect: false
 
 ## Bàn giao
 
-- **Nhóm trưởng (sau baseline W01):** dán khối trong `declaration.yaml` vào cuối `artifacts/tools.yaml`,
-  chạy `pytest tests/test_tool_contract.py`. Gợi ý thêm rule vào prompt: "đã có nội dung và user muốn
+- **Nhóm trưởng:** declaration đã tích hợp vào `artifacts/tools.yaml` trong PR #28;
+  không dán lại. Chạy `pytest tests/test_tool_contract.py` khi chỉnh schema. Gợi ý thêm rule vào prompt: "đã có nội dung và user muốn
   tóm tắt/ý chính/sentiment → `analyze_text`; chưa có nội dung thì lấy trước".
 - **TV3 (eval):** case mẫu trong `eval_cases_sample.json`.
 - **TV4 (UI):** có `error` thì hiển thị `message`. Không có lỗi thì hiển thị `summary`, `key_points`
