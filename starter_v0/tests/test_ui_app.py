@@ -297,7 +297,7 @@ def test_retrieved_data_shows_answer_and_source_link(ui, monkeypatch, fake_http)
 
     assert ANSWER in visible_answers(ui)
     assert ANSWER in history(ui)
-    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": ""}]
+    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": "example.com"}]
 
 
 # Data retrieved in an earlier turn of the same session can be presented again.
@@ -424,7 +424,7 @@ def test_provider_error_after_a_round_keeps_the_trace(ui, monkeypatch, fake_http
     assert saved["tool_events"][0]["args"] == {"query": "AI"}
     assert saved["tool_events"][0]["result"]["items"][0]["url"] == "https://example.com/a"
     assert len(saved["rounds"]) == 1
-    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": ""}]
+    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": "example.com"}]
     assert_no_secret(ui)
     assert history(ui) == []
 
