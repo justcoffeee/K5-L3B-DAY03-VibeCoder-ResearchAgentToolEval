@@ -53,12 +53,12 @@ chưa có bằng chứng để khẳng định nguyên nhân cụ thể. Không 
 Các URL cố định R04/R11/M04 trả nội dung trang 404; không đổi case để né lỗi.
 R14 gọi send sai mục đích, nhưng code guard trả needs_confirmation; không gửi Telegram.
 R03/M02/M06 dùng đúng tool, nhưng query khác exact-match expectation; cần review ngữ nghĩa riêng.
-Tên/MSSV/email các thành viên khác còn chờ chủ tài khoản tự bổ sung.
+Thông tin họ tên, MSSV, email và GitHub của cả 4 thành viên đã được bổ sung trong TEAM.md từ dữ liệu nhóm trưởng cung cấp. Nhánh nộp/commit chốt sẽ được ghi ở bước chốt bài CP5.
 
 ## Bàn giao
 
 Có thể dùng run v0 này làm mốc so sánh cho issue #10: mỗi vòng một giả thuyết, cùng Groq/model.
 Ưu tiên khảo sát hỏi lại khi thiếu thông tin, boundary hành động, ưu tiên correction mới nhất;
 không sửa đồng thời nhiều giả thuyết rồi gọi là một version. Phối hợp TV2 khi tích hợp tool mới.
-RapidAPI đã pass retest; thông tin cá nhân thành viên còn thiếu và giới hạn URL 404 vẫn cần theo dõi.
+RapidAPI đã pass retest; thông tin cá nhân 4 thành viên đã đủ trong TEAM.md. Các URL 404 của case cố định vẫn là giới hạn được ghi nhận, không sửa case để né lỗi.
 Chỉ đóng #9 khi đã kiểm tra đầy đủ checklist, thông tin nhóm và giới hạn live được nhóm chấp nhận/xử lý.
