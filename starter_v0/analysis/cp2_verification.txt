@@ -1,0 +1,7 @@
+v0: 9/20 PASS; hashes/scoring valid
+v1: 15/20 PASS; hashes/scoring valid
+v2: 14/20 PASS; hashes/scoring valid
+v3: 16/20 PASS; hashes/scoring valid
+v4-integration: 18/20 PASS; hashes/scoring valid
+Invalid attempts preserved outside version_log: v2_B_base_groq_20261110T234332919111.json, v3_B_base_groq_20261110T235156471432.json
+CP2 evidence verification PASSED (offline; no provider or tool execution)

@@ -1,0 +1,19 @@
+# Preserve exact measured bytes for artifact and preregistration hashes.
+starter_v0/artifacts/** -text whitespace=cr-at-eol
+starter_v0/analysis/cp2_plans/** -text whitespace=cr-at-eol
+starter_v0/analysis/cp2_harness/** -text whitespace=cr-at-eol
+
+# The historical Windows runs hashed these existing inputs with CRLF.
+# Explicit checkout EOL reproduces those bytes on Linux as well as Windows,
+# without changing the normalized source/case content stored in Git.
+starter_v0/agent.py text eol=crlf
+starter_v0/run_eval.py text eol=crlf
+starter_v0/tools/__init__.py text eol=crlf
+starter_v0/tools/analyze_text/tool.py text eol=crlf
+starter_v0/tools/rank/tool.py text eol=crlf
+starter_v0/data/eval_base.json text eol=crlf
+starter_v0/data/eval_research_extension.json text eol=crlf
+starter_v0/runs/v0_B_base_groq_20261110T175003235889.json text eol=crlf
+
+# Captured terminal tables contain intentional right-padding; retain the raw log.
+starter_v0/artifacts/versions/*/eval_attempt_*.txt -whitespace

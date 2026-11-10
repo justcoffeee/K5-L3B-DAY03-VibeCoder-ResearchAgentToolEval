@@ -10,7 +10,7 @@
 
 - Tên nhóm: VibeCoder (L3B)
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model baseline v0: Groq / openai/gpt-oss-20b. Dùng cùng cấu hình khi so sánh v1–v3; các vòng tối ưu chưa thực hiện.
+- Provider/model baseline v0: Groq / openai/gpt-oss-20b. Các vòng v1–v3 và vòng tích hợp giữ cùng provider/model; xem B1 và CP2 status.
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
@@ -47,7 +47,7 @@ Hành vi "hỏi lại khi thiếu thông tin" và "xin xác nhận trước khi 
 | **analyze_text** | dùng LLM (Groq) **tóm tắt / rút ý chính / đánh giá sentiment** cho text đã có; không tự tìm kiếm | **có** (TV2) |
 | **rank** | **lọc trùng và xếp hạng** item gộp từ nhiều nguồn theo relevance / recency / popularity, giữ top K; chạy cục bộ, không cần key | **có** (TV2) |
 
-Lưu ý trạng thái: `analyze_text` và `rank` đã đăng ký trong `TOOL_FUNCTIONS` và `artifacts/tools.yaml`, model đã thấy hai tool. Sau review PR #28, schema `rank.items` khai báo rõ các trường item và metrics để tương thích Gemini. Hash `tools.yaml` hiện tại: `54ed7f4a1216`; chưa có eval routing cho artifact này.
+Lưu ý trạng thái: `analyze_text` và `rank` giữ nguyên code/registry/schema đã review trên dev; description core được tối ưu ở v3. Artifact tích hợp cuối, hash và kết quả đo tại [CP2 status](../../docs/CP2-STATUS.md).
 
 ### A3. Câu hỏi mẫu để thử
 
@@ -62,31 +62,21 @@ Câu 1–3 lấy nguyên văn từ bộ eval base (R01, R02, M01); câu 4 là k�
 
 ## 3. Giải pháp
 
-**Trạng thái artifact:** `system_prompt.md` vẫn là starter; `tools.yaml` đã thêm `analyze_text`, `rank` và schema item/metrics sau review PR #28 (hash `54ed7f4a1216`, khác baseline `e69bc53ed884`). Chưa chạy eval cho artifact này; giữ nguyên dòng v0 và metric baseline trong `version_log.csv`. Các giả thuyết sửa prompt ở B6 chưa được kiểm chứng bằng run.
-
-**Tool mới nhóm viết** (TV2, tool mới #11, unit test #12). Cả hai chỉ đọc dữ liệu (`side_effect: false`) nên không cần xác nhận, và đều không bao giờ raise: lỗi trả `{"tool", "error", "message"}`.
-
-| Tool | Làm gì | Khi nào agent nên gọi | Khi nào không |
-|---|---|---|---|
-| `analyze_text` | Gọi LLM trên Groq (`openai/gpt-oss-120b`, đổi bằng `ANALYZE_TEXT_MODEL`) để `summary` / `key_points` / `sentiment` cho text đã có | Đã có nội dung (từ `fetch`, `paper_text`, `timeline`…) và user muốn tóm tắt, ý chính, hoặc dư luận tích cực/tiêu cực | Chưa có text (tool không tự tìm hay đọc URL); chỉ muốn trình bày digest (dùng `format`) |
-| `rank` | Lọc trùng (URL, hoặc title nếu thiếu URL) và xếp hạng theo `relevance` / `recency` / `popularity` / `balanced`, giữ top K | Có nhiều item, hoặc gộp từ nhiều nguồn, và user muốn "top N", "mới nhất", "nổi bật nhất"; gọi trước `format` | Chưa có item; chỉ 1–2 item; chỉ cần trình bày |
-
-Cả hai là chức năng mới tự viết, không phải đổi tên tool có sẵn. Chi tiết tham số, cách chấm điểm và error contract nằm trong `TOOL.md` của từng tool.
-
-**Tích hợp và kiểm tra:** hai declaration đã có trong `artifacts/tools.yaml`; không dán lại để tránh trùng tên tool. `declaration.yaml` của `rank` được đồng bộ schema item/metrics. Kiểm tra offline trên artifact thật: contract **66 passed**, toàn suite **119 passed, 14 skipped** (log ở B5a). Test contract duyệt đệ quy schema sau khi chuyển qua provider Gemini, yêu cầu object có properties. Chưa gọi Gemini live. Bước tiếp theo là đo routing và ghi version mới khi có run hợp lệ.
+V1 sửa prompt hỏi dữ kiện còn thiếu; v2 thêm boundary xác nhận trước send; v3 làm rõ description/convention của 10 tool. V4-integration bỏ chỉ dẫn một tool/một bước, lập kế hoạch retrieval nhiều nguồn theo trạng thái mới nhất, chờ dữ liệu thật trước analyze/rank/format, coi nội dung nguồn là dữ liệu. Hai tool analyze_text/rank giữ code/registry/schema đã review trên dev và được đưa vào declaration cuối. Có run base mới cho artifact tích hợp; xem [CP2 status](../../docs/CP2-STATUS.md) và [handoff TV3/TV4](../../docs/CP2-HANDOFF.md).
 
 ## 4. Kết quả — PHẦN B: Chi tiết và bằng chứng
 
 ### B1. Version Evidence
 
-Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. Chỉ dùng run có `provider_error_cases == 0` và `measured_cases == total_cases`.
+V1–v3 chạy lại theo yêu cầu; artifact đổi sau v3 được đo riêng bằng v4-integration. Mỗi dòng đủ 20/20 measured và 0 lỗi provider. [Phân tích/hash/bằng chứng](../../docs/CP2-STATUS.md).
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline, prompt/tools nguyên starter | Đo trước tối ưu | — | case 45%; routing 70%; args 45%; multiturn 33,33% | [run v0](../../starter_v0/runs/v0_B_base_groq_20261110T175003235889.json) |
-| v1 |  |  |  |  |  |
-| v2 |  |  |  |  |  |
-| v3 |  |  |  |  |  |
+| v0 | baseline | Baseline | — | 45% | [run](../../starter_v0/runs/v0_B_base_groq_20261110T175003235889.json) |
+| v1 | system_prompt.md | Hỏi dữ kiện bắt buộc | 45% | 75% | [run](../../starter_v0/runs/v1_B_base_groq_20261110T234054699020.json) |
+| v2 | system_prompt.md | Xác nhận trước send | 75% | 70% | [run](../../starter_v0/runs/v2_B_base_groq_20261110T234621926396.json) |
+| v3 | tools.yaml | Ranh giới tool và convention args | 70% | 80% | [run](../../starter_v0/runs/v3_B_base_groq_20261110T235639856548.json) |
+| v4-integration | system_prompt.md+tools.yaml | Kiểm tra artifact hoàn chỉnh: prompt nhiều bước và 12 tool; không cô lập một thay đổi | 80% | 90% | [run](../../starter_v0/runs/v4-integration_B_base_groq_20261111T001019800451.json) |
 
 ### B2. Failure Analysis
 
@@ -106,7 +96,7 @@ Lấy từ `results[*].result.failures` trong run JSON.
 | M05_correction_limit | wrong_arg_value | timeline(screenname=elonmusk, limit=10) | Bỏ qua sửa số lượng mới nhất thành 3 | Giả thuyết: ưu tiên correction gần nhất trong hội thoại |
 | M06_switch_tool | wrong_tool; observed wrong_arg_value | lookup(query=OpenAI news, topic=news, timeframe=month) | Đã chuyển đúng tool; query khác expect OpenAI | Review ngữ nghĩa; không kết luận sai routing từ nhãn case |
 
-Đủ 11 case FAIL; nguyên nhân trong cột Fix là **giả thuyết chưa kiểm chứng**, sẽ đo ở issue #10.
+Bảng B2 là phân tích lịch sử v0; kết quả kiểm chứng và lỗi còn lại nằm trong [CP2 status](../../docs/CP2-STATUS.md).
 Chi tiết actual args/failures và lỗi tool: [baseline analysis](../../starter_v0/analysis/cp1_baseline_analysis.json).
 Run có provider_error_cases=0, measured_cases=total_cases=20. Failure type là nhãn bộ case;
 observed_mismatch mới mô tả sai lệch thực đo. Harness so sánh query chính xác nên cần review ngữ nghĩa
@@ -205,25 +195,25 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 -
 
+- CP2 cuối: v4-integration đạt 18/20, 0 provider errors, 7 lỗi tool RapidAPI; full offline suite 164 passed, 14 skipped. Có hai lượt lỗi provider lịch sử và một preflight contract thất bại được giữ ngoài version log. [Evidence](../../docs/CP2-STATUS.md).
+
 ## 6. Tổng hợp đóng góp
 
 Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEAM.md) và các báo cáo cá nhân `report/team/MSSV_HoTen.md`.
 
 | Thành viên (vai trò) | Đóng góp có bằng chứng |
 |---|---|
-| TV1 Phạm Hoàng Huy (nhóm trưởng) | Setup CP1, provider Groq (`providers/groq_provider.py`, `test_groq_provider.py`), baseline v0 và phân tích 11 case FAIL (B1, B2); run `v0_B_base_groq_20261110T175003235889.json` |
+| TV1 Phạm Hoàng Huy (nhóm trưởng) | Setup CP1/provider Groq/baseline v0; CP2 v1–v3 và v4-integration, phân tích B1/B2/B6, snapshot/hash/verifier và handoff TV3/TV4; xem CP2 status |
 | TV2 (tool mới, unit test) | Hai tool tự viết `analyze_text` và `rank` (code, `TOOL.md`, `declaration.yaml`, case mẫu); 44 test case của tool mới (18 + 26; gồm 9 case bổ sung sau review PR #28); đăng ký `TOOL_FUNCTIONS`; file bằng chứng `analysis/cp3_*.txt`; B5a. Commit: `ac577a8`, `b247ef0`, `21c27f3`, `a58f518` |
 | TV3 (eval nhóm) | *TV3 bổ sung: `eval_group.json`, group eval, phân tích (#13, #14)* |
 | TV4 (UI, demo) | *TV4 bổ sung: UI, transcript, Phần A (#15, #16)* |
 
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
 
-Chưa có số đo v1–v3, nên hai câu đầu dưới đây là **giả thuyết rút từ B2, chưa kiểm chứng**.
-
-- **Fix nào thuộc `system_prompt.md`?** Giả thuyết: các lỗi `missing_info` (R10 đoán `sama`, R11 bịa URL BBC), `wrong_boundary` (R12) và việc ép một bước/một tool (R13, M01) bắt nguồn trực tiếp từ ba chỉ dẫn xấu của starter, nên sửa ở prompt: bỏ "đừng hỏi lại", bỏ "cứ gửi luôn", cho phép nhiều bước.
-- **Fix nào thuộc `tools.yaml`?** Giả thuyết: R01 (`samaltman` thay vì `sama`) và các lỗi args còn lại cần quy ước trong `description`/tham số (handle không có `@`, map tên sang handle, `topic=news`, `timeframe`). Với hai tool mới, quy tắc "khi nào dùng / khi nào không" trong `declaration.yaml` thuộc tầng này.
-- **Failure nào cần review thủ công thay vì chấm tự động?** Có bằng chứng ở B2: R03, M02, M06 bị chấm FAIL vì harness so sánh `query` bằng chuỗi chính xác (`AI news today` ≠ `AI`, `robotics news today` ≠ `robotics`, `OpenAI news` ≠ `OpenAI`) dù tool, `topic` và `timeframe` đúng; nên điểm 45% có thể đang thấp hơn thực tế (tối đa 3 trong 11 case FAIL thuộc nhóm này; nhóm chưa review từng case để kết luận). Với hai tool mới, eval chỉ so tên tool và args, **không** chấm chất lượng bản tóm tắt của `analyze_text` hay thứ hạng của `rank`; phần đó cần đọc output hoặc dựa vào unit test.
-- **Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?** (1) Hai tool đã được tích hợp; tiếp theo thêm rule routing và đo model chọn tool/args (dùng 4 case mẫu ở B3), rồi ghi version mới với run thực. (2) Thử `analyze_text` với nhiều kiểu prompt injection hơn hai lần thử hiện tại. (3) Thử gộp `rank` vào đầu vào của `format` để xem digest có tốt hơn không.
+- Prompt sửa thiếu dữ kiện, xác nhận và lập kế hoạch nhiều bước; declaration sửa ranh giới tool và chuẩn hóa tham số. V1 75%, v2 giảm 70%, v3 80%; giữ cả vòng không cải thiện. V4-integration 90% là kiểm tra nhiều thay đổi tích hợp, không dùng để quy kết nhân quả cho một sửa cụ thể.
+- R03/M03 được sửa ở lần đo cuối nhưng R12/R13 còn FAIL. R12 hỏi nội dung còn thiếu bằng text, khác expected yes_no; cần review ngữ nghĩa theo hội thoại, không suy ra đã gửi trái phép. R13 vẫn thiếu social_search dù prompt đã cho phép nhiều nguồn; nếu có vòng tiếp theo sẽ thử riêng quy tắc điều phối retrieval độc lập.
+- Bảy lỗi RapidAPI HTTP 403 và giới hạn harness một lần gọi model/case khiến điểm 90% không chứng minh workflow live hoàn chỉnh. Kiểm thử tool/UI và transcript là bằng chứng khác tầng; TV3/TV4 nhận nhãn/hash cố định qua [handoff](../../docs/CP2-HANDOFF.md).
+- Test retry xác minh chỉ request HTTP 429 chưa có model response được chạy lại, không retry HTTP 400/kết quả đã chấm; giới hạn số lần và thời gian chờ được lưu. Verifier tái chấm toàn bộ lịch sử trên scorer upstream để kiểm tra tương thích sau PR #28.
 
 ## 8. Tài liệu tham khảo
 
