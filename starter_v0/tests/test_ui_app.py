@@ -260,6 +260,32 @@ def test_format_alone_is_not_evidence(ui) -> None:
     assert not any(value.startswith("**Nguồn**") for value in visible_answers(ui))
 
 
+def test_source_metadata_is_rendered_as_text_and_urls_are_validated(ui, monkeypatch) -> None:
+    malicious_title = "[Đăng nhập](https://phish.example)\n- [Nút giả](https://evil.example)"
+    result = {
+        "tool": "web_search",
+        "items": [{
+            "title": malicious_title,
+            "url": "https://news.example/story",
+            "source": "[Nguồn giả](https://evil.example)",
+            "summary": "Nội dung nguồn có thật",
+        }],
+    }
+    monkeypatch.setitem(TOOL_FUNCTIONS, "lookup", lambda **kw: result)
+    ask(ui, "Tin AI?", tool_call("lookup", query="AI"), ModelResponse(text=ANSWER))
+
+    assert "[Đăng nhập](https://phish.example) - [Nút giả](https://evil.example)" in rendered(ui)
+    assert malicious_title not in visible_answers(ui), "untrusted title must not be parsed as Markdown"
+    assert ui_app.source_entries(turns(ui)[0], []) == [{
+        "title": "[Đăng nhập](https://phish.example) - [Nút giả](https://evil.example)",
+        "url": "https://news.example/story",
+        "source": "[Nguồn giả](https://evil.example)",
+    }]
+    assert ui_app.safe_source_url("javascript:alert(1)") is None
+    assert ui_app.safe_source_url("https://news.example/a)\n- [Nút giả](https://evil.example") is None
+    assert ui_app.safe_source_url("https://user:pass@news.example/a") is None
+
+
 def test_rank_output_is_not_a_source(ui, monkeypatch) -> None:
     monkeypatch.setitem(TOOL_FUNCTIONS, "rank", lambda **kw: {"tool": "rank", "items": [{"title": "T", "summary": "S"}]})
     ask(ui, "Tin AI?", tool_call("rank", items=[]), ModelResponse(text=ANSWER))
@@ -273,7 +299,7 @@ def test_retrieved_data_shows_answer_and_source_link(ui, monkeypatch, fake_http)
 
     assert ANSWER in visible_answers(ui)
     assert ANSWER in history(ui)
-    assert any("[Tin A](https://example.com/a)" in value for value in visible_answers(ui))
+    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": ""}]
 
 
 # Data retrieved in an earlier turn of the same session can be presented again.
@@ -298,7 +324,7 @@ def test_formatting_data_from_an_earlier_turn_stays_visible(ui, monkeypatch, fak
     assert ANSWER in visible_answers(ui)
     assert ANSWER in history(ui)
     assert ui_app.NO_DATA_MESSAGE not in history(ui)
-    assert sum("[Tin A](https://example.com/a)" in value for value in visible_answers(ui)) == 2
+    assert sum(len(ui_app.source_entries(turn, turns(ui)[:index])) for index, turn in enumerate(turns(ui))) == 2
 
 
 def test_reworded_summary_of_earlier_data_stays_visible(ui, monkeypatch, fake_http) -> None:
@@ -400,7 +426,7 @@ def test_provider_error_after_a_round_keeps_the_trace(ui, monkeypatch, fake_http
     assert saved["tool_events"][0]["args"] == {"query": "AI"}
     assert saved["tool_events"][0]["result"]["items"][0]["url"] == "https://example.com/a"
     assert len(saved["rounds"]) == 1
-    assert any("[Tin A](https://example.com/a)" in value for value in visible_answers(ui))
+    assert ui_app.source_entries(turns(ui)[0], []) == [{"title": "Tin A", "url": "https://example.com/a", "source": ""}]
     assert_no_secret(ui)
     assert history(ui) == []
 
