@@ -95,11 +95,11 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Tool mới (`tools/<tên>/`) |  |  |  |
-| Unit test tool mới (≥ 3 test/tool) | `pytest` output (0 failed) |  |  |
+| Tool mới (`tools/<tên>/`) | `starter_v0/tools/analyze_text/` (`tool.py`, `TOOL.md`, `declaration.yaml`); registry `tools/__init__.py`; commit: `<điền hash>` | Chức năng mới tự viết (không đổi tên tool có sẵn): gọi LLM trên Groq (`openai/gpt-oss-120b`, đổi được qua `ANALYZE_TEXT_MODEL`) để `summary` / `key_points` / `sentiment` cho text agent đã lấy về từ `fetch`, `paper_text`, `timeline`. Output JSON có cấu trúc; nếu model không trả JSON thì fallback sang text thường. Đã gọi Groq thật thành công: `key_points` và `sentiment=mixed` đúng nội dung. | Dùng chung `GROQ_API_KEY` với provider. Text từ web được bọc trong `<document>` và system prompt cấm làm theo lệnh bên trong; lần chạy thật có chèn "Ignore all previous instructions…", model không làm theo. Text dài hơn 12 000 ký tự bị cắt và báo `truncated`. Read-only, không cần xác nhận. Không bao giờ raise. Declaration chỉ tích hợp vào `tools.yaml` sau baseline. |
+| Unit test tool mới (≥ 3 test/tool) | `starter_v0/tests/test_tools_todo.py` (khối `analyze_text`); `pytest`: `<điền: N passed, 0 failed>` | 7 hàm test (18 case sau parametrize): happy path (URL/header/model/`response_format`, text bọc trong `<document>`), cắt text dài và `ANALYZE_TEXT_MODEL` không bị `GROQ_MODEL` của agent ghi đè, text xấu (`""`, `"   "`, `None`, `42`, list) không gọi API, `task`/`max_words`/`sentiment` ngoài enum được chuẩn hóa, model trả non-JSON, thiếu key, 429/401/timeout/200 nhưng thiếu `choices`. | Toàn bộ offline nhờ `fake_http`; `block_network` chặn mọi HTTP thật, không tốn credit Groq. |
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
-Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
+Tool unit tests: `analyze_text` có 7 hàm test (18 case). Ví dụ lỗi unit test bắt được còn eval thì không: model gọi đúng `analyze_text(text=..., task="sentiment")`, nên eval chấm PASS vì chỉ so tên tool và args. Nhưng nếu Groq trả `"sentiment": "angry"` (ngoài enum) hoặc trả text thường thay vì JSON, UI sẽ hiển thị sai hoặc crash. Hai test `test_analyze_text_bad_task_and_max_words_are_normalised` và `test_analyze_text_non_json_reply_falls_back_to_raw_summary` bắt đúng tầng này: chúng assert cách tool chuẩn hóa response, việc mà eval không bao giờ nhìn thấy. Tương tự, test model env bảo đảm việc đổi `GROQ_MODEL` cho agent không âm thầm đổi model của tool.
 
 ### B5. Bonus Evidence
 

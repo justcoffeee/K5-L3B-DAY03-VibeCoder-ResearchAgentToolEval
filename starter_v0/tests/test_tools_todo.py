@@ -113,13 +113,111 @@ def test_policy_instruction_like_lines_go_to_untrusted_text() -> None:
 #   2. bad / missing input from the model (empty string, wrong type, out-of-enum value)
 #   3. failure path (missing key, HTTP error, timeout) -> returns error dict, does not raise
 
-def test_my_new_tool_happy_path() -> None:
-    pytest.skip(TODO)
+# ---------------- analyze_text (team tool, Groq) ----------------
+
+analyze_text = TOOL_FUNCTIONS["analyze_text"]
 
 
-def test_my_new_tool_bad_input_from_model() -> None:
-    pytest.skip(TODO)
+def _groq_reply(content: str, model: str = "openai/gpt-oss-120b") -> FakeResponse:
+    return FakeResponse({"model": model, "choices": [{"message": {"role": "assistant", "content": content}}]})
 
 
-def test_my_new_tool_failure_returns_error_dict() -> None:
-    pytest.skip(TODO)
+@pytest.fixture
+def groq_env(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "gsk-test")
+    monkeypatch.delenv("ANALYZE_TEXT_MODEL", raising=False)
+    monkeypatch.delenv("GROQ_MODEL", raising=False)
+
+
+def test_analyze_text_sends_groq_request_and_maps_json_reply(groq_env, fake_http) -> None:
+    calls = fake_http(_groq_reply(json.dumps({
+        "summary": "Chi phí giảm 40%.", "key_points": ["Giảm chi phí", " ", "Ngữ cảnh 1M token"], "sentiment": "Mixed",
+    })))
+
+    result = analyze_text(text="  Bài viết về model mới.  ", task="key_points", focus="chi phí", max_words=80)
+
+    assert len(calls) == 1
+    req = calls[0]
+    assert req["url"] == "https://api.groq.com/openai/v1/chat/completions"
+    assert req["headers"]["Authorization"] == "Bearer gsk-test"
+    assert req["json"]["model"] == "openai/gpt-oss-120b"
+    assert req["json"]["response_format"] == {"type": "json_object"}
+    user_msg = req["json"]["messages"][1]["content"]
+    assert "Task: key_points" in user_msg and "at most 80 words" in user_msg and "chi phí" in user_msg
+    assert "<document>\nBài viết về model mới.\n</document>" in user_msg  # stripped + wrapped as data
+    assert result == {
+        "tool": "analyze_text", "task": "key_points", "model": "openai/gpt-oss-120b",
+        "summary": "Chi phí giảm 40%.", "key_points": ["Giảm chi phí", "Ngữ cảnh 1M token"], "sentiment": "mixed",
+        "parse_ok": True, "truncated": False, "input_chars": len("Bài viết về model mới."),
+    }
+
+
+def test_analyze_text_truncates_long_text_and_uses_its_own_model_env(groq_env, monkeypatch, fake_http) -> None:
+    monkeypatch.setenv("GROQ_MODEL", "agent/model")  # agent provider's model must NOT leak into the tool
+    monkeypatch.setenv("ANALYZE_TEXT_MODEL", "custom/model")
+    calls = fake_http(_groq_reply('{"summary": "ok", "key_points": [], "sentiment": "neutral"}', model="custom/model"))
+
+    result = analyze_text(text="a" * 13000)
+
+    assert calls[0]["json"]["model"] == "custom/model"
+    assert "a" * 12000 + "\n</document>" in calls[0]["json"]["messages"][1]["content"]
+    assert "a" * 12001 not in calls[0]["json"]["messages"][1]["content"]
+    assert result["truncated"] is True and result["input_chars"] == 13000
+
+
+@pytest.mark.parametrize("bad_text", ["", "   ", None, 42, ["list"]])
+def test_analyze_text_empty_or_non_string_text_returns_error_without_request(groq_env, fake_http, bad_text) -> None:
+    calls = fake_http(_groq_reply("{}"))
+
+    result = analyze_text(text=bad_text)
+
+    assert result["tool"] == "analyze_text"
+    assert result["error"] == "ValueError"
+    assert calls == []
+
+
+@pytest.mark.parametrize("raw_words, expected", [("50", 50), (0, 30), (9999, 500), ("abc", 150), (None, 150)])
+def test_analyze_text_bad_task_and_max_words_are_normalised(groq_env, fake_http, raw_words, expected) -> None:
+    calls = fake_http(_groq_reply('{"summary": "s", "key_points": [], "sentiment": "angry"}'))
+
+    result = analyze_text(text="nội dung", task="translate", max_words=raw_words)
+
+    assert result["task"] == "summary"
+    assert result["sentiment"] is None  # out-of-enum sentiment from the model is dropped
+    assert f"at most {expected} words" in calls[0]["json"]["messages"][1]["content"]
+
+
+def test_analyze_text_non_json_reply_falls_back_to_raw_summary(groq_env, fake_http) -> None:
+    fake_http(_groq_reply("Đây là bản tóm tắt dạng text thường."))
+
+    result = analyze_text(text="nội dung")
+
+    assert result["parse_ok"] is False
+    assert result["summary"] == "Đây là bản tóm tắt dạng text thường."
+    assert result["key_points"] == [] and result["sentiment"] is None
+
+
+def test_analyze_text_without_key_returns_error_and_no_request(monkeypatch, fake_http) -> None:
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    calls = fake_http(_groq_reply("{}"))
+
+    result = analyze_text(text="nội dung")
+
+    assert result["error"] == "RuntimeError"
+    assert "GROQ_API_KEY" in result["message"]
+    assert calls == []
+
+
+@pytest.mark.parametrize("failure, expected_error", [
+    (FakeResponse(status_code=429), "HTTPError"),
+    (FakeResponse(status_code=401), "HTTPError"),
+    (requests.Timeout("read timed out"), "Timeout"),
+    (FakeResponse({"error": {"message": "model decommissioned"}}), "KeyError"),  # 200 but no "choices"
+])
+def test_analyze_text_api_failures_return_error_dict(groq_env, fake_http, failure, expected_error) -> None:
+    fake_http(failure)
+
+    result = analyze_text(text="nội dung")
+
+    assert result["tool"] == "analyze_text"
+    assert result["error"] == expected_error
