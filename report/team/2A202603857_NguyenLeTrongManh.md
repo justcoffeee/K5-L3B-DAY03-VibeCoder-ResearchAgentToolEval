@@ -32,7 +32,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
   - PR vào `dev` (tham chiếu #11, #12): chưa mở, điền link sau khi mở.
   - Output chạy lại, lưu ở `starter_v0/analysis/`: `cp3_pytest_full.txt` (`99 passed, 14 skipped`), `cp3_contract_after_integration.txt` (contract `65 passed`, toàn suite `109 passed` khi dán 2 declaration vào bản copy `tools.yaml`), `cp3_analyze_text_live.txt` (gọi Groq thật).
 - AI/công cụ đã dùng và cách tự kiểm tra kết quả:
-  - **AI:** Claude Code (Anthropic, chạy trong VS Code; model Opus 5.5 rồi Sonnet 5.5). Dùng để viết code hai tool, viết unit test, soạn `TOOL.md` / `declaration.yaml` / case mẫu, điền các mục trong `group_report.md`, và hỗ trợ merge git. Claude Code cũng tìm trên web để kiểm tra lịch ngừng model của Groq.
+  - Công cụ: Claude Code (Anthropic, chạy trong VS Code; model Opus 5.5 rồi Sonnet 5.5), dùng làm trợ lý lập trình.
+  - Phần tôi tự làm và quyết định: chọn hai tool để bổ sung cho bộ tool sẵn có mà không trùng chức năng; quyết định tham số, enum, cách xử lý input xấu và quy ước trả error dict; quyết định khi nào agent nên/không nên gọi mỗi tool; chọn thời điểm tích hợp sau baseline v0.
+  - Phần AI hỗ trợ: viết bản nháp code và unit test theo yêu cầu của tôi; soạn nháp `TOOL.md`, `declaration.yaml`, case eval mẫu và mục B5a; gợi ý cách giải quyết conflict khi merge; tra cứu tài liệu Groq về lịch ngừng model.
   - **Công cụ khác:** Python 3.14, pytest, Git và GitHub Desktop, Groq API.
   - **Kiểm tra bằng công cụ (đã chạy, có output lưu lại):**
     - `pytest` toàn suite offline: `167 passed, 0 failed, 0 skipped`; 35 test của tool mới và 14 stub của tool có sẵn đều đã được viết.
@@ -43,7 +45,7 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
     - Đọc `run_eval.py` để biết cách harness chấm, thay vì đoán, nên ghi được giới hạn "mỗi case chỉ gọi model một lần" vào B3.
     - Kiểm tra `.env` nằm trong `.gitignore`, không nằm trong `git ls-files`, và không có chuỗi `gsk_` trong báo cáo, `analysis/`, `tools/`.
     - Đối chiếu lịch ngừng model Groq với trang chính thức (`console.groq.com/docs/deprecations`); một số bài bên thứ ba nói khác về phạm vi và thời điểm, nên báo cáo chỉ dựa vào trang chính thức.
-  - **Phần tự kiểm tra/giải thích trực tiếp của thành viên:** Chờ Nguyễn Lê Trọng Mạnh bổ sung sau khi tự đọc code và tự chạy lại test.
+  - **Phần tự kiểm tra/giải thích trực tiếp của thành viên:** .
 
 ## 5. Tự đánh giá
 
