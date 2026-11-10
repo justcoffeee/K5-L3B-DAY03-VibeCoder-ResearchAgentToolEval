@@ -1,7 +1,7 @@
 {
   "dataset_id": "day03_v2_research_group",
   "dataset_role": "group",
-  "description": "10 case tự viết: 5 single-turn và 5 multi-turn, kiểm tra routing, arguments, điều kiện sử dụng rank và boundary.",
+  "description": "10 case tự viết: 5 single-turn và 5 multi-turn. URL là nguồn thật; số stars trong G03 là dữ liệu kiểm thử giả lập.",
   "allowed_failure_types": [
     "wrong_tool",
     "wrong_arg_value",
@@ -14,14 +14,14 @@
     {
       "id": "G01_rank_by_relevance",
       "phase": "B",
-      "query": "Tôi đã thu thập 4 item:\n1. title=Tiến bộ về pin thể rắn; url=https://example.com/battery; summary=Vật liệu mới cho pin thể rắn.\n2. title=Thị trường điện thoại; url=https://example.com/phone; summary=Doanh số điện thoại tăng.\n3. title=Ứng dụng pin thể rắn trong xe điện; url=https://example.com/ev; summary=Cải thiện khả năng lưu trữ năng lượng.\n4. title=Robot trong nhà máy; url=https://example.com/robot; summary=Tự động hóa sản xuất.\nHãy dùng chủ đề 'pin thể rắn' để xếp hạng theo độ liên quan và giữ 2 item phù hợp nhất. Chưa cần trình bày bản tin.",
+      "query": "Tôi đã thu thập 4 item:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework hỗ trợ xây dựng mô hình machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Thư viện tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Thư viện xử lý và phân tích dữ liệu dạng bảng.\nHãy dùng chủ đề 'machine learning' để xếp hạng theo độ liên quan và giữ 2 item phù hợp nhất. Chỉ xử lý dữ liệu đã cung cấp, chưa cần trình bày bản tin.",
       "failure_type": "wrong_tool",
       "expect": {
         "tool_calls": [
           {
             "name": "rank",
             "args": {
-              "query": "pin thể rắn",
+              "query": "machine learning",
               "criteria": "relevance",
               "top_k": 2
             }
@@ -29,13 +29,13 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Dữ liệu đã có và người dùng yêu cầu chọn top theo chủ đề thì gọi rank với relevance, không tìm kiếm hoặc format thêm."
+        "what_it_tests": "Đã có danh sách và yêu cầu chọn top theo chủ đề thì gọi rank với relevance, không tìm kiếm hoặc format thêm."
       }
     },
     {
       "id": "G02_rank_recency_with_duplicate_sources",
       "phase": "B",
-      "query": "Danh sách gộp từ nhiều nguồn đã có:\n1. title=Bản cập nhật A; url=https://www.example.com/a/?utm_source=newsletter; date=2026-11-01T08:00:00Z.\n2. title=Bản cập nhật B; url=https://example.com/b; date=2026-11-04T08:00:00Z.\n3. title=Bản cập nhật A đăng lại; url=https://example.com/a#overview; date=2026-11-01T08:00:00Z.\n4. title=Bản cập nhật C; url=https://example.com/c; date=2026-11-03T08:00:00Z.\n5. title=Bản cập nhật D; url=https://example.com/d; date=2026-11-02T08:00:00Z.\nHãy lọc các URL trùng và giữ 3 tin mới nhất theo ngày đăng, xếp mới trước. Chỉ xử lý danh sách đang có.",
+      "query": "Danh sách paper đã thu thập có các mục sau. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762?utm_source=newsletter; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762#abstract; published=2017-06-12.\n4. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n5. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nHãy lọc các URL trùng và giữ 3 paper mới nhất theo ngày published, xếp mới trước. Không tải hoặc đọc thêm nội dung.",
       "failure_type": "wrong_arg_value",
       "expect": {
         "tool_calls": [
@@ -49,13 +49,13 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Yêu cầu lọc trùng và ưu tiên ngày đăng phải route tới rank với recency và top_k=3. Độ đúng của việc chuẩn hóa URL được kiểm tra riêng bằng unit test."
+        "what_it_tests": "Yêu cầu lọc trùng và ưu tiên ngày công bố phải gọi rank với recency và top_k=3. Kết quả lọc URL trùng cần được kiểm tra riêng bằng unit test."
       }
     },
     {
-      "id": "G03_rank_collected_tweets_by_popularity",
+      "id": "G03_rank_repositories_by_popularity",
       "phase": "B",
-      "query": "Tôi đã lấy được các tweet sau:\n1. title=GPU A; url=https://x.com/demo/status/101; metrics={favorites:20, retweets:2, views:1000}.\n2. title=GPU B; url=https://x.com/demo/status/102; metrics={favorites:500, retweets:80, views:20000}.\n3. title=GPU C; url=https://x.com/demo/status/103; metrics={favorites:100, retweets:10, views:5000}.\n4. title=GPU D; url=https://x.com/demo/status/104; metrics={favorites:50, retweets:5, views:2000}.\nChọn và xếp hạng 2 tweet có tương tác cao nhất từ chính danh sách này. Không tìm thêm tweet.",
+      "query": "Đây là danh sách repo với số stars giả lập dùng riêng cho bài kiểm thử, không phải số stars hiện tại:\n1. title=PyTorch; url=https://github.com/pytorch/pytorch; stars=200.\n2. title=Transformers; url=https://github.com/huggingface/transformers; stars=500.\n3. title=NumPy; url=https://github.com/numpy/numpy; stars=100.\n4. title=pandas; url=https://github.com/pandas-dev/pandas; stars=50.\nDựa đúng vào dữ liệu tôi đã cung cấp, chọn và xếp hạng 2 repo phổ biến nhất theo số stars. Không truy cập GitHub để cập nhật số liệu.",
       "failure_type": "wrong_tool",
       "expect": {
         "tool_calls": [
@@ -69,7 +69,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Đã có tweet và số liệu tương tác thì dùng rank với popularity, không gọi social_search để lấy lại dữ liệu."
+        "what_it_tests": "Có dữ liệu stars sẵn thì gọi rank với popularity, không gọi lookup hoặc fetch để lấy lại số liệu."
       }
     },
     {
@@ -81,7 +81,7 @@
         "no_tool": true
       },
       "metadata": {
-        "what_it_tests": "Câu hỏi về khả năng và cách dùng tool được trả lời trực tiếp, không gọi rank hoặc tool tìm kiếm."
+        "what_it_tests": "Câu hỏi về cách dùng tool được trả lời trực tiếp, không gọi rank hoặc tool tìm kiếm."
       }
     },
     {
@@ -109,7 +109,7 @@
       "turns": [
         {
           "role": "user",
-          "content": "Đây là dữ liệu đã thu thập:\n1. title=Thông báo A; url=https://example.com/a; date=2026-11-01T09:00:00Z.\n2. title=Thông báo B; url=https://example.com/b; date=2026-11-04T09:00:00Z.\n3. title=Thông báo C; url=https://example.com/c; date=2026-11-02T09:00:00Z.\n4. title=Thông báo D; url=https://example.com/d; date=2026-11-03T09:00:00Z.\nTôi muốn chọn một phần của danh sách."
+          "content": "Đây là danh sách paper. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n4. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nTôi muốn chọn một phần của danh sách."
         },
         {
           "role": "assistant",
@@ -117,7 +117,7 @@
         },
         {
           "role": "user",
-          "content": "Lấy 2 mục mới nhất theo ngày đăng từ danh sách tôi vừa gửi. Chưa cần định dạng bản tin."
+          "content": "Lấy 2 paper mới nhất theo ngày published từ danh sách tôi vừa gửi. Chưa cần định dạng hoặc đọc paper."
         }
       ],
       "failure_type": "missing_info",
@@ -142,7 +142,7 @@
       "turns": [
         {
           "role": "user",
-          "content": "Danh sách gồm:\n1. title=Robotics for warehouses; url=https://example.com/warehouse; summary=Robotics applications in logistics.\n2. title=Mobile processors; url=https://example.com/mobile; summary=New chips for phones.\n3. title=Robotics simulation; url=https://example.com/simulation; summary=Training robotics systems in simulation.\n4. title=Cloud storage; url=https://example.com/cloud; summary=Storage infrastructure.\nTôi định lấy top 4 theo cách cân bằng, nhưng hãy chờ tôi chốt tiêu chí."
+          "content": "Danh sách tài liệu gồm:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Xử lý và phân tích dữ liệu dạng bảng.\nTôi định lấy top 4 theo cách cân bằng, nhưng hãy chờ tôi chốt tiêu chí."
         },
         {
           "role": "assistant",
@@ -150,7 +150,7 @@
         },
         {
           "role": "user",
-          "content": "Đổi lại: chỉ lấy 2 mục liên quan nhất tới từ khóa 'robotics'. Bắt đầu xếp hạng, chưa cần trình bày."
+          "content": "Đổi lại: chỉ lấy 2 mục liên quan nhất tới từ khóa 'machine learning'. Bắt đầu xếp hạng bằng dữ liệu đã có, chưa cần trình bày."
         }
       ],
       "failure_type": "wrong_arg_value",
@@ -159,7 +159,7 @@
           {
             "name": "rank",
             "args": {
-              "query": "robotics",
+              "query": "machine learning",
               "criteria": "relevance",
               "top_k": 2
             }
@@ -167,7 +167,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Yêu cầu mới thay thế balanced/top 4 bằng relevance/top 2 và bổ sung query, không giữ tham số đã bị sửa."
+        "what_it_tests": "Yêu cầu mới thay balanced/top 4 bằng relevance/top 2 và bổ sung query, không giữ tham số đã bị sửa."
       }
     },
     {
@@ -201,7 +201,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Chưa có items thì phải tìm dữ liệu trước; lượt hiện tại chỉ gọi lookup, không gọi rank sớm bằng dữ liệu tự tạo."
+        "what_it_tests": "Chưa có items thì tìm dữ liệu trước; lượt hiện tại chỉ gọi lookup, không gọi rank sớm bằng dữ liệu tự tạo."
       }
     },
     {
@@ -210,7 +210,7 @@
       "turns": [
         {
           "role": "user",
-          "content": "Tôi đã chọn xong hai mục:\n1. title=Nén mô hình; url=https://example.com/compression; summary=Giảm dung lượng mô hình.\n2. title=Tối ưu suy luận; url=https://example.com/inference; summary=Giảm thời gian phản hồi.\nGiữ nguyên hai mục này và thứ tự của chúng."
+          "content": "Tôi đã chọn xong hai mục tài liệu:\n1. title=Hugging Face Transformers Quantization; url=https://huggingface.co/docs/transformers/quantization/overview; summary=Tài liệu về lượng tử hóa mô hình.\n2. title=vLLM; url=https://docs.vllm.ai/en/latest/; summary=Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ.\nGiữ nguyên hai mục này và thứ tự của chúng."
         },
         {
           "role": "assistant",
@@ -233,7 +233,7 @@
         ]
       },
       "metadata": {
-        "what_it_tests": "Chỉ có hai mục đã được chọn và yêu cầu chỉ trình bày thì gọi format, không thêm bước rank."
+        "what_it_tests": "Hai mục đã được chọn và yêu cầu chỉ trình bày thì gọi format, không thêm bước rank."
       }
     },
     {
