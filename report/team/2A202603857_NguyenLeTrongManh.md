@@ -51,11 +51,8 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 **Mình làm được:**
 
 - Hai tool mới nhóm bổ sung (chức năng mới, không phải đổi tên tool có sẵn): `analyze_text` (tóm tắt, rút ý chính, đánh giá sentiment bằng Groq) và `rank` (lọc trùng và xếp hạng item). Cả hai có `TOOL.md` đúng contract, đã đăng ký trong `TOOL_FUNCTIONS` và khai báo trong `artifacts/tools.yaml`.
-- 44 test case cho hai tool (7 + 11 hàm), chạy offline, mỗi tool đủ happy path, input xấu và nhánh lỗi. `pytest` ra `118 passed, 0 failed, 14 skipped`, contract `65 passed`, và bước test của CI chạy lại ở máy cũng xanh.
+- 44 test case cho hai tool (7 + 11 hàm), chạy offline, mỗi tool đủ happy path, input xấu và nhánh lỗi. Kết quả CP3 đã lưu trong `analysis/cp3_pytest_full.txt` là `119 passed, 0 failed, 14 skipped`; `analysis/cp3_contract_after_integration.txt` ghi contract `66 passed` (gồm test schema Gemini). Đây là số liệu tại mốc CP3; các lần kiểm tra sau tích hợp được ghi riêng trong báo cáo nhóm.
 - Phát hiện và sửa một lỗi thật ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả lỗi). Lỗi này được tìm ra khi chạy script audit do Claude Code viết trên tool của mình; đã sửa và có test hồi quy fail trên code gốc.
-- Hai tool mới tự viết, không phải đổi tên tool có sẵn: `analyze_text` (tóm tắt, rút ý chính, đánh giá sentiment bằng Groq) và `rank` (lọc trùng và xếp hạng item). Cả hai có `TOOL.md` đúng contract, đã đăng ký trong `TOOL_FUNCTIONS` và khai báo trong `artifacts/tools.yaml`.
-- 44 test case cho hai tool (7 + 11 hàm), chạy offline, mỗi tool đủ happy path, input xấu và nhánh lỗi. `pytest` ra `119 passed, 0 failed, 14 skipped`, contract `66 passed` (gồm test schema Gemini), và bước test của CI chạy lại ở máy cũng xanh.
-- Tìm được một lỗi thật ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả lỗi), đã sửa và có test hồi quy fail trên code gốc.
 - Mình quyết định chỉ làm phần tool mới và không sửa tool có sẵn. Vì vậy 14 stub test của tool có sẵn vẫn skip, và mình không lấy điểm bonus "Test challenge".
 
 **Mình chưa làm hoặc chưa chắc:**
