@@ -1,0 +1,1017 @@
+{
+  "scope": "Fresh v1-v3 retained; user subsequently authorized completion including a separately labelled v4-integration, based on dev c57ee19.",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "valid_versions": [
+    {
+      "version": "v0",
+      "run_file": "runs/v0_B_base_groq_20261110T175003235889.json",
+      "artifact_version": "v0+peb1c8179815b+te69bc53ed884",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 20,
+        "provider_error_cases": 0,
+        "passed_cases": 9,
+        "case_accuracy": 0.45,
+        "tool_routing_accuracy": 0.7,
+        "argument_accuracy": 0.45,
+        "multiturn_accuracy": 0.3333,
+        "failure_counts": {
+          "wrong_tool": 4,
+          "missing_info": 3,
+          "wrong_boundary": 1,
+          "out_of_scope": 1,
+          "wrong_arg_value": 2
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 6,
+          "missing_tool_call": 4,
+          "unexpected_tool_call": 1
+        }
+      },
+      "hypothesis": "Measure unchanged starter prompt and tool declarations before optimization",
+      "tool_error_count": 7,
+      "tool_errors": [
+        {
+          "case": "R01_user_tweets_routing",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=samaltman"
+          }
+        },
+        {
+          "case": "R02_search_tweets_routing",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        },
+        {
+          "case": "R05_limit_arg",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "R07_search_type_arg",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        },
+        {
+          "case": "R10_missing_handle",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+          }
+        },
+        {
+          "case": "M03_correction_handle",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+          }
+        },
+        {
+          "case": "M05_correction_limit",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ],
+      "failed_cases": [
+        {
+          "id": "R01_user_tweets_routing",
+          "actual_tool_calls": [
+            {
+              "name": "timeline",
+              "args": {
+                "limit": 1,
+                "screenname": "samaltman"
+              }
+            }
+          ],
+          "failures": [
+            "screenname: expected 'sama', got 'samaltman'"
+          ]
+        },
+        {
+          "id": "R03_web_news_routing",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news today'"
+          ]
+        },
+        {
+          "id": "R10_missing_handle",
+          "actual_tool_calls": [
+            {
+              "name": "timeline",
+              "args": {
+                "limit": 5,
+                "screenname": "sama"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call clarify",
+            "extra tool call timeline"
+          ]
+        },
+        {
+          "id": "R11_missing_url",
+          "actual_tool_calls": [
+            {
+              "name": "fetch",
+              "args": {
+                "url": "https://www.bbc.com/news/technology-66712345"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call clarify",
+            "extra tool call fetch"
+          ]
+        },
+        {
+          "id": "R12_confirm_before_send",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 3,
+                "query": "AI breakthrough 2024",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call clarify",
+            "extra tool call lookup"
+          ]
+        },
+        {
+          "id": "R13_parallel_web_and_tweets",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news today'",
+            "missing tool call social_search"
+          ]
+        },
+        {
+          "id": "R14_out_of_scope_coding",
+          "actual_tool_calls": [
+            {
+              "name": "send",
+              "args": {
+                "text": "def fibonacci(n):\n    \"\"\"Return the nth Fibonacci number using recursion.\n\n    Parameters\n    ----------\n    n : int\n        The position in the Fibonacci sequence (0-indexed). Must be non‑negative.\n\n    Returns\n    -------\n    int\n        The nth Fibonacci number.\n\n    Raises\n    ------\n    ValueError\n        If n is negative.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non‑negative integer\")\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n"
+              }
+            }
+          ],
+          "failures": [
+            "expected no tool call"
+          ]
+        },
+        {
+          "id": "M01_clarify_then_fill",
+          "actual_tool_calls": [
+            {
+              "name": "format",
+              "args": {
+                "headline": "Latest 5 tweets from @elonmusk",
+                "items": [
+                  {
+                    "section": "",
+                    "source": "",
+                    "summary": "",
+                    "title": ""
+                  }
+                ],
+                "template": "bullets"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call timeline",
+            "extra tool call format"
+          ]
+        },
+        {
+          "id": "M02_carryover_timeframe",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "robotics news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'robotics', got 'robotics news today'"
+          ]
+        },
+        {
+          "id": "M05_correction_limit",
+          "actual_tool_calls": [
+            {
+              "name": "timeline",
+              "args": {
+                "limit": 10,
+                "screenname": "elonmusk"
+              }
+            }
+          ],
+          "failures": [
+            "limit: expected 3, got 10"
+          ]
+        },
+        {
+          "id": "M06_switch_tool",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "OpenAI news",
+                "timeframe": "month",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'OpenAI', got 'OpenAI news'"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1",
+      "run_file": "runs/v1_B_base_groq_20261110T234054699020.json",
+      "artifact_version": "v1+p11a492d87f35+te69bc53ed884",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 20,
+        "provider_error_cases": 0,
+        "passed_cases": 15,
+        "case_accuracy": 0.75,
+        "tool_routing_accuracy": 0.9,
+        "argument_accuracy": 0.75,
+        "multiturn_accuracy": 0.6667,
+        "failure_counts": {
+          "wrong_tool": 2,
+          "wrong_boundary": 1,
+          "wrong_arg_value": 2
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 4,
+          "missing_tool_call": 1
+        }
+      },
+      "hypothesis": "Chỉ dẫn đoán account/URL khi thiếu dữ kiện gây missing_info; thay bằng clarify cho đầu vào bắt buộc.",
+      "tool_error_count": 6,
+      "tool_errors": [
+        {
+          "case": "R01_user_tweets_routing",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+          }
+        },
+        {
+          "case": "R02_search_tweets_routing",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "429 Client Error: Too Many Requests for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        },
+        {
+          "case": "R05_limit_arg",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "R07_search_type_arg",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        },
+        {
+          "case": "M01_clarify_then_fill",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "M05_correction_limit",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ],
+      "failed_cases": [
+        {
+          "id": "R03_web_news_routing",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news'"
+          ]
+        },
+        {
+          "id": "R12_confirm_before_send",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Bạn muốn đăng nội dung gì lên Telegram?",
+                "response_type": "text"
+              }
+            }
+          ],
+          "failures": [
+            "response_type: expected 'yes_no', got 'text'"
+          ]
+        },
+        {
+          "id": "R13_parallel_web_and_tweets",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news today'",
+            "missing tool call social_search"
+          ]
+        },
+        {
+          "id": "M02_carryover_timeframe",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "robotics news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'robotics', got 'robotics news today'"
+          ]
+        },
+        {
+          "id": "M03_correction_handle",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "options": [
+                  "Tất cả các tweet",
+                  "Sam Altman",
+                  "Andrej Karpathy",
+                  "Từ khóa khác"
+                ],
+                "question": "Bạn muốn lấy 3 tweet mới nhất của ai hoặc theo từ khóa nào?",
+                "response_type": "choice"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call timeline",
+            "extra tool call clarify"
+          ]
+        }
+      ],
+      "fixed": [
+        "R01_user_tweets_routing",
+        "R10_missing_handle",
+        "R11_missing_url",
+        "R14_out_of_scope_coding",
+        "M01_clarify_then_fill",
+        "M05_correction_limit",
+        "M06_switch_tool"
+      ],
+      "regressions": [
+        "M03_correction_handle"
+      ]
+    },
+    {
+      "version": "v2",
+      "run_file": "runs/v2_B_base_groq_20261110T234621926396.json",
+      "artifact_version": "v2+p6b593bb9bae0+te69bc53ed884",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 20,
+        "provider_error_cases": 0,
+        "passed_cases": 14,
+        "case_accuracy": 0.7,
+        "tool_routing_accuracy": 0.95,
+        "argument_accuracy": 0.7,
+        "multiturn_accuracy": 0.6667,
+        "failure_counts": {
+          "wrong_tool": 4,
+          "wrong_boundary": 1,
+          "wrong_arg_value": 1
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 6
+        }
+      },
+      "hypothesis": "Chỉ dẫn gửi/đăng ngay làm bỏ qua bước xác nhận nội dung; thay bằng quy tắc xin xác nhận rõ trước send.",
+      "tool_error_count": 7,
+      "tool_errors": [
+        {
+          "case": "R01_user_tweets_routing",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=SamAltman"
+          }
+        },
+        {
+          "case": "R02_search_tweets_routing",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "429 Client Error: Too Many Requests for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        },
+        {
+          "case": "R05_limit_arg",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "R07_search_type_arg",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        },
+        {
+          "case": "M01_clarify_then_fill",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "M03_correction_handle",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+          }
+        },
+        {
+          "case": "M05_correction_limit",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ],
+      "failed_cases": [
+        {
+          "id": "R01_user_tweets_routing",
+          "actual_tool_calls": [
+            {
+              "name": "timeline",
+              "args": {
+                "limit": 1,
+                "screenname": "SamAltman"
+              }
+            }
+          ],
+          "failures": [
+            "screenname: expected 'sama', got 'SamAltman'"
+          ]
+        },
+        {
+          "id": "R03_web_news_routing",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news today'"
+          ]
+        },
+        {
+          "id": "R12_confirm_before_send",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Bạn muốn đăng nội dung gì và gửi tới kênh Telegram nào?",
+                "response_type": "text"
+              }
+            }
+          ],
+          "failures": [
+            "response_type: expected 'yes_no', got 'text'"
+          ]
+        },
+        {
+          "id": "R13_parallel_web_and_tweets",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news today'",
+            "missing tool call social_search"
+          ]
+        },
+        {
+          "id": "M02_carryover_timeframe",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "robotics news today",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'robotics', got 'robotics news today'"
+          ]
+        },
+        {
+          "id": "M06_switch_tool",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "OpenAI news",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'OpenAI', got 'OpenAI news'"
+          ]
+        }
+      ],
+      "fixed": [
+        "M03_correction_handle"
+      ],
+      "regressions": [
+        "R01_user_tweets_routing",
+        "M06_switch_tool"
+      ]
+    },
+    {
+      "version": "v3",
+      "run_file": "runs/v3_B_base_groq_20261110T235639856548.json",
+      "artifact_version": "v3+p6b593bb9bae0+t6180659c52a7",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 20,
+        "provider_error_cases": 0,
+        "passed_cases": 16,
+        "case_accuracy": 0.8,
+        "tool_routing_accuracy": 0.9,
+        "argument_accuracy": 0.8,
+        "multiturn_accuracy": 0.8333,
+        "failure_counts": {
+          "wrong_tool": 2,
+          "wrong_boundary": 1,
+          "wrong_arg_value": 1
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 2,
+          "missing_tool_call": 2
+        }
+      },
+      "hypothesis": "Declaration mơ hồ làm model chọn nguồn và chuẩn hóa tham số sai; mô tả khi dùng/không dùng cùng quy ước handle, query, topic, timeframe, search_type rõ sẽ giảm lỗi.",
+      "tool_error_count": 6,
+      "tool_errors": [
+        {
+          "case": "R01_user_tweets_routing",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+          }
+        },
+        {
+          "case": "R02_search_tweets_routing",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        },
+        {
+          "case": "R05_limit_arg",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "R07_search_type_arg",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        },
+        {
+          "case": "M01_clarify_then_fill",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "M05_correction_limit",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ],
+      "failed_cases": [
+        {
+          "id": "R03_web_news_routing",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI news",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "query: expected 'AI', got 'AI news'"
+          ]
+        },
+        {
+          "id": "R12_confirm_before_send",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Bạn có thể cung cấp nội dung bản tin muốn đăng?",
+                "response_type": "text"
+              }
+            }
+          ],
+          "failures": [
+            "response_type: expected 'yes_no', got 'text'"
+          ]
+        },
+        {
+          "id": "R13_parallel_web_and_tweets",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "query": "AI",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call social_search"
+          ]
+        },
+        {
+          "id": "M03_correction_handle",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Bạn muốn lấy tweet từ tài khoản X nào của Andrej Karpathy? Ví dụ: @karpathy",
+                "response_type": "text"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call timeline",
+            "extra tool call clarify"
+          ]
+        }
+      ],
+      "fixed": [
+        "R01_user_tweets_routing",
+        "M02_carryover_timeframe",
+        "M06_switch_tool"
+      ],
+      "regressions": [
+        "M03_correction_handle"
+      ]
+    },
+    {
+      "version": "v4-integration",
+      "run_file": "runs/v4-integration_B_base_groq_20261111T001019800451.json",
+      "artifact_version": "v4-integration+p9ea16ca1d5c6+tf96eb98fa99f",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 20,
+        "provider_error_cases": 0,
+        "passed_cases": 18,
+        "case_accuracy": 0.9,
+        "tool_routing_accuracy": 0.95,
+        "argument_accuracy": 0.9,
+        "multiturn_accuracy": 1.0,
+        "failure_counts": {
+          "wrong_boundary": 1,
+          "wrong_tool": 1
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 1,
+          "missing_tool_call": 1
+        }
+      },
+      "hypothesis": "Kiểm tra artifact tích hợp cuối: bỏ ép một bước trong prompt và đưa analyze_text/rank từ dev vào declaration, không coi đây là phép đo cô lập một thay đổi.",
+      "tool_error_count": 7,
+      "tool_errors": [
+        {
+          "case": "R01_user_tweets_routing",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+          }
+        },
+        {
+          "case": "R02_search_tweets_routing",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+          }
+        },
+        {
+          "case": "R05_limit_arg",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "R07_search_type_arg",
+          "tool": "social_search",
+          "result": {
+            "tool": "search_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+          }
+        },
+        {
+          "case": "M01_clarify_then_fill",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        },
+        {
+          "case": "M03_correction_handle",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+          }
+        },
+        {
+          "case": "M05_correction_limit",
+          "tool": "timeline",
+          "result": {
+            "tool": "get_user_tweets",
+            "error": "HTTPError",
+            "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+          }
+        }
+      ],
+      "failed_cases": [
+        {
+          "id": "R12_confirm_before_send",
+          "actual_tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Bạn muốn đăng nội dung gì lên Telegram? Vui lòng cung cấp nội dung hoặc liên kết tới bản tin.",
+                "response_type": "text"
+              }
+            }
+          ],
+          "failures": [
+            "response_type: expected 'yes_no', got 'text'"
+          ]
+        },
+        {
+          "id": "R13_parallel_web_and_tweets",
+          "actual_tool_calls": [
+            {
+              "name": "lookup",
+              "args": {
+                "max_results": 5,
+                "query": "AI",
+                "timeframe": "day",
+                "topic": "news"
+              }
+            }
+          ],
+          "failures": [
+            "missing tool call social_search"
+          ]
+        }
+      ],
+      "fixed": [
+        "R03_web_news_routing",
+        "M03_correction_handle"
+      ],
+      "regressions": []
+    }
+  ],
+  "excluded_attempts": [
+    {
+      "run_file": "runs/v2_B_base_groq_20261110T234332919111.json",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 19,
+        "provider_error_cases": 1,
+        "passed_cases": 13,
+        "case_accuracy": 0.6842,
+        "tool_routing_accuracy": 0.9474,
+        "argument_accuracy": 0.6842,
+        "multiturn_accuracy": 0.5,
+        "failure_counts": {
+          "wrong_tool": 3,
+          "wrong_boundary": 1,
+          "wrong_arg_value": 2
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 5,
+          "missing_tool_call": 1
+        }
+      },
+      "provider_errors": [
+        {
+          "case": "R13_parallel_web_and_tweets",
+          "failures": [
+            "BadRequestError: Error code: 400 - Tool choice is required, but model did not call a tool"
+          ]
+        }
+      ]
+    },
+    {
+      "run_file": "runs/v3_B_base_groq_20261110T235156471432.json",
+      "summary": {
+        "total_cases": 20,
+        "measured_cases": 19,
+        "provider_error_cases": 1,
+        "passed_cases": 16,
+        "case_accuracy": 0.8421,
+        "tool_routing_accuracy": 0.8947,
+        "argument_accuracy": 0.8421,
+        "multiturn_accuracy": 0.8333,
+        "failure_counts": {
+          "wrong_tool": 2,
+          "wrong_arg_value": 1
+        },
+        "observed_mismatch_counts": {
+          "wrong_arg_value": 1,
+          "missing_tool_call": 2
+        }
+      },
+      "provider_errors": [
+        {
+          "case": "R12_confirm_before_send",
+          "failures": [
+            "RateLimitError: Error code: 429 - Rate limit reached for model `openai/gpt-oss-20b` in organization `org_01m732gpq5e6jv2txe1efbget5` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5531, Requested 3422. Please try again in 7.1475s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing"
+          ]
+        }
+      ]
+    }
+  ]
+}

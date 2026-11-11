@@ -1,0 +1,19 @@
+.....................................................F..                 [100%]
+================================== FAILURES ===================================
+_________ test_eval_cases_only_expect_declared_tools[eval_group.json] _________
+
+eval_file = 'eval_group.json'
+
+    @pytest.mark.parametrize("eval_file", EVAL_FILES)
+    def test_eval_cases_only_expect_declared_tools(eval_file: str) -> None:
+        data = json.loads((ROOT / "data" / eval_file).read_text(encoding="utf-8"))
+        for case in data.get("cases", []):
+            for call in case.get("expect", {}).get("tool_calls", []):
+>               assert call["name"] in DECLARED, f"{eval_file}:{case['id']} expects undeclared tool '{call['name']}'"
+E               AssertionError: eval_group.json:G01_rank_by_relevance expects undeclared tool 'rank'
+E               assert 'rank' in {'clarify': {'name': 'clarify', 'description': 'Hỏi người dùng và chờ trả lời khi thiếu dữ kiện bắt buộc hoặc cần xác ...integer', 'default': 5, 'description': 'Số kết quả theo yêu cầu mới nhất, mặc định 5.'}}, 'required': ['query']}}, ...}
+
+tests\test_tool_contract.py:74: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_tool_contract.py::test_eval_cases_only_expect_declared_tools[eval_group.json]
+1 failed, 55 passed in 0.35s

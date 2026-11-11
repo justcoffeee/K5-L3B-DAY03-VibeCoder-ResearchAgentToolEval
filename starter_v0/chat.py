@@ -84,10 +84,13 @@ def run_model_tool_loop(
     tools: list[dict[str, Any]],
     model: str | None,
     max_tool_rounds: int,
+    rounds: list[dict[str, Any]] | None = None,
+    tool_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     working_messages = list(messages)
-    rounds: list[dict[str, Any]] = []
-    all_tool_events: list[dict[str, Any]] = []
+    # A caller can pass its own lists to keep the partial trace if a later round raises.
+    rounds = [] if rounds is None else rounds
+    all_tool_events = [] if tool_events is None else tool_events
 
     for round_index in range(1, max_tool_rounds + 1):
         response = provider.complete(working_messages, tools, model=model, temperature=0.0)

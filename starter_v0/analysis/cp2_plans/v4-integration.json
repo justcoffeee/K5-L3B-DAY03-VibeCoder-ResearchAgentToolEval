@@ -1,0 +1,19 @@
+{
+  "version": "v4-integration",
+  "recorded_before_edit_at": "2026-11-11T00:04:15+07:00",
+  "changed_artifact": "system_prompt.md+tools.yaml",
+  "hypothesis": "Kiểm tra artifact tích hợp cuối: bỏ ép một bước trong prompt và đưa analyze_text/rank từ dev vào declaration, không coi đây là phép đo cô lập một thay đổi.",
+  "expected": "Contract khớp đầy đủ case nhóm/registry; yêu cầu nhiều nguồn không bị giới hạn một tool; snapshot prompt/tools/code cuối có run base hợp lệ để bàn giao.",
+  "target_cases": [
+    "R13_parallel_web_and_tweets",
+    "M01_clarify_then_fill",
+    "M03_correction_handle"
+  ],
+  "previous_run": "runs/v3_B_base_groq_20261110T235639856548.json",
+  "before_hashes": {
+    "system_prompt.md": "6b593bb9bae0d600852005db7cc524e63c552531c91451d62432a5f81b4e8bdf",
+    "tools.yaml": "6180659c52a75a5d7bbf8758608a1925cf6f5fe5256cb1bae8160b6e7f7a3475"
+  },
+  "integration": true,
+  "conditions": "RapidAPI subscription passed after v0; v0 had 7 tool errors. Same Groq/model; Telegram execution disabled; scorer unchanged."
+}

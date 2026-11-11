@@ -1,0 +1,43 @@
+{
+  "version": "v4-integration",
+  "artifact_version": "v4-integration+p9ea16ca1d5c6+tf96eb98fa99f",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "f96eb98fa99f9b1b091efd99714215a490be755b0ff49aedfa3fd36fc19142b2",
+  "source_base_commit": "c57ee1960b918dcec256d76a5b0fb30ac601ad25",
+  "runtime_hashes": {
+    "agent.py": "14a45a46cfd2029f0e71429293d80ca054ed7f41587ae30274c78ac38d1de12d",
+    "run_eval.py": "8e9f1e761013bcceafa80d55326b41190c33c144693439506a957d22539f42dc",
+    "tools/__init__.py": "ab88ce61f4a7ac150b0cd6079f4234cafd1fe08ac4bb8262f0974e9c08cf964c",
+    "tools/analyze_text/tool.py": "ab537e2710d28b6b9650427f678ff79ea46796d32ad8d5dae6642d8f7f0b5848",
+    "tools/rank/tool.py": "53ff9a01712fed91d4e37a4e73113c37443bd21bac1848977e188d251c807b8e"
+  },
+  "run_file": "runs/v4-integration_B_base_groq_20261111T001019800451.json",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 18,
+    "case_accuracy": 0.9,
+    "tool_routing_accuracy": 0.95,
+    "argument_accuracy": 0.9,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_boundary": 1,
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 1,
+      "missing_tool_call": 1
+    }
+  },
+  "tests": {
+    "passed": 164,
+    "skipped": 14,
+    "failed": 0,
+    "contract_passed": 66
+  },
+  "tool_error_count": 7,
+  "rate_limit_retry_count": 1
+}

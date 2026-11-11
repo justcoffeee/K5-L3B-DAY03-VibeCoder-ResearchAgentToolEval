@@ -1,0 +1,15 @@
+{
+  "version": "v4",
+  "snapshot_at": "2026-11-11T00:03:38+07:00",
+  "plan": "analysis/cp2_plans/v4.json",
+  "plan_sha256": "3e3594d6d942a29835c6e50e5dff3754d65e5c8b35877f4cad43b7e2df1da121",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "6180659c52a75a5d7bbf8758608a1925cf6f5fe5256cb1bae8160b6e7f7a3475",
+  "runtime_hashes": {
+    "agent.py": "14a45a46cfd2029f0e71429293d80ca054ed7f41587ae30274c78ac38d1de12d",
+    "run_eval.py": "8e9f1e761013bcceafa80d55326b41190c33c144693439506a957d22539f42dc",
+    "tools/__init__.py": "ab88ce61f4a7ac150b0cd6079f4234cafd1fe08ac4bb8262f0974e9c08cf964c",
+    "tools/analyze_text/tool.py": "ab537e2710d28b6b9650427f678ff79ea46796d32ad8d5dae6642d8f7f0b5848",
+    "tools/rank/tool.py": "53ff9a01712fed91d4e37a4e73113c37443bd21bac1848977e188d251c807b8e"
+  }
+}
