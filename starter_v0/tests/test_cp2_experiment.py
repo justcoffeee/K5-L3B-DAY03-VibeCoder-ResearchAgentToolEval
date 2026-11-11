@@ -59,12 +59,13 @@ def test_persistent_429_stops_at_retry_budget(monkeypatch):
     assert len(calls) == 3 and len(events) == 2 and sleeps == [30.0, 30.0]
 
 
-def test_long_quota_wait_is_reported_without_retry(monkeypatch):
+@pytest.mark.parametrize("server_delay", ["3600s", "21m3.6s", "1h2m3s"])
+def test_long_quota_wait_is_reported_without_retry(monkeypatch, server_delay):
     monkeypatch.setattr("scripts.cp2_experiment.time.sleep", lambda _: pytest.fail("must not sleep"))
     events = []
 
     def complete(self):
-        raise provider_error(RateLimitError, 429, "Please try again in 3600s")
+        raise provider_error(RateLimitError, 429, "Please try again in " + server_delay)
 
     with pytest.raises(RateLimitError):
         make_rate_limit_retry(complete, events, 3)(object())

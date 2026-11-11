@@ -39,3 +39,7 @@ python chat.py --provider groq --model openai/gpt-oss-20b --version v4-integrati
 ```
 
 Tài liệu này chốt đầu vào bàn giao; chưa tuyên bố TV3/TV4 đã chạy hoặc nhận tin nhắn. Sau khi publish nhánh/PR, dùng đúng commit chứa handoff và xác minh lại hash.
+
+## Profile live bổ sung 11/11/2026
+
+Theo quyết định justcoffeee sau lỗi quota 20b, group và CLI chat dùng Groq `openai/gpt-oss-120b`, nhãn `v4-integration-groq120b+p9ea16ca1d5c6+tf96eb98fa99f`. Prompt/tools giữ nguyên hash ở trên; không sửa profile20b hay số lịch sử. [Profile/evidence mới](../starter_v0/analysis/final_evidence_profile.json), [B3/B4](../report/team/group_report.md). Public UI cần smoke lại đúng model/version này khi URL hoạt động.

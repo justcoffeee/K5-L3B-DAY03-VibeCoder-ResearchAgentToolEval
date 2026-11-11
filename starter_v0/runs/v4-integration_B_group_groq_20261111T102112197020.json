@@ -1,0 +1,943 @@
+{
+  "run_id": "v4-integration_B_group_groq_20261111T102112197020",
+  "version": "v4-integration",
+  "artifact_version": "v4-integration+p9ea16ca1d5c6+tf96eb98fa99f",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "f96eb98fa99f9b1b091efd99714215a490be755b0ff49aedfa3fd36fc19142b2",
+  "phase": "B",
+  "suite": "group",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "system_prompt": "C:\\Code\\VINAI\\day03-dev-latest\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "C:\\Code\\VINAI\\day03-dev-latest\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day03_v2_research_group",
+  "dataset_role": "group",
+  "description": "10 case tự viết: 5 single-turn và 5 multi-turn. URL là nguồn thật; số stars trong G03 là dữ liệu kiểm thử giả lập.",
+  "generated_at": "2026-11-11T10:21:12",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 8,
+    "provider_error_cases": 2,
+    "passed_cases": 7,
+    "case_accuracy": 0.875,
+    "tool_routing_accuracy": 0.875,
+    "argument_accuracy": 0.875,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "missing_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_rank_by_relevance",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Đã có danh sách và yêu cầu chọn top theo chủ đề thì gọi rank với relevance, không tìm kiếm hoặc format thêm."
+      },
+      "input": "Tôi đã thu thập 4 item:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework hỗ trợ xây dựng mô hình machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Thư viện tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Thư viện xử lý và phân tích dữ liệu dạng bảng.\nHãy dùng chủ đề 'machine learning' để xếp hạng theo độ liên quan và giữ 2 item phù hợp nhất. Chỉ xử lý dữ liệu đã cung cấp, chưa cần trình bày bản tin.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "query": "machine learning",
+              "criteria": "relevance",
+              "top_k": 2,
+              "items": [
+                {
+                  "title": "PyTorch",
+                  "url": "https://pytorch.org/",
+                  "summary": "Framework hỗ trợ xây dựng mô hình machine learning và deep learning."
+                },
+                {
+                  "title": "scikit-learn",
+                  "url": "https://scikit-learn.org/stable/",
+                  "summary": "Thư viện machine learning cho Python."
+                },
+                {
+                  "title": "NumPy",
+                  "url": "https://numpy.org/",
+                  "summary": "Thư viện tính toán số và xử lý mảng."
+                },
+                {
+                  "title": "pandas",
+                  "url": "https://pandas.pydata.org/",
+                  "summary": "Thư viện xử lý và phân tích dữ liệu dạng bảng."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "relevance",
+              "items": [
+                {
+                  "summary": "Framework hỗ trợ xây dựng mô hình machine learning và deep learning.",
+                  "title": "PyTorch",
+                  "url": "https://pytorch.org/"
+                },
+                {
+                  "summary": "Thư viện machine learning cho Python.",
+                  "title": "scikit-learn",
+                  "url": "https://scikit-learn.org/stable/"
+                },
+                {
+                  "summary": "Thư viện tính toán số và xử lý mảng.",
+                  "title": "NumPy",
+                  "url": "https://numpy.org/"
+                },
+                {
+                  "summary": "Thư viện xử lý và phân tích dữ liệu dạng bảng.",
+                  "title": "pandas",
+                  "url": "https://pandas.pydata.org/"
+                }
+              ],
+              "query": "machine learning",
+              "top_k": 2
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "rank",
+          "args": {
+            "criteria": "relevance",
+            "items": [
+              {
+                "summary": "Framework hỗ trợ xây dựng mô hình machine learning và deep learning.",
+                "title": "PyTorch",
+                "url": "https://pytorch.org/"
+              },
+              {
+                "summary": "Thư viện machine learning cho Python.",
+                "title": "scikit-learn",
+                "url": "https://scikit-learn.org/stable/"
+              },
+              {
+                "summary": "Thư viện tính toán số và xử lý mảng.",
+                "title": "NumPy",
+                "url": "https://numpy.org/"
+              },
+              {
+                "summary": "Thư viện xử lý và phân tích dữ liệu dạng bảng.",
+                "title": "pandas",
+                "url": "https://pandas.pydata.org/"
+              }
+            ],
+            "query": "machine learning",
+            "top_k": 2
+          },
+          "result": {
+            "tool": "rank",
+            "query": "machine learning",
+            "criteria": "relevance",
+            "input_count": 4,
+            "dropped_invalid": 0,
+            "dropped_duplicates": 0,
+            "warnings": [],
+            "items": [
+              {
+                "summary": "Framework hỗ trợ xây dựng mô hình machine learning và deep learning.",
+                "title": "PyTorch",
+                "url": "https://pytorch.org/",
+                "rank": 1,
+                "rank_score": 0.6,
+                "rank_signals": {
+                  "relevance": 0.6,
+                  "recency": 0.0,
+                  "popularity": 0.0
+                }
+              },
+              {
+                "summary": "Thư viện machine learning cho Python.",
+                "title": "scikit-learn",
+                "url": "https://scikit-learn.org/stable/",
+                "rank": 2,
+                "rank_score": 0.6,
+                "rank_signals": {
+                  "relevance": 0.6,
+                  "recency": 0.0,
+                  "popularity": 0.0
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_rank_recency_with_duplicate_sources",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Yêu cầu lọc trùng và ưu tiên ngày công bố phải gọi rank với recency và top_k=3. Kết quả lọc URL trùng cần được kiểm tra riêng bằng unit test."
+      },
+      "input": "Danh sách paper đã thu thập có các mục sau. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762?utm_source=newsletter; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762#abstract; published=2017-06-12.\n4. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n5. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nHãy lọc các URL trùng và giữ 3 paper mới nhất theo ngày published, xếp mới trước. Không tải hoặc đọc thêm nội dung.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "recency",
+              "top_k": 3,
+              "items": [
+                {
+                  "title": "Attention Is All You Need",
+                  "url": "https://arxiv.org/abs/1706.03762?utm_source=newsletter",
+                  "published": "2017-06-12"
+                },
+                {
+                  "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+                  "url": "https://arxiv.org/abs/1810.04805",
+                  "published": "2018-10-11"
+                },
+                {
+                  "title": "Attention Is All You Need",
+                  "url": "https://arxiv.org/abs/1706.03762#abstract",
+                  "published": "2017-06-12"
+                },
+                {
+                  "title": "Language Models are Few-Shot Learners",
+                  "url": "https://arxiv.org/abs/2005.14165",
+                  "published": "2020-05-28"
+                },
+                {
+                  "title": "GPT-4 Technical Report",
+                  "url": "https://arxiv.org/abs/2303.08774",
+                  "published": "2023-03-15"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "BadRequestError: Error code: 400 - Tool choice is required, but model did not call a tool"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G03_rank_repositories_by_popularity",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Có dữ liệu stars sẵn thì gọi rank với popularity, không gọi lookup hoặc fetch để lấy lại số liệu."
+      },
+      "input": "Đây là danh sách repo với số stars giả lập dùng riêng cho bài kiểm thử, không phải số stars hiện tại:\n1. title=PyTorch; url=https://github.com/pytorch/pytorch; stars=200.\n2. title=Transformers; url=https://github.com/huggingface/transformers; stars=500.\n3. title=NumPy; url=https://github.com/numpy/numpy; stars=100.\n4. title=pandas; url=https://github.com/pandas-dev/pandas; stars=50.\nDựa đúng vào dữ liệu tôi đã cung cấp, chọn và xếp hạng 2 repo phổ biến nhất theo số stars. Không truy cập GitHub để cập nhật số liệu.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "popularity",
+              "top_k": 2,
+              "items": [
+                {
+                  "title": "PyTorch",
+                  "url": "https://github.com/pytorch/pytorch",
+                  "stars": 200
+                },
+                {
+                  "title": "Transformers",
+                  "url": "https://github.com/huggingface/transformers",
+                  "stars": 500
+                },
+                {
+                  "title": "NumPy",
+                  "url": "https://github.com/numpy/numpy",
+                  "stars": 100
+                },
+                {
+                  "title": "pandas",
+                  "url": "https://github.com/pandas-dev/pandas",
+                  "stars": 50
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "headline": "Top 2 repos by stars",
+              "items": [
+                {
+                  "section": "Top 2 repos by stars",
+                  "summary": "Stars: 500",
+                  "title": "Transformers",
+                  "url": "https://github.com/huggingface/transformers"
+                },
+                {
+                  "section": "Top 2 repos by stars",
+                  "summary": "Stars: 200",
+                  "title": "PyTorch",
+                  "url": "https://github.com/pytorch/pytorch"
+                }
+              ],
+              "template": "bullets"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call rank",
+          "extra tool call format"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "headline": "Top 2 repos by stars",
+            "items": [
+              {
+                "section": "Top 2 repos by stars",
+                "summary": "Stars: 500",
+                "title": "Transformers",
+                "url": "https://github.com/huggingface/transformers"
+              },
+              {
+                "section": "Top 2 repos by stars",
+                "summary": "Stars: 200",
+                "title": "PyTorch",
+                "url": "https://github.com/pytorch/pytorch"
+              }
+            ],
+            "template": "bullets"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "bullets",
+            "markdown": "- Stars: 500 - [github.com](https://github.com/huggingface/transformers)\n- Stars: 200 - [github.com](https://github.com/pytorch/pytorch)",
+            "item_count": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_explain_rank_without_execution",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Câu hỏi về cách dùng tool được trả lời trực tiếp, không gọi rank hoặc tool tìm kiếm."
+      },
+      "input": "Giải thích ngắn gọn sự khác nhau giữa relevance, recency và popularity của tool rank. Tôi chỉ hỏi cách sử dụng, chưa yêu cầu xử lý danh sách nào.",
+      "expect": {
+        "no_tool": true
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "**Sự khác nhau giữa các tiêu chí trong tool `rank`:**\n\n| Tiêu chí | Ý nghĩa | Khi nào dùng |\n|----------|---------|--------------|\n| **relevance** | Đánh giá mức độ liên quan của một mục đối với câu hỏi hoặc chủ đề đã cho. | Khi bạn muốn chọn những mục có nội dung thực sự liên quan nhất, bất kể thời gian hay mức độ phổ biến. |\n| **recency** | Ưu tiên các mục mới nhất, dựa trên ngày xuất bản hoặc cập nhật. | Khi thời gian là yếu tố quan trọng, ví dụ: “cập nhật mới nhất về X” hoặc “tin tức hôm nay”. |\n| **popularity** | Đánh giá mức độ phổ biến hoặc tương tác (likes, retweets, views, v.v.) của mục. | Khi bạn muốn tìm những nội dung được quan tâm nhiều nhất, thường dùng cho “điểm nóng” hoặc “đánh giá xu hướng”. |\n\n> **Cách sử dụng**: Khi gọi `rank`, chỉ cần đặt `criteria` thành `\"relevance\"`, `\"recency\"` hoặc `\"popularity\"` tùy mục tiêu của bạn. Tool sẽ sắp xếp danh sách dựa trên tiêu chí đó và trả về `top_k` mục được chọn.",
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G05_rank_missing_item_list",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "what_it_tests": "Chưa nhận được danh sách thì hỏi người dùng cung cấp dữ liệu, không tự tạo items hoặc tìm dữ liệu thay thế."
+      },
+      "input": "Hãy lọc trùng danh sách kết quả của tôi rồi giữ 3 mục mới nhất. Danh sách nằm trong một file trên máy tôi, tôi chưa gửi file hoặc dán nội dung vào cuộc trò chuyện.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn có thể cung cấp nội dung danh sách hoặc file chứa danh sách kết quả để tôi có thể lọc trùng và giữ 3 mục mới nhất không?",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn có thể cung cấp nội dung danh sách hoặc file chứa danh sách kết quả để tôi có thể lọc trùng và giữ 3 mục mới nhất không?",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn có thể cung cấp nội dung danh sách hoặc file chứa danh sách kết quả để tôi có thể lọc trùng và giữ 3 mục mới nhất không?",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_rank_items_from_previous_turn",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Sau khi người dùng bổ sung số lượng và tiêu chí, dùng danh sách ở lượt trước để gọi rank thay vì hỏi lại hoặc tìm kiếm."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đây là danh sách paper. Trường published là ngày công bố lần đầu:\n1. title=Attention Is All You Need; url=https://arxiv.org/abs/1706.03762; published=2017-06-12.\n2. title=BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding; url=https://arxiv.org/abs/1810.04805; published=2018-10-11.\n3. title=Language Models are Few-Shot Learners; url=https://arxiv.org/abs/2005.14165; published=2020-05-28.\n4. title=GPT-4 Technical Report; url=https://arxiv.org/abs/2303.08774; published=2023-03-15.\nTôi muốn chọn một phần của danh sách."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn chọn bao nhiêu mục và ưu tiên theo tiêu chí nào?"
+        },
+        {
+          "role": "user",
+          "content": "Lấy 2 paper mới nhất theo ngày published từ danh sách tôi vừa gửi. Chưa cần định dạng hoặc đọc paper."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "recency",
+              "top_k": 2,
+              "items": [
+                {
+                  "title": "Attention Is All You Need",
+                  "url": "https://arxiv.org/abs/1706.03762",
+                  "published": "2017-06-12"
+                },
+                {
+                  "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+                  "url": "https://arxiv.org/abs/1810.04805",
+                  "published": "2018-10-11"
+                },
+                {
+                  "title": "Language Models are Few-Shot Learners",
+                  "url": "https://arxiv.org/abs/2005.14165",
+                  "published": "2020-05-28"
+                },
+                {
+                  "title": "GPT-4 Technical Report",
+                  "url": "https://arxiv.org/abs/2303.08774",
+                  "published": "2023-03-15"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "failure_type": "provider_error",
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "provider_error",
+        "failures": [
+          "BadRequestError: Error code: 400 - Tool choice is required, but model did not call a tool"
+        ],
+        "actual_tool_calls": [],
+        "actual_text": null,
+        "routing_correct": false,
+        "args_correct": false
+      },
+      "tool_results": []
+    },
+    {
+      "id": "G07_rank_corrected_criteria_and_limit",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Yêu cầu mới thay balanced/top 4 bằng relevance/top 2 và bổ sung query, không giữ tham số đã bị sửa."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Danh sách tài liệu gồm:\n1. title=PyTorch; url=https://pytorch.org/; summary=Framework machine learning và deep learning.\n2. title=scikit-learn; url=https://scikit-learn.org/stable/; summary=Thư viện machine learning cho Python.\n3. title=NumPy; url=https://numpy.org/; summary=Tính toán số và xử lý mảng.\n4. title=pandas; url=https://pandas.pydata.org/; summary=Xử lý và phân tích dữ liệu dạng bảng.\nTôi định lấy top 4 theo cách cân bằng, nhưng hãy chờ tôi chốt tiêu chí."
+        },
+        {
+          "role": "assistant",
+          "content": "Tôi đã nhận danh sách và sẽ chờ bạn chốt tiêu chí."
+        },
+        {
+          "role": "user",
+          "content": "Đổi lại: chỉ lấy 2 mục liên quan nhất tới từ khóa 'machine learning'. Bắt đầu xếp hạng bằng dữ liệu đã có, chưa cần trình bày."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "query": "machine learning",
+              "criteria": "relevance",
+              "top_k": 2,
+              "items": [
+                {
+                  "title": "PyTorch",
+                  "url": "https://pytorch.org/",
+                  "summary": "Framework machine learning và deep learning."
+                },
+                {
+                  "title": "scikit-learn",
+                  "url": "https://scikit-learn.org/stable/",
+                  "summary": "Thư viện machine learning cho Python."
+                },
+                {
+                  "title": "NumPy",
+                  "url": "https://numpy.org/",
+                  "summary": "Tính toán số và xử lý mảng."
+                },
+                {
+                  "title": "pandas",
+                  "url": "https://pandas.pydata.org/",
+                  "summary": "Xử lý và phân tích dữ liệu dạng bảng."
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "rank",
+            "args": {
+              "criteria": "relevance",
+              "items": [
+                {
+                  "summary": "Framework machine learning và deep learning.",
+                  "title": "PyTorch",
+                  "url": "https://pytorch.org/"
+                },
+                {
+                  "summary": "Thư viện machine learning cho Python.",
+                  "title": "scikit-learn",
+                  "url": "https://scikit-learn.org/stable/"
+                },
+                {
+                  "summary": "Tính toán số và xử lý mảng.",
+                  "title": "NumPy",
+                  "url": "https://numpy.org/"
+                },
+                {
+                  "summary": "Xử lý và phân tích dữ liệu dạng bảng.",
+                  "title": "pandas",
+                  "url": "https://pandas.pydata.org/"
+                }
+              ],
+              "query": "machine learning",
+              "top_k": 2
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "rank",
+          "args": {
+            "criteria": "relevance",
+            "items": [
+              {
+                "summary": "Framework machine learning và deep learning.",
+                "title": "PyTorch",
+                "url": "https://pytorch.org/"
+              },
+              {
+                "summary": "Thư viện machine learning cho Python.",
+                "title": "scikit-learn",
+                "url": "https://scikit-learn.org/stable/"
+              },
+              {
+                "summary": "Tính toán số và xử lý mảng.",
+                "title": "NumPy",
+                "url": "https://numpy.org/"
+              },
+              {
+                "summary": "Xử lý và phân tích dữ liệu dạng bảng.",
+                "title": "pandas",
+                "url": "https://pandas.pydata.org/"
+              }
+            ],
+            "query": "machine learning",
+            "top_k": 2
+          },
+          "result": {
+            "tool": "rank",
+            "query": "machine learning",
+            "criteria": "relevance",
+            "input_count": 4,
+            "dropped_invalid": 0,
+            "dropped_duplicates": 0,
+            "warnings": [],
+            "items": [
+              {
+                "summary": "Framework machine learning và deep learning.",
+                "title": "PyTorch",
+                "url": "https://pytorch.org/",
+                "rank": 1,
+                "rank_score": 0.6,
+                "rank_signals": {
+                  "relevance": 0.6,
+                  "recency": 0.0,
+                  "popularity": 0.0
+                }
+              },
+              {
+                "summary": "Thư viện machine learning cho Python.",
+                "title": "scikit-learn",
+                "url": "https://scikit-learn.org/stable/",
+                "rank": 2,
+                "rank_score": 0.6,
+                "rank_signals": {
+                  "relevance": 0.6,
+                  "recency": 0.0,
+                  "popularity": 0.0
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_search_before_rank_when_no_items",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Chưa có items thì tìm dữ liệu trước; lượt hiện tại chỉ gọi lookup, không gọi rank sớm bằng dữ liệu tự tạo."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi muốn có một danh sách tin nổi bật về chip AI."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn đã có danh sách tin để lựa chọn chưa?"
+        },
+        {
+          "role": "user",
+          "content": "Chưa có. Trước hết hãy tìm trên web 6 tin tức về chip AI trong tuần này. Chỉ xếp hạng ở bước sau khi đã có kết quả."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week",
+              "max_results": 6
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 6,
+              "query": "chip AI",
+              "timeframe": "week",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "max_results": 6,
+            "query": "chip AI",
+            "timeframe": "week",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "chip AI",
+            "topic": "news",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Google's chip business is on a faster track than Nvidia's own AI boom",
+                "url": "https://finance.yahoo.com/markets/article/googles-chip-business-is-on-a-faster-track-than-nvidias-own-ai-boom-135447046.html",
+                "source": "finance.yahoo.com",
+                "summary": "Google is selling on price. SemiAnalysis found that Google's current Ironwood TPU delivers up to nearly three times as much AI output per dollar as Nvidia's Blackwell chips when running AI agents, though Nvidia's top system still wins when speed is everything.\n\nBar chart of peak AI computing power per chip in petaflops. Nvidia Rubin 35, Google TPU 8i Max 20, Nvidia Blackwell Ultra 15, Google TPU 8t 13, Google TPU 8i 10 and AMD MI355X 10.\n\nGoogle, Nvidia, AMD, Yahoo Finance [...] Google introduced two new tensor processing units, or TPUs — its homegrown AI chips — on Monday. The TPU 8tx and TPU 8i Max join the 8t and 8i it unveiled in April, the first time Google has introduced four TPU systems in a single year. Both new chips ship next year. [...] Think of it as a chip menu. The 8tx keeps data encrypted for governments, banks, and other regulated businesses, paired with processors from AMD (AMD). The 8i Max squeezes two chips into one package for requests with long context windows — the amount of information an AI model can juggle at once.",
+                "score": 0.7070003
+              },
+              {
+                "title": "Google unveils new AI chip variants as cloud demand surges | Reuters",
+                "url": "https://www.reuters.com/business/google-to-introduce-two-variants-its-in-house-chips-bloomberg-news-reports-2026-11-09",
+                "source": "reuters.com",
+                "summary": "It pairs Google's chip technology with AMD's (AMD.O) processors and encrypts data ​at the hardware ​level, delivering ⁠up to twice the speed of the previous version with virtually no trade-off in performance, ​the company said.\n\nThe 8i Max, meanwhile, is designed ​for ⁠AI applications that need to process very large amounts of information at once. [...] The new chips, 8tx and 8i Max, are redesigned versions of existing processors ​tailored for specific customer needs, according to the company. Bloomberg ​News first reported the development earlier in the day.\n\nThe 8tx is aimed ‌at ⁠government agencies and companies in regulated industries that need to keep sensitive data protected while it is being processed. [...] It combines two chips into a single package to ⁠provide ​additional memory and computing power, the ​company said, making it well suited for coding assistants, mathematical reasoning and drug-discovery ​tasks.\n\nReporting by Anhata Rooprai in Bengaluru; Editing by Jonathan Ananda\n\nOur Standards: The Thomson Reuters Trust Principles.",
+                "score": 0.68162084
+              },
+              {
+                "title": "AI boom draws chip supply from other end-markets, Siltronic CEO says | Reuters",
+                "url": "https://www.reuters.com/business/ai-boom-draws-chip-supply-other-end-markets-siltronic-ceo-says-2026-11-04",
+                "source": "reuters.com",
+                "summary": "Demand for AI-related chips remains so strong that semiconductor manufacturers are allocating more supply to those applications, leaving less capacity for other end markets.\n\n\"When ​our customers have the choice to sell their chips to different ​segments, they will always send them to the ones that pay best,\" he ‌said. \"The ⁠pockets of the AI players, particularly the hyperscalers, are the deepest.\" [...] The Reuters Daily Briefing newsletter provides all the news you need to start your day. Sign up here.\n\nAI-linked demand has ​become the chip industry's main growth engine, but Heckmeier ​told Reuters in an interview that some other semiconductor end ⁠markets could grow faster if more chips were available.\n\n\"It's not ​that AI is offsetting certain weaknesses,\" Heckmeier said. \"It's more AI is generating ​a certain weakness.\" [...] The trend has made AI servers the industry's main growth engine, with the impact extending beyond higher server volumes.\n\nHeckmeier said AI server farms consume ​roughly three to ​four times more ⁠silicon area than traditional servers, boosting demand for advanced wafers\n\nAny moderation in AI demand would not ​necessarily derail the industry's growth, Heckmeier said, because capacity ​could flow ⁠back to smartphones, PCs and other markets where underlying demand remains solid.",
+                "score": 0.66225064
+              },
+              {
+                "title": "Nvidia, Chinese Espionage, and the AI Race: Four Foreign Policy Issues to Watch | Council on Foreign Relations",
+                "url": "https://www.cfr.org/articles/nvidia-chinese-espionage-and-the-ai-race-four-foreign-policy-issues-to-watch",
+                "source": "cfr.org",
+                "summary": "Nvidia, valued at more than $4 trillion, makes the chips that underpin the large language models and data centers that have become pillars of U.S. economic growth. CFR Senior Fellow Rebecca Patterson said that Nvidia “is central to America’s AI efforts, both in terms of its size and weight in major equity indices, as well as its status as the so-called central bank for the AI ecosystem.” [...] Last year, President Donald Trump allowed Nvidia to sell H20 chips to China in exchange for a cut of the revenue, a deal later extended to the H200. However, the White House has barred the sale of Nvidia’s most advanced artificial intelligence chips—specifically its flagship Blackwell series—to China. [...] U.S. experts believe that the United States has an edge in the AI race against China. To maintain that lead, the U.S. government has barred Nvidia from selling its most cutting-edge AI chips to China since 2022. Still, critics have noted that there have been gaps in enforcing that ban. Nvidia chips can be legally sold to non-Chinese customers in other countries, such as Malaysia or Singapore, and then illicitly resold or re-exported to China. And Chinese companies can legally access the most",
+                "score": 0.61474097
+              },
+              {
+                "title": "Find My AI Chips: the US Plans to Track GPUs Abroad - IEEE Spectrum",
+                "url": "https://spectrum.ieee.org/find-my-ai-chip",
+                "source": "spectrum.ieee.org",
+                "summary": "Whether or not a “Find My” for AI chips becomes a regulatory requirement, Feldgoise envisions tighter conditions for the export of advanced AI chips. “This is based on the increasing importance of compute to national and economic security,” he says. “The chips that generate compute are being seen as a strategic resource, so I would be unsurprised if the due diligence requirements on these devices increase as time passes.” [...] To deduce an AI chip’s location, PLV measures the time it takes for a ping to travel from the chip to multiple trusted “landmark” servers around the world and back. Kyle Miller, a senior research analyst at CSET and coauthor of the report, says that for new AI chips, manufacturers could integrate PLV functionality into the hardware itself, while a firmware update could be applied to chips already in circulation. [...] Hanna Dohmen, a senior research analyst at CSET and coauthor of the report, points to other gaps in the U.S. export control regime. “Currently, Chinese companies are legally able to remotely access AI chips abroad through cloud service providers,” she says. These advanced AI chips might be installed in data centers across Southeast Asian countries like Malaysia, which are increasingly serving Chinese firms.",
+                "score": 0.5700322
+              },
+              {
+                "title": "Nvidia Faces Congressional Scrutiny Over AI Chip Sales, Export Controls - Bloomberg",
+                "url": "https://www.bloomberg.com/news/articles/2026-11-06/nvidia-s-ai-chip-exports-emerge-as-target-in-democratic-congress",
+                "source": "bloomberg.com",
+                "summary": "# Nvidia’s AI Chip Exports Emerge as Target in Democratic Congress\n\nNvidia Corp. is in for tougher scrutiny from a new Democratic majority in Congress that’s set to demand answers from Chief Executive Officer Jensen Huang about whether the company is doing enough to keep its coveted artificial intelligence chips out of the hands of China and other US adversaries.",
+                "score": 0.56781673
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_format_only_for_two_selected_items",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Hai mục đã được chọn và yêu cầu chỉ trình bày thì gọi format, không thêm bước rank."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tôi đã chọn xong hai mục tài liệu:\n1. title=Hugging Face Transformers Quantization; url=https://huggingface.co/docs/transformers/quantization/overview; summary=Tài liệu về lượng tử hóa mô hình.\n2. title=vLLM; url=https://docs.vllm.ai/en/latest/; summary=Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ.\nGiữ nguyên hai mục này và thứ tự của chúng."
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn trình bày hai mục theo mẫu nào?"
+        },
+        {
+          "role": "user",
+          "content": "Dùng mẫu bullets. Chỉ trình bày lại, không chấm điểm, không lọc và không tìm thêm."
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "template": "bullets"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "format",
+            "args": {
+              "items": [
+                {
+                  "source": "Hugging Face Docs",
+                  "summary": "Tài liệu về lượng tử hóa mô hình",
+                  "title": "Hugging Face Transformers Quantization",
+                  "url": "https://huggingface.co/docs/transformers/quantization/overview"
+                },
+                {
+                  "source": "vLLM Docs",
+                  "summary": "Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ",
+                  "title": "vLLM",
+                  "url": "https://docs.vllm.ai/en/latest/"
+                }
+              ],
+              "template": "bullets"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "unnecessary_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "format",
+          "args": {
+            "items": [
+              {
+                "source": "Hugging Face Docs",
+                "summary": "Tài liệu về lượng tử hóa mô hình",
+                "title": "Hugging Face Transformers Quantization",
+                "url": "https://huggingface.co/docs/transformers/quantization/overview"
+              },
+              {
+                "source": "vLLM Docs",
+                "summary": "Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ",
+                "title": "vLLM",
+                "url": "https://docs.vllm.ai/en/latest/"
+              }
+            ],
+            "template": "bullets"
+          },
+          "result": {
+            "tool": "render_digest",
+            "template": "bullets",
+            "markdown": "- Tài liệu về lượng tử hóa mô hình - [Hugging Face Docs](https://huggingface.co/docs/transformers/quantization/overview)\n- Tài liệu về hệ thống phục vụ suy luận mô hình ngôn ngữ - [vLLM Docs](https://docs.vllm.ai/en/latest/)",
+            "item_count": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_cancel_publish_after_confirmation_question",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "what_it_tests": "Người dùng từ chối xác nhận thì không gọi send và không gọi thêm tool xử lý nội dung."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Soạn bản nháp Telegram với nội dung: Buổi đọc paper của nhóm bắt đầu lúc 19 giờ. Chưa gửi ngay."
+        },
+        {
+          "role": "assistant",
+          "content": "Bản nháp: Buổi đọc paper của nhóm bắt đầu lúc 19 giờ. Bạn xác nhận gửi nội dung này lên Telegram chứ?"
+        },
+        {
+          "role": "user",
+          "content": "Không gửi. Giữ nguyên bản nháp, không chỉnh sửa hay thực hiện hành động nào thêm."
+        }
+      ],
+      "expect": {
+        "no_tool": true
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [],
+        "actual_text": "Đã ghi nhận. Bản nháp sẽ được giữ nguyên và không gửi.",
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": []
+    }
+  ],
+  "execution_policy": {
+    "plan": "analysis/live_group_20261111T101747494704.plan.json",
+    "requested_by": "justcoffeee",
+    "operator": "Codex (AI assistant)",
+    "telegram": "disabled_for_entire_session",
+    "provider_tool_apis": "live",
+    "real_external_human_test": false,
+    "scripted_user_inputs": false,
+    "rate_limit_retries": []
+  }
+}
