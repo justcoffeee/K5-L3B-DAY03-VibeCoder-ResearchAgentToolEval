@@ -84,10 +84,13 @@ def run_model_tool_loop(
     tools: list[dict[str, Any]],
     model: str | None,
     max_tool_rounds: int,
+    rounds: list[dict[str, Any]] | None = None,
+    tool_events: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     working_messages = list(messages)
-    rounds: list[dict[str, Any]] = []
-    all_tool_events: list[dict[str, Any]] = []
+    # A caller can pass its own lists to keep the partial trace if a later round raises.
+    rounds = [] if rounds is None else rounds
+    all_tool_events = [] if tool_events is None else tool_events
 
     for round_index in range(1, max_tool_rounds + 1):
         response = provider.complete(working_messages, tools, model=model, temperature=0.0)
@@ -151,7 +154,7 @@ def write_transcript(path: Path, transcript: dict[str, Any]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Interactive Research Agent chat with transcript logging.")
-    parser.add_argument("--provider", choices=["openrouter", "openai", "anthropic", "gemini", "ollama"], required=True)
+    parser.add_argument("--provider", choices=["openrouter", "openai", "anthropic", "gemini", "ollama", "groq"], required=True)
     parser.add_argument("--model", default=None)
     parser.add_argument("--version", required=True, help="Student-chosen artifact version label, e.g. v0, v1, v2.")
     parser.add_argument("--system-prompt", type=Path, default=ARTIFACTS_DIR / "system_prompt.md")

@@ -1,0 +1,271 @@
+{
+  "run_file": "runs/v4-integration_B_base_groq_20261111T001019800451.json",
+  "previous_run": "runs/v3_B_base_groq_20261110T235639856548.json",
+  "hypothesis": "Kiểm tra artifact tích hợp cuối: bỏ ép một bước trong prompt và đưa analyze_text/rank từ dev vào declaration, không coi đây là phép đo cô lập một thay đổi.",
+  "expected": "Contract khớp đầy đủ case nhóm/registry; yêu cầu nhiều nguồn không bị giới hạn một tool; snapshot prompt/tools/code cuối có run base hợp lệ để bàn giao.",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 18,
+    "case_accuracy": 0.9,
+    "tool_routing_accuracy": 0.95,
+    "argument_accuracy": 0.9,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {
+      "wrong_boundary": 1,
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 1,
+      "missing_tool_call": 1
+    }
+  },
+  "fixed": [
+    {
+      "id": "R03_web_news_routing",
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "AI",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "M03_correction_handle",
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "limit": 3,
+              "screenname": "karpathy"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "timeline",
+            "args": {
+              "screenname": "karpathy",
+              "limit": 3
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "regressions": [],
+  "still_failed": [
+    {
+      "id": "R12_confirm_before_send",
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn muốn đăng nội dung gì lên Telegram? Vui lòng cung cấp nội dung hoặc liên kết tới bản tin.",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "response_type: expected 'yes_no', got 'text'"
+        ]
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "yes_no"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "R13_parallel_web_and_tweets",
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "max_results": 5,
+              "query": "AI",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call social_search"
+        ]
+      },
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "topic": "news",
+              "timeframe": "day"
+            }
+          },
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tool_errors": [
+    {
+      "case": "R01_user_tweets_routing",
+      "tool": "timeline",
+      "args": {
+        "limit": 1,
+        "screenname": "sama"
+      },
+      "result": {
+        "tool": "get_user_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+      }
+    },
+    {
+      "case": "R02_search_tweets_routing",
+      "tool": "social_search",
+      "args": {
+        "limit": 10,
+        "query": "GPT-5",
+        "search_type": "Latest"
+      },
+      "result": {
+        "tool": "search_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+      }
+    },
+    {
+      "case": "R05_limit_arg",
+      "tool": "timeline",
+      "args": {
+        "limit": 10,
+        "screenname": "elonmusk"
+      },
+      "result": {
+        "tool": "get_user_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+      }
+    },
+    {
+      "case": "R07_search_type_arg",
+      "tool": "social_search",
+      "args": {
+        "limit": 5,
+        "query": "OpenAI",
+        "search_type": "Top"
+      },
+      "result": {
+        "tool": "search_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+      }
+    },
+    {
+      "case": "M01_clarify_then_fill",
+      "tool": "timeline",
+      "args": {
+        "limit": 5,
+        "screenname": "elonmusk"
+      },
+      "result": {
+        "tool": "get_user_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+      }
+    },
+    {
+      "case": "M03_correction_handle",
+      "tool": "timeline",
+      "args": {
+        "limit": 3,
+        "screenname": "karpathy"
+      },
+      "result": {
+        "tool": "get_user_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+      }
+    },
+    {
+      "case": "M05_correction_limit",
+      "tool": "timeline",
+      "args": {
+        "limit": 3,
+        "screenname": "elonmusk"
+      },
+      "result": {
+        "tool": "get_user_tweets",
+        "error": "HTTPError",
+        "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+      }
+    }
+  ]
+}

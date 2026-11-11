@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-11-11T10:15:42+07:00",
+  "url": "https://bar-barbara-coated-county.trycloudflare.com",
+  "requested_by": "justcoffeee",
+  "tester": "Codex (AI assistant)",
+  "test_type": "public_browser_navigation",
+  "result": "blocked",
+  "observed_browser_error": "net::ERR_NAME_NOT_RESOLVED",
+  "ui_loaded": false,
+  "human_outside_group_test": "pending_user_supplied_confirmation",
+  "user_followup": "User confirmed the link is currently broken; requested recording the link and drafting detailed test content. User will supply real outside-human confirmation.",
+  "test_plan": "docs/DEMO-TEST-PLAN.md",
+  "success_claimed": false
+}

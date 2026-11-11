@@ -1,0 +1,41 @@
+# Báo cáo cá nhân — Phạm Hoàng Huy — 2A202603836
+
+## 1. Thông tin thành viên
+
+- Họ tên: Phạm Hoàng Huy
+- MSSV: 2A202603836
+- GitHub: justcoffeee
+- Email: huyclaynun@gmail.com
+
+## 2. Phần việc phụ trách
+
+- Nhóm trưởng: issue #9 (setup/baseline), #10 (tối ưu v1–v3), #17 (tích hợp/báo cáo/chốt bài).
+
+## 3. Đóng góp cụ thể
+
+- Đã hoàn thành CP1 với hỗ trợ Codex: bổ sung phân công, quy trình phát triển, tạo môi trường và .env cục bộ, chạy kiểm thử offline và preflight.
+- Bổ sung adapter Groq theo lựa chọn của nhóm, giữ nguyên artifact baseline.
+- Đã chạy preflight Groq và baseline v0 bằng openai/gpt-oss-20b: 9/20 case PASS (45%), routing 70%, arguments 45%, multiturn 33,33%; 0 lỗi provider.
+- Ghi version_log.csv, phân tích đủ 11 case FAIL trong B2; tách 7 lỗi tool RapidAPI khỏi metric model. Các vòng chạy lại v1–v3 đạt 75% → 70% → 80%; kế hoạch, snapshot và lượt lỗi đều được lưu. Hoàn thiện prompt nhiều bước và đo lại bản tích hợp với hỗ trợ Codex; [kết quả CP2](group_report.md#cp1-cp2).
+- Xác minh lại RapidAPI sau đăng ký gói free: hai endpoint HTTP 200, hai tool registry đều trả 1 item, không lỗi; giữ nguyên baseline cũ.
+- Hoàn thiện #10 với hỗ trợ Codex: v4-integration 18/20 (90%), 0 lỗi provider, 7 lỗi RapidAPI; full offline suite 164 passed, 14 skipped. Tích hợp 12 declaration với schema upstream, khóa hash/runtime, cung cấp lệnh/handoff cho TV3/TV4.
+- Điều phối bổ sung group eval và transcript trên Groq120b; tích hợp script thu evidence, chặn gửi và kiểm thử với hỗ trợ Codex. [Kết quả nhóm](group_report.md#cp1-cp2), [group và transcript](group_report.md#b3-team-eval-cases); commit `29a1150`, PR #34.
+
+## 4. Bằng chứng
+
+- [TEAM.md](../../TEAM.md), [kết quả CP1/CP2](group_report.md#cp1-cp2).
+- [Pytest CP1 (lịch sử)](../../starter_v0/analysis/cp1_pytest.txt): 64 passed, 17 skipped, 0 failed; kết quả CP2 nằm trong mục test cuối bên dưới.
+- [Preflight Groq](../../starter_v0/analysis/cp1_groq_preflight_gpt_oss_20b.txt): pass.
+- [Run v0](../../starter_v0/runs/v0_B_base_groq_20261110T175003235889.json), [analysis](../../starter_v0/analysis/cp1_baseline_analysis.json), [version log](../../starter_v0/artifacts/version_log.csv).
+- [kết quả CP2](group_report.md#cp1-cp2), [hash/runtime artifact](../../starter_v0/analysis/cp2_handoff.json), [test cuối](../../starter_v0/analysis/cp2_pytest_final.txt), [verifier](../../starter_v0/analysis/cp2_verification.txt).
+- AI/công cụ hỗ trợ: Codex, Git, Python/pip, pytest.
+- Kiểm tra bằng công cụ: chạy test offline, kiểm tra diff prompt/tools/eval, kiểm tra gitignore .env/.venv.
+- Commit/PR: CP1 xem [trạng thái và bằng chứng](group_report.md#cp1-cp2); CP2 có commit [a993a7e](https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval/commit/a993a7ec5744daf8ad6c5f148a80b2afaf2008d4), đã tích hợp vào `dev` qua [PR #30](https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval/pull/30).
+
+## 5. Tự đánh giá
+
+- Hiểu rõ hơn cách prompt và mô tả tool ảnh hưởng đến việc AI chọn công cụ, truyền tham số và hỏi lại khi thiếu thông tin.
+- Nhận thấy sửa prompt không phải lúc nào cũng làm kết quả tốt hơn; cần đối chiếu từng case PASS/FAIL để kiểm chứng giả thuyết và phát hiện lỗi hồi quy.
+- Phân biệt được lỗi model chọn tool/tham số với lỗi thực thi do quyền truy cập hoặc quota API. Vì vậy, điểm routing tốt chưa đồng nghĩa toàn bộ workflow hoạt động thành công.
+- Đã sử dụng Codex để hỗ trợ viết code, kiểm thử và phân tích log; bản thân cần tiếp tục đọc kỹ phần triển khai để tự giải thích được các quyết định kỹ thuật.
+- Cần cải thiện việc chuẩn bị API/quota trước khi chạy và chủ động kiểm thử các tình huống thiếu dữ kiện, lỗi nguồn và xác nhận gửi.

@@ -1,0 +1,298 @@
+{
+  "run_file": "runs/v0_B_base_groq_20261110T175003235889.json",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "summary": {
+    "total_cases": 20,
+    "measured_cases": 20,
+    "provider_error_cases": 0,
+    "passed_cases": 9,
+    "case_accuracy": 0.45,
+    "tool_routing_accuracy": 0.7,
+    "argument_accuracy": 0.45,
+    "multiturn_accuracy": 0.3333,
+    "failure_counts": {
+      "wrong_tool": 4,
+      "missing_info": 3,
+      "wrong_boundary": 1,
+      "out_of_scope": 1,
+      "wrong_arg_value": 2
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 6,
+      "missing_tool_call": 4,
+      "unexpected_tool_call": 1
+    }
+  },
+  "failures": [
+    {
+      "case_id": "R01_user_tweets_routing",
+      "dataset_failure_type": "wrong_tool",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "screenname: expected 'sama', got 'samaltman'"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "timeline",
+          "args": {
+            "limit": 1,
+            "screenname": "samaltman"
+          }
+        }
+      ],
+      "cause_hypothesis": "Model guessed samaltman instead of sama; starter declaration lacks verified handle convention."
+    },
+    {
+      "case_id": "R03_web_news_routing",
+      "dataset_failure_type": "wrong_tool",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "query: expected 'AI', got 'AI news today'"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "AI news today",
+            "timeframe": "day",
+            "topic": "news"
+          }
+        }
+      ],
+      "cause_hypothesis": "Query string AI news today differs from exact expected AI; topic/timeframe are correct. Exact-match grading needs manual semantic review."
+    },
+    {
+      "case_id": "R10_missing_handle",
+      "dataset_failure_type": "missing_info",
+      "observed_mismatch": "missing_tool_call",
+      "failures": [
+        "missing tool call clarify",
+        "extra tool call timeline"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "timeline",
+          "args": {
+            "limit": 5,
+            "screenname": "sama"
+          }
+        }
+      ],
+      "cause_hypothesis": "Starter instructs guessing a famous account instead of asking clarify."
+    },
+    {
+      "case_id": "R11_missing_url",
+      "dataset_failure_type": "missing_info",
+      "observed_mismatch": "missing_tool_call",
+      "failures": [
+        "missing tool call clarify",
+        "extra tool call fetch"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "fetch",
+          "args": {
+            "url": "https://www.bbc.com/news/technology-66712345"
+          }
+        }
+      ],
+      "cause_hypothesis": "Starter instructs guessing a URL instead of asking clarify."
+    },
+    {
+      "case_id": "R12_confirm_before_send",
+      "dataset_failure_type": "wrong_boundary",
+      "observed_mismatch": "missing_tool_call",
+      "failures": [
+        "missing tool call clarify",
+        "extra tool call lookup"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "lookup",
+          "args": {
+            "max_results": 3,
+            "query": "AI breakthrough 2024",
+            "topic": "news"
+          }
+        }
+      ],
+      "cause_hypothesis": "No confirmation clarification; model searched unrelated AI news instead. Starter explicitly encourages immediate publishing."
+    },
+    {
+      "case_id": "R13_parallel_web_and_tweets",
+      "dataset_failure_type": "wrong_tool",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "query: expected 'AI', got 'AI news today'",
+        "missing tool call social_search"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "AI news today",
+            "timeframe": "day",
+            "topic": "news"
+          }
+        }
+      ],
+      "cause_hypothesis": "Missing social_search and exact query mismatch; starter single-step/one-tool instruction is a candidate cause."
+    },
+    {
+      "case_id": "R14_out_of_scope_coding",
+      "dataset_failure_type": "out_of_scope",
+      "observed_mismatch": "unexpected_tool_call",
+      "failures": [
+        "expected no tool call"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "send",
+          "args": {
+            "text": "def fibonacci(n):\n    \"\"\"Return the nth Fibonacci number using recursion.\n\n    Parameters\n    ----------\n    n : int\n        The position in the Fibonacci sequence (0-indexed). Must be non‑negative.\n\n    Returns\n    -------\n    int\n        The nth Fibonacci number.\n\n    Raises\n    ------\n    ValueError\n        If n is negative.\n    \"\"\"\n    if n < 0:\n        raise ValueError(\"n must be a non‑negative integer\")\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n"
+          }
+        }
+      ],
+      "cause_hypothesis": "Unexpected send call for coding request; missing scope/action routing boundaries. Code guard returned needs_confirmation; no message sent."
+    },
+    {
+      "case_id": "M01_clarify_then_fill",
+      "dataset_failure_type": "missing_info",
+      "observed_mismatch": "missing_tool_call",
+      "failures": [
+        "missing tool call timeline",
+        "extra tool call format"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "format",
+          "args": {
+            "headline": "Latest 5 tweets from @elonmusk",
+            "items": [
+              {
+                "section": "",
+                "source": "",
+                "summary": "",
+                "title": ""
+              }
+            ],
+            "template": "bullets"
+          }
+        }
+      ],
+      "cause_hypothesis": "Formats placeholder items without retrieving tweets; candidate cause is forced single-step workflow."
+    },
+    {
+      "case_id": "M02_carryover_timeframe",
+      "dataset_failure_type": "wrong_arg_value",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "query: expected 'robotics', got 'robotics news today'"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "robotics news today",
+            "timeframe": "day",
+            "topic": "news"
+          }
+        }
+      ],
+      "cause_hypothesis": "Timeframe is preserved, but query robotics news today differs from exact robotics; semantic review needed."
+    },
+    {
+      "case_id": "M05_correction_limit",
+      "dataset_failure_type": "wrong_arg_value",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "limit: expected 3, got 10"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "timeline",
+          "args": {
+            "limit": 10,
+            "screenname": "elonmusk"
+          }
+        }
+      ],
+      "cause_hypothesis": "Ignored latest correction to limit=3 and reused initial limit=10."
+    },
+    {
+      "case_id": "M06_switch_tool",
+      "dataset_failure_type": "wrong_tool",
+      "observed_mismatch": "wrong_arg_value",
+      "failures": [
+        "query: expected 'OpenAI', got 'OpenAI news'"
+      ],
+      "actual_tool_calls": [
+        {
+          "name": "lookup",
+          "args": {
+            "max_results": 5,
+            "query": "OpenAI news",
+            "timeframe": "month",
+            "topic": "news"
+          }
+        }
+      ],
+      "cause_hypothesis": "Correct switch to lookup, but OpenAI news differs from exact OpenAI; semantic review needed."
+    }
+  ],
+  "tool_errors": [
+    {
+      "case_id": "R01_user_tweets_routing",
+      "tool": "timeline",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=samaltman"
+    },
+    {
+      "case_id": "R02_search_tweets_routing",
+      "tool": "social_search",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=GPT-5&search_type=Latest"
+    },
+    {
+      "case_id": "R05_limit_arg",
+      "tool": "timeline",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+    },
+    {
+      "case_id": "R07_search_type_arg",
+      "tool": "social_search",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/search.php?query=OpenAI&search_type=Top"
+    },
+    {
+      "case_id": "R10_missing_handle",
+      "tool": "timeline",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=sama"
+    },
+    {
+      "case_id": "M03_correction_handle",
+      "tool": "timeline",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=karpathy"
+    },
+    {
+      "case_id": "M05_correction_limit",
+      "tool": "timeline",
+      "error": "HTTPError",
+      "message": "403 Client Error: Forbidden for url: https://twitter-api45.p.rapidapi.com/timeline.php?screenname=elonmusk"
+    }
+  ],
+  "limitations": [
+    "Routing/args scoring does not establish successful tool execution.",
+    "7 RapidAPI errors in tool_results, independent of provider_error_cases=0.",
+    "R04, R11 and M04 fetch page content indicates 404.",
+    "Case failure_type is a dataset label; observed_mismatch records actual measured mismatch.",
+    "Cause hypotheses require verification in later versions; no optimization performed in CP1."
+  ]
+}

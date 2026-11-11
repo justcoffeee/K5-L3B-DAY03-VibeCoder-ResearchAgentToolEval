@@ -1,0 +1,27 @@
+{
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "version": "v4-integration-groq120b",
+  "artifact_version": "v4-integration-groq120b+p9ea16ca1d5c6+tf96eb98fa99f",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "f96eb98fa99f9b1b091efd99714215a490be755b0ff49aedfa3fd36fc19142b2",
+  "original_profile": "v4-integration / openai/gpt-oss-20b",
+  "change_authorized_by": "justcoffeee",
+  "reason": "20b daily quota; explicit user authorization to use 120b",
+  "group_run": "runs/v4-integration-groq120b_B_group_groq_20261111T103500070067.json",
+  "transcript": "transcripts/v4-integration-groq120b_groq_20261111T103625141884.transcript.json",
+  "comparison_limit": "Different model and dataset from base20b; no same-configuration improvement claim",
+  "telegram_delivery": "disabled",
+  "external_human_test": "pending user confirmation",
+  "transcript_input_operator": "Codex AI; scripted inputs, real provider/tool responses",
+  "transcript_turns": 6,
+  "transcript_provider_errors": 0,
+  "transcript_tool_errors": [
+    {
+      "turn": 3,
+      "tool": "timeline",
+      "http_status": 403
+    }
+  ],
+  "source_limitation": "Turn 1 lookup returns MicroPython documentation, not CPython documentation."
+}

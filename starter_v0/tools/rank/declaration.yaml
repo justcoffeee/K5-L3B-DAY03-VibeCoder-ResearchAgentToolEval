@@ -1,0 +1,55 @@
+# Declaration cho nhóm trưởng tích hợp vào artifacts/tools.yaml (sau baseline v0).
+# Copy nguyên khối dưới đây vào cuối list `tools:` (giữ thụt lề 2 space),
+# rồi chạy: pytest tests/test_tool_contract.py
+
+  - name: rank
+    description: >-
+      Lọc trùng và xếp hạng các item ĐÃ THU THẬP từ tool khác (lookup, social_search, timeline, papers...),
+      giữ lại top_k. Chạy cục bộ, không gọi mạng.
+      DÙNG KHI có nhiều item (gộp từ nhiều nguồn hoặc nhiều hơn số user cần) và user muốn
+      "top N quan trọng nhất", "mới nhất trước", "nhiều tương tác nhất". Gọi TRƯỚC format.
+      KHÔNG DÙNG khi chưa có item (phải tìm trước), khi chỉ có 1-2 item, để tóm tắt nội dung (dùng analyze_text)
+      hoặc chỉ để trình bày (dùng format).
+    parameters:
+      type: object
+      properties:
+        items:
+          type: array
+          default: []
+          description: "Truyền nguyên các item lấy từ kết quả tool trước (giữ title, url, source, summary, date, metrics, score...)."
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              source: {type: string}
+              summary: {type: string}
+              date: {type: string}
+              published: {type: string}
+              updated_at: {type: string}
+              updated: {type: string}
+              published_date: {type: string}
+              score: {type: number}
+              stars: {type: number}
+              points: {type: number}
+              metrics:
+                type: object
+                properties:
+                  favorites: {type: number}
+                  likes: {type: number}
+                  retweets: {type: number}
+                  views: {type: number}
+        query:
+          type: string
+          default: ""
+          description: "Chủ đề hoặc câu hỏi của user, dùng để chấm độ liên quan (vd: 'GPT-5')."
+        criteria:
+          type: string
+          enum: [balanced, relevance, recency, popularity]
+          default: balanced
+          description: "recency khi user muốn 'mới nhất'; popularity khi muốn 'nổi bật/nhiều like/viral'; relevance khi muốn 'liên quan nhất'; còn lại balanced."
+        top_k:
+          type: integer
+          default: 5
+          description: "Số item giữ lại (1-20), lấy đúng số user yêu cầu, mặc định 5."
+      required: [items]

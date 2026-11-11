@@ -1,0 +1,36 @@
+# Declaration cho nhóm trưởng tích hợp vào artifacts/tools.yaml SAU baseline v0 (W01).
+# Copy nguyên khối dưới đây vào cuối list `tools:` (giữ thụt lề 2 space),
+# rồi chạy: pytest tests/test_tool_contract.py
+
+  - name: analyze_text
+    description: >-
+      Dùng LLM (Groq) để tóm tắt, rút ý chính hoặc đánh giá sentiment của một đoạn text ĐÃ CÓ.
+      DÙNG KHI agent đã lấy được nội dung (từ fetch, paper_text, timeline, social_search...) và user
+      muốn "tóm tắt", "ý chính", "dư luận tích cực/tiêu cực".
+      KHÔNG DÙNG để tìm kiếm hoặc đọc URL: tool không truy cập web, phải gọi fetch/lookup/timeline trước.
+      KHÔNG DÙNG để trình bày nhiều item thành bản tin (dùng format).
+    parameters:
+      type: object
+      properties:
+        text:
+          type: string
+          default: ""
+          description: "Nội dung nguyên văn cần phân tích, lấy từ kết quả tool trước. Không truyền URL."
+        task:
+          type: string
+          enum: [summary, key_points, sentiment]
+          default: summary
+          description: "summary khi user muốn tóm tắt; key_points khi muốn các ý chính/gạch đầu dòng; sentiment khi hỏi thái độ/dư luận tích cực hay tiêu cực."
+        focus:
+          type: string
+          default: ""
+          description: "Khía cạnh user muốn tập trung nếu có (vd: 'chi phí', 'rủi ro'). Để trống nếu không nói."
+        language:
+          type: string
+          default: vi
+          description: "Ngôn ngữ của output: vi (mặc định) hoặc en nếu user yêu cầu tiếng Anh."
+        max_words:
+          type: integer
+          default: 150
+          description: "Độ dài tối đa của summary (30-500 từ). Đặt theo yêu cầu của user, ví dụ 'tóm tắt trong 50 chữ' thì 50."
+      required: [text]

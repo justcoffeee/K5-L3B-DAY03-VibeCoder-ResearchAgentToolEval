@@ -1,0 +1,1 @@
+NotFoundError: Error code: 404 - The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.

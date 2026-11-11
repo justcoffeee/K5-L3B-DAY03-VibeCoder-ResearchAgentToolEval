@@ -1,0 +1,154 @@
+{
+  "method": "Offline replay of recorded tool calls/text through evaluate_phase_b; no provider/tool execution. Original JSON files are unmodified. The rescore is not a new live run.",
+  "historical_group_run": "runs/v3_B_group_groq_20261110T231149921563.json",
+  "historical_summary_verified": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 7,
+    "case_accuracy": 0.7,
+    "tool_routing_accuracy": 0.8,
+    "argument_accuracy": 0.7,
+    "multiturn_accuracy": 0.6,
+    "failure_counts": {
+      "missing_info": 2,
+      "wrong_tool": 1
+    },
+    "observed_mismatch_counts": {
+      "missing_tool_call": 2,
+      "wrong_arg_value": 1
+    }
+  },
+  "historical_prompt_hash": "eb1c8179815bd79d34de7d326420bb99b3072e6e8ae96464c02d4411f905fc68",
+  "historical_tools_hash": "54ed7f4a1216057ef9826e745ccca275f776cd4845fbdba2f9f91cdf6a0ef43c",
+  "matches_final_artifact": false,
+  "current_eval_file": "data/eval_group.json",
+  "offline_rescore_against_current_expectations": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 4,
+    "case_accuracy": 0.4,
+    "tool_routing_accuracy": 0.8,
+    "argument_accuracy": 0.4,
+    "multiturn_accuracy": 0.4,
+    "failure_counts": {
+      "wrong_arg_value": 2,
+      "wrong_tool": 2,
+      "missing_info": 2
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 4,
+      "missing_tool_call": 2
+    }
+  },
+  "case_comparison": [
+    {
+      "id": "G01_rank_by_relevance",
+      "historical_expect_matches_current": false,
+      "historical_passed": true,
+      "current_expect_passed": true,
+      "current_failures": []
+    },
+    {
+      "id": "G02_rank_recency_with_duplicate_sources",
+      "historical_expect_matches_current": false,
+      "historical_passed": true,
+      "current_expect_passed": false,
+      "current_failures": [
+        "items: expected [{'title': 'Attention Is All You Need', 'url': 'https://arxiv.org/abs/1706.03762?utm_source=newsletter', 'published': '2017-06-12'}, {'title': 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding', 'url': 'https://arxiv.org/abs/1810.04805', 'published': '2018-10-11'}, {'title': 'Attention Is All You Need', 'url': 'https://arxiv.org/abs/1706.03762#abstract', 'published': '2017-06-12'}, {'title': 'Language Models are Few-Shot Learners', 'url': 'https://arxiv.org/abs/2005.14165', 'published': '2020-05-28'}, {'title': 'GPT-4 Technical Report', 'url': 'https://arxiv.org/abs/2303.08774', 'published': '2023-03-15'}], got [{'published': '2017-06-12', 'title': 'Attention Is All You Need', 'url': 'https://arxiv.org/abs/1706.03762?utm_source=newsletter'}, {'published': '2018-10-11', 'title': 'BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding', 'url': 'https://arxiv.org/abs/1810.04805'}, {'published': '2020-05-28', 'title': 'Language Models are Few-Shot Learners', 'url': 'https://arxiv.org/abs/2005.14165'}, {'published': '2023-03-15', 'title': 'GPT-4 Technical Report', 'url': 'https://arxiv.org/abs/2303.08774'}]"
+      ]
+    },
+    {
+      "id": "G03_rank_repositories_by_popularity",
+      "historical_expect_matches_current": false,
+      "historical_passed": true,
+      "current_expect_passed": false,
+      "current_failures": [
+        "items: expected [{'title': 'PyTorch', 'url': 'https://github.com/pytorch/pytorch', 'stars': 200}, {'title': 'Transformers', 'url': 'https://github.com/huggingface/transformers', 'stars': 500}, {'title': 'NumPy', 'url': 'https://github.com/numpy/numpy', 'stars': 100}, {'title': 'pandas', 'url': 'https://github.com/pandas-dev/pandas', 'stars': 50}], got [{'points': 200, 'title': 'PyTorch', 'url': 'https://github.com/pytorch/pytorch'}, {'points': 500, 'title': 'Transformers', 'url': 'https://github.com/huggingface/transformers'}, {'points': 100, 'title': 'NumPy', 'url': 'https://github.com/numpy/numpy'}, {'points': 50, 'title': 'pandas', 'url': 'https://github.com/pandas-dev/pandas'}]"
+      ]
+    },
+    {
+      "id": "G04_explain_rank_without_execution",
+      "historical_expect_matches_current": true,
+      "historical_passed": true,
+      "current_expect_passed": true,
+      "current_failures": []
+    },
+    {
+      "id": "G05_rank_missing_item_list",
+      "historical_expect_matches_current": true,
+      "historical_passed": false,
+      "current_expect_passed": false,
+      "current_failures": [
+        "missing tool call clarify",
+        "extra tool call timeline"
+      ]
+    },
+    {
+      "id": "G06_rank_items_from_previous_turn",
+      "historical_expect_matches_current": false,
+      "historical_passed": false,
+      "current_expect_passed": false,
+      "current_failures": [
+        "missing tool call rank",
+        "extra tool call send"
+      ]
+    },
+    {
+      "id": "G07_rank_corrected_criteria_and_limit",
+      "historical_expect_matches_current": false,
+      "historical_passed": true,
+      "current_expect_passed": false,
+      "current_failures": [
+        "items: expected [{'title': 'PyTorch', 'url': 'https://pytorch.org/', 'summary': 'Framework machine learning và deep learning.'}, {'title': 'scikit-learn', 'url': 'https://scikit-learn.org/stable/', 'summary': 'Thư viện machine learning cho Python.'}, {'title': 'NumPy', 'url': 'https://numpy.org/', 'summary': 'Tính toán số và xử lý mảng.'}, {'title': 'pandas', 'url': 'https://pandas.pydata.org/', 'summary': 'Xử lý và phân tích dữ liệu dạng bảng.'}], got [{'source': 'pytorch.org', 'summary': 'Framework machine learning và deep learning', 'title': 'PyTorch', 'url': 'https://pytorch.org/'}, {'source': 'scikit-learn.org', 'summary': 'Thư viện machine learning cho Python', 'title': 'scikit-learn', 'url': 'https://scikit-learn.org/stable/'}, {'source': 'numpy.org', 'summary': 'Tính toán số và xử lý mảng', 'title': 'NumPy', 'url': 'https://numpy.org/'}, {'source': 'pandas.pydata.org', 'summary': 'Xử lý và phân tích dữ liệu dạng bảng', 'title': 'pandas', 'url': 'https://pandas.pydata.org/'}]"
+      ]
+    },
+    {
+      "id": "G08_search_before_rank_when_no_items",
+      "historical_expect_matches_current": true,
+      "historical_passed": false,
+      "current_expect_passed": false,
+      "current_failures": [
+        "timeframe: expected 'week', got None"
+      ]
+    },
+    {
+      "id": "G09_format_only_for_two_selected_items",
+      "historical_expect_matches_current": true,
+      "historical_passed": true,
+      "current_expect_passed": true,
+      "current_failures": []
+    },
+    {
+      "id": "G10_cancel_publish_after_confirmation_question",
+      "historical_expect_matches_current": true,
+      "historical_passed": true,
+      "current_expect_passed": true,
+      "current_failures": []
+    }
+  ],
+  "excluded_base_attempt": {
+    "run_file": "runs/v3_B_base_groq_20261111T085337173320.json",
+    "summary_verified": {
+      "total_cases": 20,
+      "measured_cases": 17,
+      "provider_error_cases": 3,
+      "passed_cases": 15,
+      "case_accuracy": 0.8824,
+      "tool_routing_accuracy": 0.9412,
+      "argument_accuracy": 0.8824,
+      "multiturn_accuracy": 1.0,
+      "failure_counts": {
+        "wrong_boundary": 1,
+        "wrong_tool": 1
+      },
+      "observed_mismatch_counts": {
+        "wrong_arg_value": 1,
+        "missing_tool_call": 1
+      }
+    },
+    "reason": "3 provider errors / 17 measured of 20; label v3 but hashes match final integration. Preserve as diagnostic only, do not add to version_log.",
+    "hashes_match_final": true
+  }
+}

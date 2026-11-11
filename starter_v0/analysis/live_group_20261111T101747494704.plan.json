@@ -1,0 +1,16 @@
+{
+  "recorded_before_execution_at": "2026-11-11T10:17:47+07:00",
+  "mode": "group",
+  "version": "v4-integration",
+  "artifact_version": "v4-integration+p9ea16ca1d5c6+tf96eb98fa99f",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "f96eb98fa99f9b1b091efd99714215a490be755b0ff49aedfa3fd36fc19142b2",
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "requested_by": "justcoffeee",
+  "executed_by": "Codex (AI assistant)",
+  "telegram": "disabled_for_entire_session",
+  "real_external_human_test": false,
+  "inputs": "data/eval_group.json",
+  "group_dataset_sha256": "6313cdf2cad31646bc5a6cee0e0bae89d9e3d5b7feb3a0b9ad4ff7c296fae5e1"
+}

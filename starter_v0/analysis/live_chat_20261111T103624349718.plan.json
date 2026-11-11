@@ -1,0 +1,24 @@
+{
+  "recorded_before_execution_at": "2026-11-11T10:36:24+07:00",
+  "mode": "chat",
+  "version": "v4-integration-groq120b",
+  "artifact_version": "v4-integration-groq120b+p9ea16ca1d5c6+tf96eb98fa99f",
+  "prompt_hash": "9ea16ca1d5c61eeaf3ca7a1abf559bfebb9644a2d70bd6971a4b2c25a48849e6",
+  "tools_hash": "f96eb98fa99f9b1b091efd99714215a490be755b0ff49aedfa3fd36fc19142b2",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "requested_by": "justcoffeee",
+  "executed_by": "Codex (AI assistant)",
+  "telegram": "disabled_for_entire_session",
+  "real_external_human_test": false,
+  "response_normalization": "Preserve actual failed_generation text only for exact required-tool/no-call rejection; score as no tool, retain raw HTTP 400 body. Other errors unchanged.",
+  "inputs": [
+    "Dùng lookup để tra cứu trên web 1 tài liệu chính thức về Python asyncio. Chỉ trả lời ngắn gồm tiêu đề và URL nguồn; không gửi Telegram.",
+    "Tóm tắt 1 tweet mới nhất giúp mình, nhưng mình chưa nói của tài khoản nào. Hãy hỏi lại dữ kiện còn thiếu.",
+    "Tài khoản X là @sama. Lấy đúng 1 tweet mới nhất, tóm tắt ngắn và kèm URL nguồn.",
+    "Soạn bản nháp Telegram với đúng nội dung: Buổi đọc paper của nhóm bắt đầu lúc 19 giờ. Chưa gửi ngay.",
+    "Mình muốn gửi đúng bản nháp đó lên private channel của nhóm. Hãy hỏi mình xác nhận trước; hiện chưa có xác nhận gửi.",
+    "Không gửi. Hủy yêu cầu gửi; giữ nguyên bản nháp và không thực hiện hành động nào thêm."
+  ],
+  "group_dataset_sha256": "6313cdf2cad31646bc5a6cee0e0bae89d9e3d5b7feb3a0b9ad4ff7c296fae5e1"
+}
