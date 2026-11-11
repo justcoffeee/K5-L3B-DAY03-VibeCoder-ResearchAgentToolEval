@@ -1,0 +1,19 @@
+{
+  "version": "v4",
+  "recorded_before_edit_at": "2026-11-11T00:03:06+07:00",
+  "changed_artifact": "system_prompt.md",
+  "hypothesis": "Chỉ dẫn ép một tool/một bước làm bỏ nguồn và thực hiện bước phụ thuộc trước retrieval; thay bằng kế hoạch có nhiều nguồn và thứ tự phụ thuộc.",
+  "expected": "Yêu cầu nhiều nguồn gọi đủ retrieval độc lập; chỉ format/analyze/rank sau dữ liệu thật; thiếu dữ kiện thì clarify và chờ.",
+  "target_cases": [
+    "R13_parallel_web_and_tweets",
+    "M01_clarify_then_fill",
+    "M04_clarify_then_url"
+  ],
+  "previous_run": "runs/v3_B_base_groq_20261110T235639856548.json",
+  "before_hashes": {
+    "system_prompt.md": "6b593bb9bae0d600852005db7cc524e63c552531c91451d62432a5f81b4e8bdf",
+    "tools.yaml": "6180659c52a75a5d7bbf8758608a1925cf6f5fe5256cb1bae8160b6e7f7a3475"
+  },
+  "integration": false,
+  "conditions": "RapidAPI subscription passed after v0; v0 had 7 tool errors. Same Groq/model; Telegram execution disabled; scorer unchanged."
+}

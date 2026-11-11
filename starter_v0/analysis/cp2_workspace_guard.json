@@ -1,0 +1,8 @@
+{
+  "../TEAM.md": "458e101130fb5fee91f62a570b0a2b3d71a82f7e925558924636db6114f25aa0",
+  "runs/v0_B_base_groq_20261110T175003235889.json": "9f82fb454eae3369207c7403fc2f872e3b8f365350df86c8966414de9207bb2e",
+  "data/eval_base.json": "e799be81e009172f235266aab12cadc3cb17ed67cf7a9e0717bf289e1766cf73",
+  "data/eval_research_extension.json": "0dab771f7e9d83b75dfc1ff6b2bdb393d8ea90696e1b2b280331ee64c8196c97",
+  "run_eval.py": "a87e7be1e1b95597754d987dbcdff1e91bdddeb74d30c3184aed8d2114729b43",
+  "agent.py": "14a45a46cfd2029f0e71429293d80ca054ed7f41587ae30274c78ac38d1de12d"
+}

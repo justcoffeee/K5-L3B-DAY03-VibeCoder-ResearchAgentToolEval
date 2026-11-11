@@ -1,0 +1,12 @@
+{
+  "source_revision": "c57ee1960b918dcec256d76a5b0fb30ac601ad25",
+  "original_harness": "analysis/cp2_harness/original_run_eval.py",
+  "harness_change": "Upstream PR #28 fixes normalize_value sorting lists of dictionaries via canonical JSON keys; no local changes to case/scorer. Verify v0-v3 scores against the updated scorer as well.",
+  "runtime_hashes": {
+    "agent.py": "14a45a46cfd2029f0e71429293d80ca054ed7f41587ae30274c78ac38d1de12d",
+    "run_eval.py": "8e9f1e761013bcceafa80d55326b41190c33c144693439506a957d22539f42dc",
+    "tools/__init__.py": "ab88ce61f4a7ac150b0cd6079f4234cafd1fe08ac4bb8262f0974e9c08cf964c",
+    "tools/analyze_text/tool.py": "ab537e2710d28b6b9650427f678ff79ea46796d32ad8d5dae6642d8f7f0b5848",
+    "tools/rank/tool.py": "53ff9a01712fed91d4e37a4e73113c37443bd21bac1848977e188d251c807b8e"
+  }
+}

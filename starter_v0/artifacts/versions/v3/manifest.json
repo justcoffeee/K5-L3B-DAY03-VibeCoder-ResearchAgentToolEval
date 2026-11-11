@@ -1,0 +1,8 @@
+{
+  "version": "v3",
+  "snapshot_at": "2026-11-10T23:52:09+07:00",
+  "plan": "analysis/cp2_plans/v3.json",
+  "plan_sha256": "799af5b5e5dbd864f372bedbdecb9596f9a011f2a68093ab49de2cab041c3cba",
+  "prompt_hash": "6b593bb9bae0d600852005db7cc524e63c552531c91451d62432a5f81b4e8bdf",
+  "tools_hash": "6180659c52a75a5d7bbf8758608a1925cf6f5fe5256cb1bae8160b6e7f7a3475"
+}

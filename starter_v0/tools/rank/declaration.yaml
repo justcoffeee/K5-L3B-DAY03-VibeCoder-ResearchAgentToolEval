@@ -17,7 +17,28 @@
           type: array
           default: []
           description: "Truyền nguyên các item lấy từ kết quả tool trước (giữ title, url, source, summary, date, metrics, score...)."
-          items: {type: object}
+          items:
+            type: object
+            properties:
+              title: {type: string}
+              url: {type: string}
+              source: {type: string}
+              summary: {type: string}
+              date: {type: string}
+              published: {type: string}
+              updated_at: {type: string}
+              updated: {type: string}
+              published_date: {type: string}
+              score: {type: number}
+              stars: {type: number}
+              points: {type: number}
+              metrics:
+                type: object
+                properties:
+                  favorites: {type: number}
+                  likes: {type: number}
+                  retweets: {type: number}
+                  views: {type: number}
         query:
           type: string
           default: ""

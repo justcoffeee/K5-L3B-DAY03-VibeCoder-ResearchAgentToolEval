@@ -72,3 +72,19 @@ def test_eval_cases_only_expect_declared_tools(eval_file: str) -> None:
     for case in data.get("cases", []):
         for call in case.get("expect", {}).get("tool_calls", []):
             assert call["name"] in DECLARED, f"{eval_file}:{case['id']} expects undeclared tool '{call['name']}'"
+
+
+def test_gemini_tool_objects_have_declared_properties() -> None:
+    """Gemini rejects empty object schemas even for tools the user does not call."""
+    from providers.gemini_provider import _to_gemini_declarations
+
+    def check(schema, path):
+        if schema.get("type") == "object":
+            assert schema.get("properties"), f"{path}: empty object schema"
+        for name, child in schema.get("properties", {}).items():
+            check(child, f"{path}.{name}")
+        if "items" in schema:
+            check(schema["items"], f"{path}[]")
+
+    for tool in _to_gemini_declarations(to_openai_tools(DECLARATIONS)):
+        check(tool["parameters"], tool["name"])
