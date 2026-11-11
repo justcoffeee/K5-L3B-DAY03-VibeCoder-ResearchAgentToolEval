@@ -40,9 +40,9 @@
 
 **Chưa hoàn thành tại thời điểm viết**
 
-- PR #22 đã merge vào dev ở c57ee19. Code/UI tests đã tích hợp; phần còn thiếu là public link, smoke live và transcript artifact cuối theo #15/#16.
-- Cần chạy một phiên chat live chính thức $\ge 3$ lượt trên artifact cuối cùng của nhóm (sau khi CP2 tối ưu prompt/tools) để ghi transcript nộp bài và điền bảng B4.
-- Điền link public Cloudflare Tunnel vào mục A1 của báo cáo nhóm khi mở demo.
+- PR #22 đã merge vào dev ở c57ee19. Code/UI tests đã tích hợp. Link public đã ghi ở A1; transcript CLI thật đã có ở B4, còn smoke public UI và xác nhận người ngoài nhóm theo #15/#16.
+- [B4](group_report.md#b4-live-chat-evidence) có transcript CLI 6 lượt trên Groq120b, do Codex chạy theo kịch bản với API thật; đây là evidence nhóm, chưa thay thế transcript public UI.
+- Cần khôi phục link Cloudflare Tunnel đã ghi ở A1 để kiểm tra public UI.
 - Thử nghiệm gửi Telegram thật trên private channel để lấy điểm bonus (UI đã sẵn sàng nút bấm và logic gọi).
 
 ## 4. Bằng chứng
@@ -77,8 +77,8 @@
 
 **Mình chưa làm hoặc cần hoàn thiện thêm:**
 
-- Chưa có transcript chạy live chính thức $\ge 3$ lượt trên prompt/tools hoàn thiện sau CP2 để đưa vào bảng B4 của báo cáo nhóm.
-- Link Cloudflare Tunnel mới chạy thử nghiệm cục bộ, cần mở và ghi nhận public URL chính thức khi nhóm tổ chức demo/showdown.
+- Nhóm đã có transcript CLI 6 lượt ở B4; phần UI public vẫn cần phiên kiểm tra riêng.
+- Link Cloudflare Tunnel đã ghi ở A1 nhưng lần kiểm tra báo lỗi DNS; cần khôi phục khi tổ chức demo/showdown.
 - Chưa kích hoạt gửi Telegram thật trên live channel để ghi nhận điểm bonus 2 điểm (dù code UI và logic xác nhận đã sẵn sàng).
 
 **AI làm gì, mình làm gì:**
@@ -97,9 +97,3 @@
 3. *Cơ chế theo dõi nguồn qua các lượt hoạt động ra sao?* UI lưu trữ tập từ vựng (`terms`) của các dữ liệu đã thu thập ở các lượt trước. Khi người dùng yêu cầu tóm tắt lại hoặc định dạng ở lượt sau, UI kiểm tra tỷ lệ từ vựng trùng khớp ($\ge 30\%$) để nhận biết model đang làm việc trên dữ liệu đã được kiểm chứng thay vì bịa đặt mới.
 4. *Tại sao cần `safe_link_url` và `escape_markdown` cho dữ liệu nguồn?* Siêu dữ liệu từ web hoặc API bên thứ ba là không đáng tin cậy. Nếu không escape hoặc kiểm tra schema URL, kẻ tấn công có thể chèn markdown inject link phishing giả dạng kết quả tìm kiếm hoặc phá vỡ cấu trúc trang web.
 5. *Tại sao việc ẩn câu trả lời không có nguồn lại quan trọng hơn việc đưa ra một câu trả lời trôi chảy?* Mục tiêu của research agent là cung cấp thông tin trung thực, có bằng chứng. Một câu trả lời mượt mà nhưng dựa trên dữ liệu ảo giác gây rủi ro thông tin nghiêm trọng hơn nhiều so với việc thông báo thẳng thắn rằng hệ thống chưa lấy được dữ liệu nguồn.
-
-## Bổ sung theo yêu cầu justcoffeee — 11/11/2026
-
-justcoffeee yêu cầu hoàn thiện #14–#16, cung cấp URL và quyết định đổi sang Groq `openai/gpt-oss-120b` khi 20b hết quota. Codex thực hiện API runs, script chặn gửi/thu bằng chứng, kiểm thử và tổng hợp tài liệu; không ghi là thành viên tự thao tác. Group mới 6/10 PASS, 10/10 measured; 3 HTTP400 chứa text model được giữ và chấm FAIL thiếu tool. Transcript CLI thật 6 lượt, lỗi X403 hiển thị trung thực, không gửi Telegram. Full suite 175 passed, 14 skipped. [B3/B4 và evidence](../../report/team/group_report.md), [phần còn chờ](../../docs/SUBMISSION-READINESS.md).
-
-URL demo lỗi DNS; người dùng sẽ bổ sung xác nhận người thật. Chưa coi public UI/người ngoài nhóm thử hoặc tự đánh giá cá nhân là hoàn thành.

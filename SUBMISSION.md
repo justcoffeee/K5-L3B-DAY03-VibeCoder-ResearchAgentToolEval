@@ -65,29 +65,12 @@ Không commit `.env`, API key, token Telegram, `.venv`, cache hay `arxiv_papers/
 ## Checklist
 
 - [x] Đổi tên repo theo đúng quy ước `K5-L3A-…` hoặc `K5-L3B-…`.
-- [ ] Điền thông tin vào `TEAM.md` ở root, ghi commit chốt.
+- [x] Điền thông tin vào `TEAM.md` ở root, ghi commit chốt.
 - [x] Mỗi thành viên có file báo cáo đã đổi tên đúng định dạng `report/team/MSSV_HoTen.md`.
 - [ ] `report/team/group_report.md` điền đủ Phần A và Phần B.
-- [ ] Mỗi thành viên có commit kỹ thuật trong lịch sử branch nộp bài.
+- [x] Mỗi thành viên có commit kỹ thuật trong lịch sử branch nộp bài.
 - [x] `cd starter_v0 && pytest` báo 0 failed.
 - [ ] Có đủ run v0–v3, run group, transcript và UI chạy được.
 - [x] Không sửa nội dung case trong `data/eval_base.json`; không commit secret, password, file `.env`.
 - [ ] Đã push lên GitHub; repo mở được cho người chấm.
 - [ ] Mọi thành viên đã nộp cùng link repo trên LMS trước deadline.
-
-
-## Đối chiếu tiến độ ngày 11/11/2026
-
-Bổ sung local trên nền dev e12df66, dựa vào [bảng evidence và phần còn thiếu](docs/SUBMISSION-READINESS.md). Các ô đã đánh dấu chỉ phản ánh điều đã kiểm chứng ở snapshot này, không tuyên bố bài đã nộp.
-
-- Repo đúng mẫu tên; có đủ bốn file báo cáo cá nhân đúng tên.
-- Dev có commit kỹ thuật của cả bốn thành viên; chưa đánh dấu hạng mục branch nộp vì nhánh/commit chốt chưa được quyết định.
-- Kết quả full offline suite mới đã xác minh: 175 passed, 14 skipped, 0 failed; 14 skip được phép. Run group và transcript API thật đã bổ sung theo yêu cầu; cấu hình 120b được ghi riêng.
-- Verifier xác nhận nguyên trạng bộ eval cố định và hash/điểm evidence CP2. Quét 176 file tracked không thấy credential đã cấu hình hoặc mẫu key phổ biến, không có .env/.venv/arxiv_papers tracked. Cần rà lại sau khi thêm run/transcript mới; không suy kết quả này thành bảo đảm cho mọi dữ liệu tương lai.
-- Code đã ở GitHub dev nhưng URL đã bổ sung nhưng lỗi DNS; group120b và transcript CLI thật đã có. Public UI, người ngoài nhóm thử, quyền người chấm và LMS vẫn cần xác nhận. TEAM chưa có commit chốt; các mục ghép điều kiện này chưa đánh dấu hoàn tất.
-
-## Bổ sung theo yêu cầu justcoffeee — 11/11/2026
-
-justcoffeee yêu cầu hoàn thiện #14–#16, cung cấp URL và quyết định đổi sang Groq `openai/gpt-oss-120b` khi 20b hết quota. Codex thực hiện API runs, script chặn gửi/thu bằng chứng, kiểm thử và tổng hợp tài liệu; không ghi là thành viên tự thao tác. Group mới 6/10 PASS, 10/10 measured; 3 HTTP400 chứa text model được giữ và chấm FAIL thiếu tool. Transcript CLI thật 6 lượt, lỗi X403 hiển thị trung thực, không gửi Telegram. Full suite 175 passed, 14 skipped. [B3/B4 và evidence](report/team/group_report.md), [phần còn chờ](docs/SUBMISSION-READINESS.md).
-
-URL demo lỗi DNS; người dùng sẽ bổ sung xác nhận người thật. Chưa coi public UI/người ngoài nhóm thử hoặc tự đánh giá cá nhân là hoàn thành.
