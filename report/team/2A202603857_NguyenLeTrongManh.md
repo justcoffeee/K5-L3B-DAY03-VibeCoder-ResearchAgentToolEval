@@ -16,9 +16,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 - **Tool `rank`** (`starter_v0/tools/rank/`): lọc trùng (theo URL, hoặc title nếu thiếu URL) và xếp hạng item gộp từ nhiều nguồn theo `relevance` / `recency` / `popularity` / `balanced`, giữ top K. Chạy cục bộ, không cần key. Đọc được ngày tháng định dạng Twitter, ISO và RFC 2822.
 - **Đăng ký và bàn giao:** thêm vào `TOOL_FUNCTIONS` trong `tools/__init__.py`; viết `TOOL.md` (frontmatter đúng contract), `declaration.yaml` và `eval_cases_sample.json` (2 case mỗi tool) cho TV3. Sau baseline v0 đã dán khối khai báo của 2 tool vào cuối `artifacts/tools.yaml` (hash `e69bc53ed884` → `54ed7f4a1216`); **không sửa** `system_prompt.md` và không đổi `description` của tool có sẵn. Chưa chạy eval cho bản này nên chưa có số đo.
 - **Unit test** (`starter_v0/tests/test_tools_todo.py`): `analyze_text` 7 hàm / 18 case, `rank` 11 hàm / 26 case (44 case cho 2 tool mới); offline hoàn toàn nhờ `fake_http`, key giả qua `monkeypatch.setenv`.
-- **Tự kiểm tra tool mới và sửa lỗi:** thử "phá" `analyze_text` và `rank` bằng input lạ, tìm ra lỗi ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả `OverflowError`), sửa hàm `_num` và thêm test hồi quy. **Phạm vi:** chỉ làm phần tool mới; không sửa code và không viết test cho tool có sẵn (14 stub của tool starter vẫn skip, được phép).
+- **Kiểm tra tool mới và sửa lỗi (làm cùng Claude Code):** thử "phá" `analyze_text` và `rank` bằng input lạ, tìm ra lỗi ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả `OverflowError`), sửa hàm `_num` và thêm test hồi quy. **Phạm vi:** chỉ làm phần tool mới; không sửa code và không viết test cho tool có sẵn (14 stub của tool starter vẫn skip, được phép).
 - **Báo cáo nhóm:** điền B5a, mục 3, 5, 7, 8 và các phần A1–A3, B3 trong `report/team/group_report.md` bằng số liệu thật; các ô thuộc người khác (UI, v1–v3, bảng B3) để trống có ghi chú.
-- **Tích hợp git:** merge `origin/dev` vào nhánh cá nhân, giải quyết 4 xung đột (`group_report.md`, `.env.example`, `tools/__init__.py`, `test_tools_todo.py`).
+- **Tích hợp git:** merge `origin/dev` vào nhánh cá nhân, giải quyết 4 xung đột (Claude Code xử lý theo yêu cầu của mình) (`group_report.md`, `.env.example`, `tools/__init__.py`, `test_tools_todo.py`).
 
 ## 4. Bằng chứng
 
@@ -28,6 +28,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
   - PR vào `dev` (tham chiếu #11, #12): [#28](https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval/pull/28).
   - Output chạy lại, lưu ở `starter_v0/analysis/`: `cp3_pytest_full.txt` (`119 passed, 14 skipped`), `cp3_contract_after_integration.txt` (`test_tool_contract.py` `66 passed` trên `tools.yaml` thật đã khai báo 2 tool), `cp3_analyze_text_live.txt` (gọi Groq thật), `cp3_rank_regression_on_original_code.txt` (test hồi quy của `rank` fail trên code gốc), `cp3_new_tool_audit.txt` (kết quả `scripts/audit_new_tools.py`).
 - AI/công cụ đã dùng và cách tự kiểm tra kết quả:
+  - **Công cụ AI:** Claude Code (Anthropic, chạy trong VS Code; model Opus 5.5 rồi Sonnet 5.5), dùng làm trợ lý lập trình.
+  - **Phần mình quyết định và làm:** chọn hướng hai tool (một tool gọi API Groq để tóm tắt và phân tích text, một tool lọc trùng và xếp hạng kết quả); quyết định giữ nguyên tool có sẵn và chỉ làm phần tool mới; yêu cầu khai báo hai tool vào `artifacts/tools.yaml` sau baseline v0; yêu cầu rà soát các file liên quan CP3; cung cấp key Groq để gọi thử thật; tự commit, push và xử lý merge qua GitHub Desktop.
+  - **Phần Claude Code làm:** thiết kế chi tiết hai tool (tham số, enum, cách xử lý input xấu, quy ước error dict), viết code hai tool và unit test, soạn `TOOL.md` / `declaration.yaml` / case mẫu, điền các mục trong `group_report.md`, giải quyết xung đột git theo yêu cầu của mình, và tra trang tài liệu Groq về lịch ngừng model.
   - **Sửa sau review bằng Codex:** bổ sung schema item/metrics cho Gemini và test contract; thêm 9 case hồi quy `rank`, script audit và script chứng minh lỗi trên parser cũ; chạy lại offline với socket bị chặn và cập nhật log/báo cáo. Chưa gọi Gemini live hoặc chạy eval routing ở bước này.
   - **AI:** Claude Code (Anthropic, chạy trong VS Code; model Opus 5.5 rồi Sonnet 5.5). Dùng để viết code hai tool, viết unit test, soạn `TOOL.md` / `declaration.yaml` / case mẫu, điền các mục trong `group_report.md`, và hỗ trợ merge git. Claude Code cũng tìm trên web để kiểm tra lịch ngừng model của Groq.
   - **Công cụ khác:** Python 3.14, pytest, Git và GitHub Desktop, Groq API.
@@ -47,9 +50,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 
 **Mình làm được:**
 
-- Hai tool mới tự viết, không phải đổi tên tool có sẵn: `analyze_text` (tóm tắt, rút ý chính, đánh giá sentiment bằng Groq) và `rank` (lọc trùng và xếp hạng item). Cả hai có `TOOL.md` đúng contract, đã đăng ký trong `TOOL_FUNCTIONS` và khai báo trong `artifacts/tools.yaml`.
-- 44 test case cho hai tool (7 + 11 hàm), chạy offline, mỗi tool đủ happy path, input xấu và nhánh lỗi. `pytest` ra `119 passed, 0 failed, 14 skipped`, contract `66 passed` (gồm test schema Gemini), và bước test của CI chạy lại ở máy cũng xanh.
-- Tìm được một lỗi thật ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả lỗi), đã sửa và có test hồi quy fail trên code gốc.
+- Hai tool mới nhóm bổ sung (chức năng mới, không phải đổi tên tool có sẵn): `analyze_text` (tóm tắt, rút ý chính, đánh giá sentiment bằng Groq) và `rank` (lọc trùng và xếp hạng item). Cả hai có `TOOL.md` đúng contract, đã đăng ký trong `TOOL_FUNCTIONS` và khai báo trong `artifacts/tools.yaml`.
+- 44 test case cho hai tool (7 + 11 hàm), chạy offline, mỗi tool đủ happy path, input xấu và nhánh lỗi. Kết quả CP3 đã lưu trong `analysis/cp3_pytest_full.txt` là `119 passed, 0 failed, 14 skipped`; `analysis/cp3_contract_after_integration.txt` ghi contract `66 passed` (gồm test schema Gemini). Đây là số liệu tại mốc CP3; các lần kiểm tra sau tích hợp được ghi riêng trong báo cáo nhóm.
+- Phát hiện và sửa một lỗi thật ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả lỗi). Lỗi này được tìm ra khi chạy script audit do Claude Code viết trên tool của mình; đã sửa và có test hồi quy fail trên code gốc.
 - Mình quyết định chỉ làm phần tool mới và không sửa tool có sẵn. Vì vậy 14 stub test của tool có sẵn vẫn skip, và mình không lấy điểm bonus "Test challenge".
 
 **Mình chưa làm hoặc chưa chắc:**
@@ -60,7 +63,7 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 - Mới có 2 trong 4 tool cần cho bonus "hơn 3 tool mới", nên chưa lấy bonus này.
 - PR #28 đã được review; hai vấn đề schema Gemini và bằng chứng test được sửa trong commit bổ sung trước merge.
 
-**AI làm gì, mình làm gì:** code hai tool, test và phần lớn các mục báo cáo do Claude Code viết theo yêu cầu của mình (đã khai báo ở mục 4). Mình chọn hướng tool (một tool dùng API Groq, một tool xếp hạng), quyết định giữ nguyên tool có sẵn, và yêu cầu rà soát các file liên quan CP3.
+**AI làm gì, mình làm gì:** phần lớn code hai tool, unit test và các mục báo cáo do Claude Code viết theo yêu cầu của mình (chi tiết ở mục 4). Phần mình làm là chọn hướng tool, đặt phạm vi (chỉ tool mới, giữ nguyên tool có sẵn), yêu cầu khai báo vào `tools.yaml` và rà soát file CP3, cung cấp key Groq, và quản lý git. Mình chưa tự viết phần code nào của hai tool này, nên mình cần đọc kỹ và tự giải thích được chúng (các câu hỏi bên dưới) trước khi nộp.
 
 **Những câu mình cần tự trả lời được trước khi nộp** (chưa ghi câu trả lời ở đây vì mình sẽ tự luyện):
 
