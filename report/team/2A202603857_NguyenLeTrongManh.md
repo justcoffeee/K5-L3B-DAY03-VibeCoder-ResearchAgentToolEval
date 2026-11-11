@@ -44,7 +44,7 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
     - Đọc `run_eval.py` để biết cách harness chấm, thay vì đoán, nên ghi được giới hạn "mỗi case chỉ gọi model một lần" vào B3.
     - Kiểm tra `.env` nằm trong `.gitignore`, không nằm trong `git ls-files`, và không có chuỗi `gsk_` trong báo cáo, `analysis/`, `tools/`.
     - Đối chiếu lịch ngừng model Groq với trang chính thức (`console.groq.com/docs/deprecations`); một số bài bên thứ ba nói khác về phạm vi và thời điểm, nên báo cáo chỉ dựa vào trang chính thức.
-  - **Phần tự kiểm tra/giải thích trực tiếp của mình:** chưa điền. Mình sẽ tự chạy `python -m pytest -v`, đọc `tool.py` của hai tool rồi ghi nhận xét của mình vào đây.
+  
 
 ## 5. Tự đánh giá
 
