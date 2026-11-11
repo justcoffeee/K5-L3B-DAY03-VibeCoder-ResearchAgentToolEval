@@ -65,10 +65,10 @@ Không commit `.env`, API key, token Telegram, `.venv`, cache hay `arxiv_papers/
 ## Checklist
 
 - [x] Đổi tên repo theo đúng quy ước `K5-L3A-…` hoặc `K5-L3B-…`.
-- [ ] Điền thông tin vào `TEAM.md` ở root, ghi commit chốt.
+- [x] Điền thông tin vào `TEAM.md` ở root, ghi commit chốt.
 - [x] Mỗi thành viên có file báo cáo đã đổi tên đúng định dạng `report/team/MSSV_HoTen.md`.
 - [ ] `report/team/group_report.md` điền đủ Phần A và Phần B.
-- [ ] Mỗi thành viên có commit kỹ thuật trong lịch sử branch nộp bài.
+- [x] Mỗi thành viên có commit kỹ thuật trong lịch sử branch nộp bài.
 - [x] `cd starter_v0 && pytest` báo 0 failed.
 - [ ] Có đủ run v0–v3, run group, transcript và UI chạy được.
 - [x] Không sửa nội dung case trong `data/eval_base.json`; không commit secret, password, file `.env`.

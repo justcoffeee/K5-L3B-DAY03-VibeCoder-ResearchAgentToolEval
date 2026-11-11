@@ -7,7 +7,8 @@
 - Repo nhóm: `K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval`
 - URL repo: https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval
 - Nhánh tích hợp: `dev`; mỗi thành viên làm nhánh cá nhân và mở PR vào `dev`.
-- Nhánh nộp, commit chốt: Chưa chốt; điền khi hoàn thành kiểm tra bài nộp.
+- Nhánh nộp: `main` (tích hợp từ `dev`).
+- Commit chốt nội dung code/báo cáo: [`066d414`](https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval/commit/066d4141e4674053801faec80dee2684424c6152). Thông tin chốt trong TEAM được cập nhật bằng commit tiếp theo.
 
 ## Thành viên
 
@@ -23,9 +24,9 @@ Danh sách công việc: [GitHub Issues](https://github.com/justcoffeee/K5-L3B-D
 
 ## Báo cáo cá nhân và bằng chứng kỹ thuật
 
-| Thành viên | Báo cáo | Ví dụ commit/PR có trong dev |
+| Thành viên | Báo cáo | Commit/PR kỹ thuật |
 |---|---|---|
-| Phạm Hoàng Huy | [2A202603836](report/team/2A202603836_PhamHoangHuy.md) | 5952984: kiểm tra API45; PR #30: CP2/run/hash/handoff |
+| Phạm Hoàng Huy | [2A202603836](report/team/2A202603836_PhamHoangHuy.md) | 5952984: kiểm tra API45; PR #30: CP2/run/hash/handoff; 29a1150 / PR #34: group và transcript 120b |
 | Nguyễn Lê Trọng Mạnh | [2A202603857](report/team/2A202603857_NguyenLeTrongManh.md) | a58f518 và các commit tool/test; PR #28/#31 |
 | Vũ Văn Chủ | [2A202603873](report/team/2A202603873_VuVanChu.md) | b45aaf5/a2f59de: eval nhóm; PR #29/#32 |
 | Vũ Duy Khánh | [2A202603865](report/team/2A202603865_VuDuyKhanh.md) | 007e176/ee94c41/e4462bc: UI và sửa review; PR #22 |
