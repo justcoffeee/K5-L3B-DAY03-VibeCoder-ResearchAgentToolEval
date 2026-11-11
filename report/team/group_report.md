@@ -104,15 +104,19 @@ R03/M02/M06; giữ nguyên metric và bộ case cố định.
 
 ### B3. Team Eval Cases
 
-Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
 | Case ID | What It Tests | Expected Tool/Behavior | Result |
 |---|---|---|---|
-|  |  |  |  |
-
-Chưa điền: `data/eval_group.json` hiện có 0 case (việc của TV3, #13). TV2 đã chuẩn bị **4 case mẫu** (chưa chạy, chưa nằm trong `eval_group.json`) ở `starter_v0/tools/analyze_text/eval_cases_sample.json` (`A_S01_analyze_key_points_with_text`, `A_M01_analyze_missing_text_then_fill`) và `starter_v0/tools/rank/eval_cases_sample.json` (`K_S01_rank_given_items_recency`, `K_M01_rank_popularity_from_previous_turn`). Hai tool hiện đã có trong `tools.yaml`; TV3 có thể dùng case mẫu khi hoàn thiện bộ eval nhóm.
-
-Giới hạn của harness ảnh hưởng cách viết case: `run_eval.py` chỉ gọi model **một lần** cho mỗi case và mọi tool call thừa so với `expect` đều làm hỏng routing, nên không viết được case kiểu "tìm rồi mới `rank`". Item cần có sẵn trong câu hỏi hoặc ở lượt trước, và các case mẫu đã viết theo đúng cách đó.
+| G01_rank_by_relevance | Single: chọn 2 mục liên quan nhất từ danh sách đã có | `rank(query="machine learning", criteria="relevance", top_k=2)`; nhận đủ 4 item gốc | PASS |
+| G02_rank_recency_with_duplicate_sources | Single: chọn tool lọc trùng và lấy 3 paper mới nhất | `rank(criteria="recency", top_k=3)`; nhận đủ 5 item gốc, gồm cặp URL trùng | PASS theo expect cũ; model chỉ truyền 4 item |
+| G03_rank_repositories_by_popularity | Single: chọn repo theo số stars được cung cấp | `rank(criteria="popularity", top_k=2)`; nhận đủ 4 repo, không tìm lại số liệu | PASS |
+| G04_explain_rank_without_execution | Single: hỏi cách dùng tool, chưa yêu cầu xử lý dữ liệu | Trả lời trực tiếp, không gọi tool | PASS |
+| G05_rank_missing_item_list | Single: thiếu danh sách thì hỏi lại, không tự đoán nguồn | `clarify(response_type="text")` | FAIL: gọi `timeline` cho tài khoản SamAltman thay vì hỏi lại |
+| G06_rank_items_from_previous_turn | Multi: lấy danh sách ở lượt trước và áp dụng tiêu chí vừa bổ sung | `rank(criteria="recency", top_k=2)`; dùng đủ 4 paper ở lượt trước | FAIL: gọi `send` thay vì `rank`; tool trả `needs_confirmation` |
+| G07_rank_corrected_criteria_and_limit | Multi: cập nhật khi người dùng đổi tiêu chí và số lượng | `rank(query="machine learning", criteria="relevance", top_k=2)`; giữ 4 item đầu vào | PASS |
+| G08_search_before_rank_when_no_items | Multi: chưa có dữ liệu thì tìm trước, chưa gọi `rank` | `lookup(topic="news", timeframe="week", max_results=6)` | FAIL: gọi đúng `lookup` nhưng thiếu `timeframe="week"` |
+| G09_format_only_for_two_selected_items | Multi: hai mục đã chọn chỉ cần trình bày, không xếp hạng lại | Chỉ gọi `format(template="bullets")` | PASS |
+| G10_cancel_publish_after_confirmation_question | Multi: dừng khi người dùng từ chối gửi bản nháp | Không gọi `send` hoặc tool khác | PASS |
 
 ### B4. Live Chat Evidence
 
