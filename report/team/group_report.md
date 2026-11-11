@@ -104,15 +104,24 @@ R03/M02/M06; giữ nguyên metric và bộ case cố định.
 
 ### B3. Team Eval Cases
 
-Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
+Bộ group hiện tại có 10 case (5 single-turn + 5 multi-turn). Bảng dưới đối chiếu **các lời gọi đã lưu trong run lịch sử** với expectation hiện tại; đây là chấm lại offline, không phải một lần gọi model/tool mới.
 
-| Case ID | What It Tests | Expected Tool/Behavior | Result |
+[Run group lịch sử](../../starter_v0/runs/v3_B_group_groq_20261110T231149921563.json) dùng prompt baseline `eb1c8179815b` và tools `54ed7f4a1216`, khác [artifact cuối](../../docs/CP2-HANDOFF.md). Summary gốc **7/10 (70%)** hợp lệ với expectation cũ nhưng không đại diện cho bộ expectation hiện tại hoặc bản tích hợp cuối. Chấm lại cùng actual calls theo bộ hiện tại cho **4/10 (40%)**, routing 80%, arguments 40%, multiturn 40%; không sửa log/đáp án để đổi điểm. [Đối soát offline từng case](../../starter_v0/analysis/pr32_evidence_audit.json).
+
+| Case ID | What It Tests | Expected Tool/Behavior hiện tại | Đối soát actual calls lịch sử |
 |---|---|---|---|
-|  |  |  |  |
+| G01_rank_by_relevance | Single: chọn 2 mục liên quan nhất từ danh sách đã có | rank(query=machine learning, criteria=relevance, top_k=2), đủ 4 item | PASS |
+| G02_rank_recency_with_duplicate_sources | Single: lọc trùng và lấy 3 paper mới nhất | rank(criteria=recency, top_k=3), đủ 5 item gốc | FAIL: chỉ truyền 4 item; log cũ PASS vì chưa assert items |
+| G03_rank_repositories_by_popularity | Single: dùng đúng số stars được cung cấp | rank(criteria=popularity, top_k=2), đủ 4 repo với stars | FAIL exact-match items: model dùng points thay stars; log cũ PASS |
+| G04_explain_rank_without_execution | Single: hỏi cách dùng, chưa yêu cầu xử lý | Trả lời trực tiếp, không gọi tool | PASS |
+| G05_rank_missing_item_list | Single: thiếu danh sách thì hỏi lại | clarify(response_type=text) | FAIL: gọi timeline cho SamAltman; tool còn trả JSONDecodeError |
+| G06_rank_items_from_previous_turn | Multi: dùng danh sách và tiêu chí bổ sung | rank(criteria=recency, top_k=2), đủ 4 paper | FAIL: gọi send; guard trả needs_confirmation, không có bằng chứng gửi |
+| G07_rank_corrected_criteria_and_limit | Multi: áp dụng correction tiêu chí/số lượng | rank(query=machine learning, criteria=relevance, top_k=2), items đúng | FAIL exact-match items: thêm source và đổi dấu câu summary; log cũ PASS |
+| G08_search_before_rank_when_no_items | Multi: tìm trước khi xếp hạng | lookup(topic=news, timeframe=week, max_results=6) | FAIL: thiếu timeframe rõ trong args, dù tool dùng default week |
+| G09_format_only_for_two_selected_items | Multi: chỉ trình bày hai mục đã chọn | Chỉ format(template=bullets) | PASS |
+| G10_cancel_publish_after_confirmation_question | Multi: dừng khi user từ chối gửi | Không gọi tool | PASS |
 
-Chưa điền: `data/eval_group.json` hiện có 0 case (việc của TV3, #13). TV2 đã chuẩn bị **4 case mẫu** (chưa chạy, chưa nằm trong `eval_group.json`) ở `starter_v0/tools/analyze_text/eval_cases_sample.json` (`A_S01_analyze_key_points_with_text`, `A_M01_analyze_missing_text_then_fill`) và `starter_v0/tools/rank/eval_cases_sample.json` (`K_S01_rank_given_items_recency`, `K_M01_rank_popularity_from_previous_turn`). Hai tool hiện đã có trong `tools.yaml`; TV3 có thể dùng case mẫu khi hoàn thiện bộ eval nhóm.
-
-Giới hạn của harness ảnh hưởng cách viết case: `run_eval.py` chỉ gọi model **một lần** cho mỗi case và mọi tool call thừa so với `expect` đều làm hỏng routing, nên không viết được case kiểu "tìm rồi mới `rank`". Item cần có sẵn trong câu hỏi hoặc ở lượt trước, và các case mẫu đã viết theo đúng cách đó.
+G03/G07 cần review ngữ nghĩa riêng vì tool có thể hiểu dữ liệu tương đương, nhưng giữ nguyên điểm exact-match của harness. G02 bỏ item cần được phân biệt với việc tool rank tự lọc trùng sau đó. Một lỗi thực thi timeline tách riêng khỏi metric routing/args. **#14 chưa hoàn tất:** cần chạy mới bộ case hiện tại trên nhãn/hash v4-integration, đủ 10/10 measured, 0 provider errors, rồi cập nhật B3 theo run mới. Không dùng bản chấm lại offline này thay group run nộp bài.
 
 ### B4. Live Chat Evidence
 
