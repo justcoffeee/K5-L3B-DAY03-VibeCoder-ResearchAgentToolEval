@@ -1,0 +1,52 @@
+{
+  "affected_incomplete_run": "v4-integration_B_group_groq_20261111T103307769604.json",
+  "incorrect_annotation_preserved_for_audit": {
+    "plan": "analysis/live_group_20261111T103155633436.plan.json",
+    "requested_by": "justcoffeee",
+    "operator": "Codex (AI assistant)",
+    "telegram": "disabled_for_entire_session",
+    "provider_tool_apis": "live",
+    "model": "openai/gpt-oss-120b",
+    "version": "v4-integration-groq120b",
+    "real_external_human_test": false,
+    "scripted_user_inputs": false,
+    "rate_limit_retries": [],
+    "preserved_required_tool_rejections": [
+      {
+        "at": "2026-11-11T10:31:59+07:00",
+        "http_status": 400,
+        "body": {
+          "message": "Tool choice is required, but model did not call a tool",
+          "type": "invalid_request_error",
+          "code": "tool_use_failed",
+          "failed_generation": "**Các URL duy nhất của 3 paper mới nhất (theo ngày published, mới trước):**\n\n1. https://arxiv.org/abs/2303.08774 (published 2023‑03‑15)  \n2. https://arxiv.org/abs/2005.14165 (published 2020‑05‑28)  \n3. https://arxiv.org/abs/1810.04805 (published 2018‑10‑11)"
+        },
+        "interpretation": "actual model text; zero tool calls; score missing tool as FAIL"
+      },
+      {
+        "at": "2026-11-11T10:32:19+07:00",
+        "http_status": 400,
+        "body": {
+          "message": "Tool choice is required, but model did not call a tool",
+          "type": "invalid_request_error",
+          "code": "tool_use_failed",
+          "failed_generation": "**Top 2 repositories (theo số stars đã cung cấp)**  \n\n1. **Transformers** – 500 stars – https://github.com/huggingface/transformers  \n2. **PyTorch** – 200 stars – https://github.com/pytorch/pytorch  "
+        },
+        "interpretation": "actual model text; zero tool calls; score missing tool as FAIL"
+      },
+      {
+        "at": "2026-11-11T10:33:37+07:00",
+        "http_status": 400,
+        "body": {
+          "message": "Tool choice is required, but model did not call a tool",
+          "type": "invalid_request_error",
+          "code": "tool_use_failed",
+          "failed_generation": "Dưới đây là 2 paper mới nhất trong danh sách bạn đã cung cấp (theo ngày published):\n\n1. **GPT‑4 Technical Report** – published 15 tháng 3 2023  \n   URL: https://arxiv.org/abs/2303.08774  \n\n2. **Language Models are Few‑Shot Learners** – published 28 tháng 5 2020  \n   URL: https://arxiv.org/abs/2005.14165  "
+        },
+        "interpretation": "actual model text; zero tool calls; score missing tool as FAIL"
+      }
+    ],
+    "normalization_is_scored_model_failure": true
+  },
+  "repair": "Only execution_policy was corrected; original results/summary unchanged. Exact retry timestamps/raw rejection metadata for this incomplete attempt are unavailable after overwrite; do not reconstruct them."
+}

@@ -30,7 +30,7 @@
 - Giữ `rounds` và `tool_events` đã chạy khi provider lỗi ở vòng sau, bằng 2 tham số tuỳ chọn trong `chat.py`.
 - Theo dõi nguồn qua các lượt trong cùng phiên, để việc trình bày lại dữ liệu đã lấy không bị ẩn nhầm, trong khi dữ liệu tự bịa vẫn bị chặn.
 - Vệ sinh dữ liệu nguồn (Source Sanitization): loại bỏ ký tự điều khiển Markdown và chuẩn hoá URL (`safe_link_url`, `escape_markdown`) để ngăn chặn việc tool bên ngoài trả metadata giả mạo link lừa đảo (phishing) hoặc phá vỡ cấu trúc hiển thị danh sách nguồn.
-- Thêm `starter_v0/tests/test_ui_app.py` gồm 62 regression test offline (38 test logic cốt lõi + 24 test an toàn dữ liệu/chống injection URL).
+- Thêm regression tests offline trong `starter_v0/tests/test_ui_app.py`. Đối chiếu snapshot dev e12df66 ngày 11/11/2026: pytest collect được 39 UI test case; full suite đã ghi nhận 164 passed, 14 skipped. Số liệu 62 UI test/181 passed từng ghi cho nhánh riêng chưa có log tương ứng trong dev, không dùng làm số liệu của snapshot hiện tại.
 
 **Phát hiện khi chạy thử thật, đã báo cho nhóm**
 
@@ -40,7 +40,7 @@
 
 **Chưa hoàn thành tại thời điểm viết**
 
-- PR #22 đang chờ nhóm trưởng merge vào `dev`: bản sửa hoàn tất ở commit `e4462bc` và đã gộp commit mới nhất từ `dev` ở `b353b8d`.
+- PR #22 đã merge vào dev ở c57ee19. Code/UI tests đã tích hợp; phần còn thiếu là public link, smoke live và transcript artifact cuối theo #15/#16.
 - Cần chạy một phiên chat live chính thức $\ge 3$ lượt trên artifact cuối cùng của nhóm (sau khi CP2 tối ưu prompt/tools) để ghi transcript nộp bài và điền bảng B4.
 - Điền link public Cloudflare Tunnel vào mục A1 của báo cáo nhóm khi mở demo.
 - Thử nghiệm gửi Telegram thật trên private channel để lấy điểm bonus (UI đã sẵn sàng nút bấm và logic gọi).
@@ -50,9 +50,9 @@
 - Pull request: [#22](https://github.com/justcoffeee/K5-L3B-DAY03-VibeCoder-ResearchAgentToolEval/pull/22), nhánh `vuduykhanh` vào `dev`.
 - Commit: `007e176` (UI ban đầu), `ee94c41` (provider `groq`), `f5ac081` (cập nhật UI), `80ad67e` (sửa 4 lỗi review), `e4462bc` (theo dõi nguồn qua các lượt), `b353b8d` (merge `dev` vào `vuduykhanh`).
 - File: `starter_v0/app.py`, `starter_v0/.streamlit/config.toml`, `starter_v0/assets/vinuni_logo.png`, `starter_v0/tests/test_ui_app.py`, thay đổi trong `starter_v0/chat.py`, `starter_v0/requirements.txt`, `starter_v0/.env.example`.
-- Kiểm thử: `pytest` trên nhánh sau khi gộp `dev`: **181 passed, 14 skipped, 0 failed**; toàn bộ 62 test của UI trong `test_ui_app.py` đều pass; 14 test skipped là stub TODO có sẵn của starter.
+- Kiểm thử trên snapshot dev e12df66: **164 passed, 14 skipped, 0 failed** theo [log](../../starter_v0/analysis/cp2_pytest_final.txt); `pytest --collect-only -q tests/test_ui_app.py` đếm 39 case UI. 14 test skipped là stub starter; không dùng số liệu nhánh riêng thay kết quả dev.
 - CI: job `offline-tests` xanh ở commit `f6eea20` và các commit sửa lỗi sau đó.
-- Chạy thật: các phiên thử UI local được lưu tại `starter_v0/transcripts/ui/` để kiểm tra các trường hợp tương tác thực tế với Groq, OpenRouter và Ollama.
+- Theo ghi nhận thử nghiệm local của thành viên, từng có các phiên UI với Groq/OpenRouter/Ollama; tuy nhiên `starter_v0/transcripts/ui/` chưa có trong dev được đối chiếu. Chưa dùng mô tả này thay transcript nộp bài; thành viên cần bổ sung file thật hoặc ghi rõ nhánh/commit lưu evidence.
 
 **AI/công cụ đã dùng và cách tự kiểm tra kết quả**
 
@@ -73,7 +73,7 @@
   4. *Bảo toàn vết thực thi (Partial Traces):* Giữ nguyên lịch sử các vòng gọi tool trước đó nếu provider gặp sự cố ở vòng tiếp theo.
   5. *Truy vết nguồn qua nhiều lượt:* Tính toán độ trùng lặp từ vựng (`MIN_SHARED_TERMS = 0.3`) để các yêu cầu định dạng lại dữ liệu đã lấy ở lượt trước không bị chặn nhầm.
   6. *Vệ sinh liên kết và siêu dữ liệu (Metadata Sanitization):* Kiểm tra URL hợp lệ qua `safe_link_url` và vô hiệu hóa cú pháp Markdown qua `escape_markdown` để chặn hoàn toàn nguy cơ link giả mạo (phishing) được inject từ dữ liệu bên ngoài.
-- Viết 62 regression tests offline trong `starter_v0/tests/test_ui_app.py` bao phủ toàn bộ các case: che thông tin nhạy cảm, chặn hành động gửi, xử lý lỗi provider, truy vết bằng chứng nguồn và chống injection link độc hại. Toàn bộ test chạy offline hoàn toàn (`181 passed, 14 skipped`).
+- Bộ UI tests trong `starter_v0/tests/test_ui_app.py` kiểm tra che thông tin nhạy cảm, chặn gửi chưa duyệt, lỗi provider, truy vết nguồn và vệ sinh liên kết. Snapshot dev hiện có 39 case UI và full suite `164 passed, 14 skipped`; số liệu lịch sử nhánh riêng cần gắn đúng log/commit nếu tiếp tục sử dụng.
 
 **Mình chưa làm hoặc cần hoàn thiện thêm:**
 
@@ -97,3 +97,9 @@
 3. *Cơ chế theo dõi nguồn qua các lượt hoạt động ra sao?* UI lưu trữ tập từ vựng (`terms`) của các dữ liệu đã thu thập ở các lượt trước. Khi người dùng yêu cầu tóm tắt lại hoặc định dạng ở lượt sau, UI kiểm tra tỷ lệ từ vựng trùng khớp ($\ge 30\%$) để nhận biết model đang làm việc trên dữ liệu đã được kiểm chứng thay vì bịa đặt mới.
 4. *Tại sao cần `safe_link_url` và `escape_markdown` cho dữ liệu nguồn?* Siêu dữ liệu từ web hoặc API bên thứ ba là không đáng tin cậy. Nếu không escape hoặc kiểm tra schema URL, kẻ tấn công có thể chèn markdown inject link phishing giả dạng kết quả tìm kiếm hoặc phá vỡ cấu trúc trang web.
 5. *Tại sao việc ẩn câu trả lời không có nguồn lại quan trọng hơn việc đưa ra một câu trả lời trôi chảy?* Mục tiêu của research agent là cung cấp thông tin trung thực, có bằng chứng. Một câu trả lời mượt mà nhưng dựa trên dữ liệu ảo giác gây rủi ro thông tin nghiêm trọng hơn nhiều so với việc thông báo thẳng thắn rằng hệ thống chưa lấy được dữ liệu nguồn.
+
+## Bổ sung theo yêu cầu justcoffeee — 11/11/2026
+
+justcoffeee yêu cầu hoàn thiện #14–#16, cung cấp URL và quyết định đổi sang Groq `openai/gpt-oss-120b` khi 20b hết quota. Codex thực hiện API runs, script chặn gửi/thu bằng chứng, kiểm thử và tổng hợp tài liệu; không ghi là thành viên tự thao tác. Group mới 6/10 PASS, 10/10 measured; 3 HTTP400 chứa text model được giữ và chấm FAIL thiếu tool. Transcript CLI thật 6 lượt, lỗi X403 hiển thị trung thực, không gửi Telegram. Full suite 175 passed, 14 skipped. [B3/B4 và evidence](../../report/team/group_report.md), [phần còn chờ](../../docs/SUBMISSION-READINESS.md).
+
+URL demo lỗi DNS; người dùng sẽ bổ sung xác nhận người thật. Chưa coi public UI/người ngoài nhóm thử hoặc tự đánh giá cá nhân là hoàn thành.

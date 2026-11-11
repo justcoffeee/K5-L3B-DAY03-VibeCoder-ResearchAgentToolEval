@@ -55,7 +55,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 - Phát hiện và sửa một lỗi thật ở `rank` (số đếm `inf`/`nan` cho điểm NaN, `10**400` làm cả lời gọi trả lỗi). Lỗi này được tìm ra khi chạy script audit do Claude Code viết trên tool của mình; đã sửa và có test hồi quy fail trên code gốc.
 - Mình quyết định chỉ làm phần tool mới và không sửa tool có sẵn. Vì vậy 14 stub test của tool có sẵn vẫn skip, và mình không lấy điểm bonus "Test challenge".
 
-**Mình chưa làm hoặc chưa chắc:**
+**Cập nhật bằng chứng nhóm ngày 11/11/2026:** PR #28/#30/#31 đã merge. Artifact cuối có base run 18/20, 0 lỗi provider; eval_group.json đã có 10 case, gồm 5 case route rank. [CP2 status](../../docs/CP2-STATUS.md), [case nhóm](../../starter_v0/data/eval_group.json). Group run trên artifact cuối vẫn chưa có; không dùng base run để khẳng định routing mới của tool đã được group eval nghiệm thu. Phần tự đọc/giải thích dưới đây vẫn cần thành viên tự ghi.
+
+**Mình chưa làm hoặc chưa chắc (ghi tại mốc CP3, giữ làm lịch sử):**
 
 - Chưa chạy eval, nên **chưa biết** model có route đúng tới hai tool mới không, và việc thêm hai tool có làm xấu routing của các case base không. `tools_hash` đã đổi từ `e69bc53ed884` sang `54ed7f4a1216` nhưng chưa có dòng nào trong `version_log.csv`.
 - Chưa có case nào cho tool mới trong `eval_group.json` (việc của TV3). Mình mới chuẩn bị 4 case mẫu.
@@ -73,3 +75,9 @@ TV2 theo [TEAM.md](../../TEAM.md) (GitHub `Tiberu2611`): **tool mới (#11)** v�
 - `rank` chấm điểm thế nào? Vì sao popularity dùng log, vì sao item không có ngày được 0 còn item cũ nhất được 0.1?
 - Vì sao `tools_hash` đổi và vì sao phải đo lại bằng eval?
 - Test nào bắt được lỗi mà eval không thấy (ví dụ điểm NaN của `rank`)?
+
+## Bổ sung theo yêu cầu justcoffeee — 11/11/2026
+
+justcoffeee yêu cầu hoàn thiện #14–#16, cung cấp URL và quyết định đổi sang Groq `openai/gpt-oss-120b` khi 20b hết quota. Codex thực hiện API runs, script chặn gửi/thu bằng chứng, kiểm thử và tổng hợp tài liệu; không ghi là thành viên tự thao tác. Group mới 6/10 PASS, 10/10 measured; 3 HTTP400 chứa text model được giữ và chấm FAIL thiếu tool. Transcript CLI thật 6 lượt, lỗi X403 hiển thị trung thực, không gửi Telegram. Full suite 175 passed, 14 skipped. [B3/B4 và evidence](../../report/team/group_report.md), [phần còn chờ](../../docs/SUBMISSION-READINESS.md).
+
+URL demo lỗi DNS; người dùng sẽ bổ sung xác nhận người thật. Chưa coi public UI/người ngoài nhóm thử hoặc tự đánh giá cá nhân là hoàn thành.

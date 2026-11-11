@@ -1,0 +1,11 @@
+{
+  "purpose": "Quota diagnostic of original-size request, SDK retries disabled; no tools executed",
+  "case": "G07_rank_corrected_criteria_and_limit",
+  "status": 429,
+  "body": {
+    "message": "Rate limit reached for model `openai/gpt-oss-20b` in organization `org_01m732gpq5e6jv2txe1efbget5` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199305, Requested 3620. Please try again in 21m3.6s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing",
+    "type": "tokens",
+    "code": "rate_limit_exceeded"
+  },
+  "message": "Error code: 429 - Rate limit reached for model `openai/gpt-oss-20b` in organization `org_01m732gpq5e6jv2txe1efbget5` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199305, Requested 3620. Please try again in 21m3.6s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing"
+}

@@ -1,0 +1,33 @@
+{
+  "source_revision": "e12df663a6ce773beeffb1fa2561ea33b8a1d00e",
+  "scope": "User-authorized real group/chat evidence and documentation; model switch explicitly approved; no real external human test or Telegram delivery",
+  "ui_test_cases_collected": 39,
+  "full_suite_recorded": {
+    "passed": 175,
+    "skipped": 14,
+    "failed": 0,
+    "log": "analysis/submission_final_pytest.txt"
+  },
+  "credential_scan": {
+    "files_scanned": 204,
+    "configured_secret_hits": 0,
+    "forbidden_env_venv_cache_files": 0,
+    "scope": "tracked and nonignored untracked files, including all new logs/run/transcript"
+  },
+  "cp2_verifier": "PASS after evidence supplement; historical scores/hashes unchanged",
+  "current_group_case_count": 10,
+  "current_group_split": {
+    "single": 5,
+    "multi": 5
+  },
+  "final_artifact_group_live_run": "runs/v4-integration-groq120b_B_group_groq_20261111T103500070067.json",
+  "real_submission_transcripts": "transcripts/v4-integration-groq120b_groq_20261111T103625141884.transcript.json",
+  "public_demo_url": "https://bar-barbara-coated-county.trycloudflare.com",
+  "submission_branch_commit": "NOT_FINALIZED",
+  "member_self_assessment_and_lms": "REQUIRES_MEMBER_INPUT",
+  "supplied_huy_report_restored_from_commit": "a4e3f417ced5b26a9e421bdfc71ebf8e5850b89c",
+  "public_demo_result": "ERR_NAME_NOT_RESOLVED; user confirmed broken",
+  "external_human_confirmation": "PENDING_USER",
+  "model_change": "20b to 120b; explicitly authorized by justcoffeee",
+  "required_tool_http400_normalization": "3 actual no-tool model text responses retained, scored FAIL; raw bodies preserved; not all HTTP200"
+}

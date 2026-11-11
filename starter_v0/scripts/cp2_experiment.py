@@ -54,8 +54,9 @@ def make_rate_limit_retry(complete, events, retries):
             except RateLimitError as exc:
                 if retry == retries:
                     raise
-                match = re.search(r"try again in ([0-9.]+)s", str(exc), re.IGNORECASE)
-                delay = max(10.0, float(match.group(1)) + 1.0) if match else 30.0
+                match = re.search(r"try again in (?:(\d+(?:\.\d+)?)h)?(?:(\d+(?:\.\d+)?)m)?(?:(\d+(?:\.\d+)?)s)?", str(exc), re.IGNORECASE)
+                seconds = sum(float(value or 0) * unit for value, unit in zip(match.groups(), [3600, 60, 1])) if match and any(match.groups()) else None
+                delay = max(10.0, seconds + 1.0) if seconds is not None else 30.0
                 if delay > 60:
                     raise
                 events.append({"at": now(), "retry": retry + 1, "delay_seconds": delay})
